@@ -31,10 +31,9 @@ Some more guidelines to follow:
 
 
 
-## Useful topics to learn
-In order of decreasing relevance:
-* [Object-oriented programming](https://realpython.com/python3-object-oriented-programming/)
-* [Unit testing](https://docs.python.org/3/library/unittest.html)
-* [Git](https://docs.github.com/en/get-started/using-git/about-git)
-* [NumPy](https://numpy.org/devdocs/user/quickstart.html) (math and linear algebra package for Python)
-* [PyCharm](https://www.jetbrains.com/pycharm/) (highly recommended Python IDE/editor)
+## Data Structure
+Since data is not committed but has to be downloaded by every developer, there should be a common structure of the `data/` folder:
+* `measurements/`
+  * `dataset_name/` (e.g., `ref_2023`)
+    * `sheet.xlsx`: Post-flight data sheet
+    * `measurements.mat`: Measurements from Flight Test Instrumentation System
