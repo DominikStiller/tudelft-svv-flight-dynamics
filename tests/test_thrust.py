@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from numpy.testing import assert_allclose
 
-from fd.thrust import calculate_thrust
+from fd.analysis.thrust import calculate_thrust
 
 
 class TestThrust(TestCase):
