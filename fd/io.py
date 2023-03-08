@@ -7,7 +7,7 @@ def load_measurements(path: str) -> pd.DataFrame:
     data = {}
     for column_name, values in raw.items():
         data[column_name] = values["data"]
-    data = pd.DataFrame(data)
+    data = pd.DataFrame(data).set_index("time")
     return data
 
 
