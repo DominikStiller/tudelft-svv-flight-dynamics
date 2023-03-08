@@ -68,7 +68,7 @@ CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
 # Stability derivatives
 CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500
-CXa = +0.47966  # Positive, see FD lecture notes)
+CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
@@ -80,9 +80,11 @@ CZadot = -0.00350
 CZq = -5.66290
 CZde = -0.69612
 
+Cm0 = +0.0297
 Cmu = +0.06990
 Cmadot = +0.17800
 Cmq = -8.79415
+CmTc = -0.0064
 
 CYb = -0.7500
 CYbdot = 0
