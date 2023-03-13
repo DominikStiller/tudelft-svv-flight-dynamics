@@ -1,6 +1,8 @@
 # Citation 550 - Linear simulation
 
 from math import sin, cos, pi
+from B24.fd.structs import AerodynamicParameters
+
 
 # xcg = 0.25 * c
 
