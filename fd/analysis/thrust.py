@@ -8,7 +8,7 @@ tto = 0
 pto = 0
 po = 0
 t_o = 0
-temp = 0
+T_isa = 0
 rho = 0
 nu = 0
 mu = 0
@@ -89,24 +89,25 @@ delmh = 0
 Tn = 0
 
 
-def atmos(h, M, dtemp):
-    global temp, po, t_o, tto, pto, a_s
-    temp = 288.15 - 0.0065 * h
-    po = 101325 * pow(temp / 288.15, 5.256)
+def atmos(h, M, T_static):
+    global T_isa, po, t_o, tto, pto, a_s
+    T_isa = 288.15 - 0.0065 * h
+    po = 101325 * pow(T_isa / 288.15, 5.256)
     if h >= 11000:
-        temp = 216.65
+        T_isa = 216.65
         po = 22631.23 * exp(-9.80665 / 216.65 / 287.05 * (h - 11000))
-    t_o = temp + dtemp
+    t_o = T_static
     # rho=po/287.05/temp
     tto = t_o * (1 + 0.2 * M**2)
     pto = po * (1 + 0.2 * M**2) ** 3.5
     a_s = sqrt(1.4 * 287.05 * t_o)
     # mu=0.000017894*pow((t_o/288.15),1.50)*(288.15+110.4)/(to+110.4)
     # nu=mu/rho
+    return T_isa
 
 
 def stuw(h, M, dtemp, mfi):
-    global ittmax, Ne, NL, tto, pto, po, t_o, temp, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
 
     elpcc = 0
     theta = t_o / 288.15
@@ -261,7 +262,7 @@ def stuw(h, M, dtemp, mfi):
 
 
 def W_end0():
-    global ittmax, Ne, NL, tto, pto, po, t_o, temp, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
 
     if pt3 / po < 1:
         if b > 15:
@@ -330,7 +331,7 @@ def W_end0():
 
 
 def W_end1():
-    global ittmax, Ne, NL, tto, pto, po, t_o, temp, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
 
     if c >= 40:
         return True
@@ -384,7 +385,7 @@ def W_end1():
 
 
 def W_end4():
-    global ittmax, Ne, NL, tto, pto, po, t_o, temp, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
 
     if pt3 / po < 1:
         if b > 15:
@@ -471,18 +472,19 @@ def W_end4():
     return False
 
 
-def calculate_thrust(h, M, dT, fuelflow):
+def calculate_thrust(h, M, T, fuelflow):
     """
     Calculates thrust based on operating conditions.
 
     Args:
         h: Altitude [m]
         M: Mach number [-]
-        dT: Temperature difference [K]
+        T: Static temperature [K]
         fuelflow: Fuel mass flow [kg/s]
 
     Returns:
         Thrust [N]
     """
-    atmos(h, M, dT)
-    return stuw(h, M, dT, fuelflow)
+    T_isa = atmos(h, M, T)
+    delta_T = T - T_isa
+    return stuw(h, M, delta_T, fuelflow)
