@@ -15,7 +15,7 @@ def calc_CL(W: float, V: float, S = constants.S, rho = constants.rho0) -> float:
         (array_like): CL [-]
     """
 
-    return 2 * W / (rho * V**2 * S)
+    return 2 * W / (rho * V*V * S)
 
 def calc_CL_alpha(CL: float, alpha: float) -> float:
     """
@@ -51,7 +51,7 @@ def calc_CD(T: float, Vc: float) -> float:
         CD (array_like): Drag coefficient CD[-].
 
     """    
-    return T/(0.5*constants.rho0*Vc**2*constants.S)
+    return T/(0.5*constants.rho0*Vc*Vc*constants.S)
 
 def calc_CD0_e(CD: list, CL: list) ->float:
     """
