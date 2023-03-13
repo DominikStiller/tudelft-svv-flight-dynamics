@@ -1,9 +1,9 @@
 import math
 
 
-def deg_to_rad(rad):
+def deg_to_rad(deg):
     """Convert value from degree to radians"""
-    return math.pi / 180 * rad
+    return math.pi / 180 * deg
 
 
 def lbshr_to_kgs(lbshr):
