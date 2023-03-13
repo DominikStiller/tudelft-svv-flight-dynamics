@@ -18,6 +18,7 @@ COLUMNS = {
     "Dadc1_cas": "cas",
     "Dadc1_tas": "tas",
     "Dadc1_sat": "T_static",
+    "Dadc1_tat": "T_total",
 }
 
 
@@ -37,3 +38,4 @@ class FTISMeasurements:
         self.df["cas"] = kts_to_ms(self.df["cas"])
         self.df["tas"] = kts_to_ms(self.df["tas"])
         self.df["T_static"] = C_to_K(self.df["T_static"])
+        self.df["T_total"] = C_to_K(self.df["T_total"])
