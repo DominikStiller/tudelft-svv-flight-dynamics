@@ -2,6 +2,43 @@ from fd.simulation import constants
 import scipy.stats as stats
 import math
 
+def calc_CL(W: float, rho: float, V: float, S: float) -> float:
+    """
+    Calculate CL for a given combination of W, rho, V and S.
+    Args:
+        W (array_like): Weight [-]
+        rho (float): Air density [kg/m3]
+        V (array_like): Velocity [m/s]
+        S (float): Surface area [m2]
+
+    Returns:
+        (array_like): CL [-]
+    """
+
+    return 2 * W / (rho * V**2 * S)
+
+def calc_CL_alpha(CL: float, alpha: float) -> float:
+    """
+    Calculate the slope, CL-intercept and alpha intercept of the CL-alpha plot using a Theil-Sen robust linear estimator.
+    Args:
+        CL (array_like): CL [-]
+        alpha (array_like): angle of attack [deg]
+
+    Returns:
+        CLalpha (float): slope of CL-alpha plot [1/deg]
+        CL_alpha_equals0 (float): CL at alpha = 0
+        alpha_0 (float): alpha at CL = 0
+    """
+    result = stats.theilslopes(CL, alpha)
+    CLalpha = result.slope
+    CL_alpha_equals0 = result.intercept
+    # low_slope = result.low_slope # Lower bound of the confidence interval on slope
+    # high_slope = result.high_slope# Higher bound of the confidence interval on slope
+    alpha_0 = -CL_alpha_equals0/CLalpha
+
+    return CLalpha, CL_alpha_equals0, alpha_0 # low_slope, high_slope
+
+
 def calc_CD(T: float, Vc: float) -> float:
     """
     This function calculates the drag coefficient CD[-]
