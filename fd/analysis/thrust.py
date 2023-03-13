@@ -1,5 +1,9 @@
+import subprocess
+import tempfile
 from math import exp, sqrt, pow
+from pathlib import Path
 
+import pandas as pd
 
 ittmax = 730
 Ne = 2
@@ -87,6 +91,7 @@ fi = 0
 deltem = 0
 delmh = 0
 Tn = 0
+mfi = 0
 
 
 def atmos(h, M, T_static):
@@ -106,10 +111,9 @@ def atmos(h, M, T_static):
     return T_isa
 
 
-def stuw(h, M, dtemp, mfi):
-    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+def stuw(h, M, dtemp):
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn, mfi
 
-    elpcc = 0
     theta = t_o / 288.15
     thetat = tto / 288.15
     NLcor = NL / sqrt(theta)
@@ -262,7 +266,7 @@ def stuw(h, M, dtemp, mfi):
 
 
 def W_end0():
-    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn, mfi
 
     if pt3 / po < 1:
         if b > 15:
@@ -316,7 +320,7 @@ def W_end0():
                 mh = Ah * wh * phe / 287.05 / t8
                 delmh = mh / mhd
                 if c >= 40:
-                    return
+                    return True
                 if delmh < 0.999:
                     mhd = mhd + 0.1 * (mh - mhd)
                 elif delmh > 1.001:
@@ -331,7 +335,7 @@ def W_end0():
 
 
 def W_end1():
-    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn, mfi
 
     if c >= 40:
         return True
@@ -385,7 +389,7 @@ def W_end1():
 
 
 def W_end4():
-    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn
+    global ittmax, Ne, NL, tto, pto, po, t_o, T_isa, rho, nu, mu, a_s, elpcc, r, tel, mh, mc, wh, wc, tt5, mf, tet, tt1, tt2, tt3, tt4, tt6, tt7, ttb, t8, t9, pa, pt1, pt2, itt, s, pt3, pt4, pt5, pt6, pt7, bpr, dnct, nr, nf, nc, nb, dpt, nt, nm, nnc, nnh, mht3p3, ehpc, mhd, tt3d, b, thetat, c, d, Ah, Ac, pce, phe, p3krit, p7krit, dncn, dhnr, dtnr, dhmnr, vo, tt4max, itrel, dmhnr, theta, NLcor, NLcort1, NLcort, dncn1, elpc, elpc1, nf1, fi, deltem, delmh, Tn, mfi
 
     if pt3 / po < 1:
         if b > 15:
@@ -485,6 +489,89 @@ def calculate_thrust(h, M, T, fuelflow):
     Returns:
         Thrust [N]
     """
+    global mfi
     T_isa = atmos(h, M, T)
     delta_T = T - T_isa
-    return stuw(h, M, delta_T, fuelflow)
+    mfi = fuelflow
+    try:
+        return stuw(h, M, delta_T)
+    except (ValueError, OverflowError):
+        # Some values cause math domain or overflow errors
+        return None
+
+
+def calculate_thrust_from_row(row: pd.Series):
+    return calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_left"])
+
+
+def calculate_thrust_exe(h, M, dT, fuelflow):
+    thrust_exe = Path(".") / "bin/thrust.exe"
+    cwd = Path(tempfile.gettempdir())
+    input_file = cwd / "matlab.dat"
+    output_file = cwd / "thrust.dat"
+
+    with input_file.open("w") as f:
+        f.write(f"{h:f} {M:f} {dT:f} {fuelflow:f} 0")
+
+    try:
+        subprocess.run(thrust_exe.absolute(), cwd=cwd, stdout=subprocess.DEVNULL, timeout=5)
+    except subprocess.TimeoutExpired:
+        return None
+
+    with output_file.open("r") as f:
+        thrust = float(f.readline().split()[0])
+
+    # Delete temporary files
+    input_file.unlink()
+    output_file.unlink()
+
+    return thrust
+
+
+def calculate_thrust_from_row_exe(row: pd.Series):
+    T_isa = 288.15 - 0.0065 * row["h"]
+    dT = row["T_static"] - T_isa
+    return calculate_thrust_exe(row["h"], row["M"], dT, row["fuel_flow_left"])
+
+
+def calculate_thrust_from_df_exe(df: pd.DataFrame) -> list[float]:
+    thrust_exe = Path(".") / "bin/thrust.exe"
+    cwd = Path(tempfile.gettempdir())
+    input_file = cwd / "matlab.dat"
+    output_file = cwd / "thrust.dat"
+
+    with input_file.open("w") as f:
+        for row in df.itertuples():
+            T_isa = 288.15 - 0.0065 * row.h
+            dT = row.T_static - T_isa
+            f.write(f"{row.h:f} {row.M:f} {dT:f} {row.fuel_flow_left:f} 0\n")
+
+    try:
+        subprocess.run(
+            thrust_exe.absolute(), cwd=cwd, stdout=subprocess.DEVNULL, timeout=5 * len(df.index)
+        )
+    except subprocess.TimeoutExpired:
+        return None
+
+    with output_file.open("r") as f:
+        thrusts = [float(line.split()[0]) for line in f.readlines()]
+
+    # Delete temporary files
+    input_file.unlink()
+    output_file.unlink()
+
+    return thrusts
+
+
+if __name__ == "__main__":
+    from fd.io import load_ftis_measurements
+    from fd.analysis.ftis_measurements import process_ftis_measurements
+
+    df = process_ftis_measurements(load_ftis_measurements("data/ref_2023"))
+    # df = df.iloc[0:-1:3000].iloc[14:15]  # returns 0
+    # df = df.iloc[0:-1:100].iloc[97:98]  # math domain error (neg sqrt)
+    # df = df.iloc[0:-1:100].iloc[115:116]  # overflow error in pow
+
+    # print(df.apply(calculate_thrust_from_row_exe, axis=1))
+    # print(calculate_thrust_from_row_exe(df.iloc[3]))
+    print(calculate_thrust_from_row(df.iloc[3]))
