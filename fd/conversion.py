@@ -1,9 +1,9 @@
 import math
 
 
-def deg_to_rad(rad):
+def deg_to_rad(deg):
     """Convert value from degree to radians"""
-    return math.pi / 180 * rad
+    return math.pi / 180 * deg
 
 
 def lbshr_to_kgs(lbshr):
@@ -11,7 +11,7 @@ def lbshr_to_kgs(lbshr):
     return 0.45359237 / 3600 * lbshr
 
 
-def psi_to_Pa(x):
+def psi_to_Pa(psi):
     """Convert value from psi to Pa"""
     return 6894.757 * psi
 
