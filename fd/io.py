@@ -6,7 +6,7 @@ import scipy
 from openpyxl.reader.excel import load_workbook
 
 
-def load_measurements(path: str) -> pd.DataFrame:
+def load_ftis_measurements(path: str) -> pd.DataFrame:
     raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)["flightdata"]
     data = {}
     for column_name, values in raw.items():
@@ -15,7 +15,7 @@ def load_measurements(path: str) -> pd.DataFrame:
     return data
 
 
-def extract_column_descriptions(path: str):
+def extract_ftis_column_descriptions(path: str):
     raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)["flightdata"]
     metadata = []
     for column_name, values in raw.items():
@@ -37,4 +37,4 @@ def load_data_sheet(path: str) -> list[list[Any]]:
 if __name__ == "__main__":
     import sys
 
-    extract_column_descriptions(sys.argv[1])
+    extract_ftis_column_descriptions(sys.argv[1])

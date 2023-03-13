@@ -1,6 +1,6 @@
-from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
-from fd.io import load_measurements
+import pandas as pd
 
+from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
 
 COLUMNS = {
     "vane_AOA": "alpha",
@@ -22,20 +22,18 @@ COLUMNS = {
 }
 
 
-class FTISMeasurements:
-    def __init__(self, data_path: str):
-        self.df = load_measurements(data_path)
+def process_ftis_measurements(df: pd.DataFrame):
+    df = df[COLUMNS.keys()].rename(columns=COLUMNS)
 
-        self.df = self.df[COLUMNS.keys()].rename(columns=COLUMNS)
-        self._convert_to_si()
+    # Convert to SI units
+    df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
+    df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
+    df["fuel_used_left"] = lbs_to_kg(df["fuel_used_left"])
+    df["fuel_used_right"] = lbs_to_kg(df["fuel_used_right"])
+    df["h"] = ft_to_m(df["h"])
+    df["cas"] = kts_to_ms(df["cas"])
+    df["tas"] = kts_to_ms(df["tas"])
+    df["T_static"] = C_to_K(df["T_static"])
+    df["T_total"] = C_to_K(df["T_total"])
 
-    def _convert_to_si(self):
-        self.df["fuel_flow_left"] = lbshr_to_kgs(self.df["fuel_flow_left"])
-        self.df["fuel_flow_right"] = lbshr_to_kgs(self.df["fuel_flow_right"])
-        self.df["fuel_used_left"] = lbs_to_kg(self.df["fuel_used_left"])
-        self.df["fuel_used_right"] = lbs_to_kg(self.df["fuel_used_right"])
-        self.df["h"] = ft_to_m(self.df["h"])
-        self.df["cas"] = kts_to_ms(self.df["cas"])
-        self.df["tas"] = kts_to_ms(self.df["tas"])
-        self.df["T_static"] = C_to_K(self.df["T_static"])
-        self.df["T_total"] = C_to_K(self.df["T_total"])
+    return df
