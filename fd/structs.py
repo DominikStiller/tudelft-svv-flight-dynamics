@@ -8,7 +8,7 @@ class SimulationOutput:
 
 @dataclass
 class AerodynamicParameters:
-    C_l_alpha: float
+    C_L_alpha: float
     C_D_0: float
     C_m_alpha: float
     C_m_delta: float

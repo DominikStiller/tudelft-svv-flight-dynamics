@@ -10,11 +10,49 @@ class AircraftModel:
     def __init__(self, aero_params: AerodynamicParameters):
         self.aero_params = aero_params
 
+    def get_non_dim_masses(
+            self, m: float, rho: float):
+        '''
 
+        Args:
+            m: Aircraft mass
+            rho: Air density for the initial steady conditions
+
+        Returns:
+            muc: Non-dimensional aircraft mass wrt MAC
+            mub: Non-dimensional aircraft mass wrt wingspan
+
+        '''
+        muc = m / (rho * S * c)
+        mub = m / (rho * S * b)
+        return muc, mub
+
+    def get_init_stability_deriv(
+            self, m:float, th0:float, rho:float, V0:float):
+        '''
+
+        Args:
+            m: Aircraft mass
+            th0: Pitch angle for the initial steady flight condition
+            rho: Air density for the initial steady conditions
+            V0: Airspeed for the initial steady flight condition
+
+        Returns:
+            CX0: 
+
+        '''
+        W = m*g
+        CX0 = W * sin(th0) / (0.5 * rho * V0 ** 2 * S)
+        CZ0 = -W * cos(th0) / (0.5 * rho * V0 ** 2 * S)
+        return CX0, CZ0
 
     def get_state_space_matrices_symmetric(
-        self, mass: float
+        self, m: float, V0: float, rho: float, th0:float
     ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+        Cma = self.aero_params.C_m_alpha
+        muc = self.get_non_dim_masses(m, rho)
+        Cx0, CZ0 = self.get_init_stability_deriv(m, th0, rho, V0)
+
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array([[-2 * muc * c / (V0 ** 2), 0, 0, 0],
                         [0, (CZadot - 2 * muc) * c / V0, 0, 0],
@@ -36,8 +74,11 @@ class AircraftModel:
         return A, B, C, D
 
     def get_state_space_matrices_asymmetric(
-            self, mass: float
+            self, m: float, V0: float, rho: float, th0: float, CL: float
     ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
+
+        mub = self.get_non_dim_masses(m, rho)
+
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array([[(CYbdot-2*mub)*b/V0, 0, 0, 0],
                         [0, -b/2*V0, 0, 0],
