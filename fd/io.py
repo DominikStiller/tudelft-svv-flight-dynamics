@@ -1,5 +1,9 @@
+import warnings
+from typing import Any
+
 import pandas as pd
 import scipy
+from openpyxl.reader.excel import load_workbook
 
 
 def load_measurements(path: str) -> pd.DataFrame:
@@ -20,6 +24,14 @@ def extract_column_descriptions(path: str):
         )
     metadata = pd.DataFrame(metadata)
     metadata.to_excel("data/column_descriptions.xlsx", index=False)
+
+
+def load_data_sheet(path: str) -> list[list[Any]]:
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+        wb = load_workbook(filename=f"{path}/sheet.xlsx")
+    ws = wb.worksheets[0]
+    return [[cell.value for cell in row] for row in ws.rows]
 
 
 if __name__ == "__main__":
