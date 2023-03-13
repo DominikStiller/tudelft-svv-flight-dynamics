@@ -10,7 +10,9 @@ class TestUnitconversion(TestCase):
         # Calculated from Excel sheet
         assert_allclose(conversion.deg_to_rad(0), 0)
         assert_allclose(conversion.deg_to_rad(90), 1.570796326794897)
-        assert_allclose(conversion.deg_to_rad(22.0), 0.38397243543)  # randomly generated
+        assert_allclose(
+            conversion.deg_to_rad(22.0), 0.38397243543
+        )  # randomly generated
         assert_allclose(conversion.lbshr_to_kgs(125), 0.015749735069444)
         assert_allclose(conversion.lbshr_to_kgs(0), 0)
         assert_allclose(conversion.psi_to_Pa(25), 172368.925)

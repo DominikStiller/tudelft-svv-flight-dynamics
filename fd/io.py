@@ -3,7 +3,9 @@ import scipy
 
 
 def load_measurements(path: str) -> pd.DataFrame:
-    raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)["flightdata"]
+    raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)[
+        "flightdata"
+    ]
     data = {}
     for column_name, values in raw.items():
         data[column_name] = values["data"]
@@ -12,11 +14,17 @@ def load_measurements(path: str) -> pd.DataFrame:
 
 
 def extract_column_descriptions(path: str):
-    raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)["flightdata"]
+    raw = scipy.io.loadmat(f"{path}/measurements.mat", simplify_cells=True)[
+        "flightdata"
+    ]
     metadata = []
     for column_name, values in raw.items():
         metadata.append(
-            {"Column": column_name, "Description": values["description"], "Units": values["units"]}
+            {
+                "Column": column_name,
+                "Description": values["description"],
+                "Units": values["units"],
+            }
         )
     metadata = pd.DataFrame(metadata)
     metadata.to_excel("data/column_descriptions.xlsx", index=False)

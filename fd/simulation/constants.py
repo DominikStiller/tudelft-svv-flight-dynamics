@@ -46,12 +46,12 @@ R = 287.05  # specific gas constant [m^2/s^2K]
 g = 9.81  # [m/s^2] (gravity constant)
 
 # air density [kg/m^3]
-#rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
-#W = m * g  # [N]       (aircraft weight)
+# rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
+# W = m * g  # [N]       (aircraft weight)
 
 # Constant values concerning aircraft inertia
-#muc = m / (rho * S * c)
-#mub = m / (rho * S * b)
+# muc = m / (rho * S * c)
+# mub = m / (rho * S * b)
 KX2 = 0.019
 KZ2 = 0.042
 KXZ = 0.002
@@ -64,8 +64,8 @@ CNha = 2 * pi * Ah / (Ah + 2)  # Stabilizer normal force slope [-]
 depsda = 4 / (A + 2)  # Downwash gradient [-]
 
 # Lift and drag coefficient
-#CL_init = 2 * W / (rho * V0**2 * S)  # Steady flight Lift coefficient [-]
-#CD_init = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Steady flight Drag coefficient [-]
+# CL_init = 2 * W / (rho * V0**2 * S)  # Steady flight Lift coefficient [-]
+# CD_init = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Steady flight Drag coefficient [-]
 
 # Stability derivatives
 CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
