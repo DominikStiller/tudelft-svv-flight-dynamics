@@ -39,3 +39,9 @@ def ft_to_m(ft):
 def C_to_K(C):
     """Convert temperature in Celcius to Kelvin"""
     return 273.15 + C
+
+
+def hminstr_to_s(hminstr):
+    """Convert hh:mm string to seconds"""
+    h, min = hminstr.split(":")
+    return float(h) * 3600 + float(min) * 60
