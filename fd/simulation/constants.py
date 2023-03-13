@@ -68,14 +68,14 @@ depsda = 4 / (A + 2)  # Downwash gradient [-]
 # CD_init = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Steady flight Drag coefficient [-]
 
 # Stability derivatives
-CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
+#CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
+#CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
 CZu = -0.37616
 CZa = -5.74340
 CZadot = -0.00350
