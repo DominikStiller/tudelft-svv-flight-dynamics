@@ -2,13 +2,13 @@ from fd.simulation import constants
 import scipy.stats as stats
 import math
 
-def calc_CL(W: float, rho: float, V: float, S: float) -> float:
+def calc_CL(W: float, V: float, S = constants.S, rho = constants.rho0) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
     Args:
         W (array_like): Weight [-]
-        rho (float): Air density [kg/m3]
-        V (array_like): Velocity [m/s]
+        rho (float): Air density (set to sea level) [kg/m3]
+        V (array_like): Velocity (calibrated one since we are using rho at sea level) [m/s]
         S (float): Surface area [m2]
 
     Returns:
