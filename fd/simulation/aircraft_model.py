@@ -65,7 +65,7 @@ class AircraftModel:
         """
         Cma = self.aero_params.C_m_alpha
         muc = self.get_non_dim_masses(m, rho)
-        Cx0, CZ0 = self.get_gravity_term_coeff(m, th0, rho, V0)
+        CX0, CZ0 = self.get_gravity_term_coeff(m, th0, rho, V0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array(
