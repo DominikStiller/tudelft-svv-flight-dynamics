@@ -26,12 +26,12 @@ R = 287.05  # specific gas constant [m^2/s^2K]
 g = 9.81  # [m/s^2] (gravity constant)
 
 # air density [kg/m^3]
-#rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
-#W = m * g  # [N]       (aircraft weight)
+# rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
+# W = m * g  # [N]       (aircraft weight)
 
 # Constant values concerning aircraft inertia
-#muc = m / (rho * S * c)
-#mub = m / (rho * S * b)
+# muc = m / (rho * S * c)
+# mub = m / (rho * S * b)
 KX2 = 0.019
 KZ2 = 0.042
 KXZ = 0.002
@@ -39,23 +39,23 @@ KY2 = 1.25 * 1.114
 
 # Aerodynamic constants
 Cmac = 0  # Moment coefficient about the aerodynamic centre [-]
-#CNwa = CLa  # Wing normal force slope [-]
+# CNwa = CLa  # Wing normal force slope [-]
 CNha = 2 * pi * Ah / (Ah + 2)  # Stabilizer normal force slope [-]
 depsda = 4 / (A + 2)  # Downwash gradient [-]
 
 # Lift and drag coefficient
-#CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
-#CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
+# CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
+# CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
 
 # Stability derivatives
-#CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
+# CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-#CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
+# CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
 CZu = -0.37616
 CZa = -5.74340
 CZadot = -0.00350

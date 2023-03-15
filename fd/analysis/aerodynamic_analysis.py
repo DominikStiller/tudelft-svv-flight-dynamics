@@ -2,7 +2,8 @@ from fd.simulation import constants
 import scipy.stats as stats
 import math
 
-def calc_CL(W: float, V: float, S = constants.S, rho = constants.rho0) -> float:
+
+def calc_CL(W: float, V: float, S=constants.S, rho=constants.rho0) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
     Args:
@@ -15,7 +16,8 @@ def calc_CL(W: float, V: float, S = constants.S, rho = constants.rho0) -> float:
         (array_like): CL [-]
     """
 
-    return 2 * W / (rho * V*V * S)
+    return 2 * W / (rho * V * V * S)
+
 
 def calc_CL_alpha(CL: float, alpha: float) -> float:
     """
@@ -34,9 +36,9 @@ def calc_CL_alpha(CL: float, alpha: float) -> float:
     CL_alpha_equals0 = result[1]
     # low_slope = result.low_slope # Lower bound of the confidence interval on slope
     # high_slope = result.high_slope# Higher bound of the confidence interval on slope
-    alpha_0 = -CL_alpha_equals0/CLalpha
+    alpha_0 = -CL_alpha_equals0 / CLalpha
 
-    return CLalpha, CL_alpha_equals0, alpha_0 # low_slope, high_slope
+    return CLalpha, CL_alpha_equals0, alpha_0  # low_slope, high_slope
 
 
 def calc_CD(T: float, Vc: float) -> float:
@@ -50,10 +52,11 @@ def calc_CD(T: float, Vc: float) -> float:
     Returns:
         CD (array_like): Drag coefficient CD[-].
 
-    """    
-    return T/(0.5*constants.rho0*Vc*Vc*constants.S)
+    """
+    return T / (0.5 * constants.rho0 * Vc * Vc * constants.S)
 
-def calc_CD0_e(CD: list, CL: list) ->float:
+
+def calc_CD0_e(CD: list, CL: list) -> float:
     """
     This function uses the parabolic drag formula to calculate the zero lift drag, CD0[-], and the oswald
     efficiency factor, e[-].
@@ -70,6 +73,6 @@ def calc_CD0_e(CD: list, CL: list) ->float:
     TheilslopesResults = stats.theilslopes(CD, CL**2, alpha=0.99)
 
     CD0 = TheilslopesResults[1]
-    e = 1/(math.pi*constants.A*TheilslopesResults[0])
-    
+    e = 1 / (math.pi * constants.A * TheilslopesResults[0])
+
     return CD0, e
