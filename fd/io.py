@@ -29,7 +29,7 @@ def extract_ftis_column_descriptions(path: str):
 def load_data_sheet(path: str) -> list[list[Any]]:
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
-        wb = load_workbook(filename=f"{path}/sheet.xlsx")
+        wb = load_workbook(filename=path)
     ws = wb.worksheets[0]
     return [[cell.value for cell in row] for row in ws.rows]
 

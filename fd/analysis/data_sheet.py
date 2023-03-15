@@ -1,10 +1,12 @@
 from typing import Any
 
+import numpy as np
 import pandas as pd
 
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation.constants import mass_basic_empty
+from fd.util import mean_not_none
 
 
 class DataSheet:
@@ -71,9 +73,9 @@ def extract_single_timeseries(ws: list[list[Any]], row_start: int, row_end: int)
     )
     df = df.dropna(subset="time").reset_index(drop=True)
     df["time"] = df["time"].apply(timestamp_to_s)
+    df["time_min"] = df["time"] / 60
     # Force as float since Excel sheet stores them as string
     df = df.astype("float64")
-    df = df.set_index("time", drop=True)
 
     df = df.rename(
         columns={
@@ -98,3 +100,57 @@ def extract_single_timeseries(ws: list[list[Any]], row_start: int, row_end: int)
     df["T_total"] = C_to_K(df["T_total"])
 
     return df
+
+
+class AveragedDataSheet:
+    def __init__(self, data_sheets: dict[str, DataSheet]):
+        self.data_sheet_names = list(data_sheets.keys())
+        self.data_sheets = data_sheets.values()
+        self._average()
+
+    def _average(self):
+        self.df_clcd = self._average_dataframe_and_check([ds.df_clcd for ds in self.data_sheets])
+        self.df_elevator_trim = self._average_dataframe_and_check(
+            [ds.df_elevator_trim for ds in self.data_sheets]
+        )
+        self.df_cg_shift = self._average_dataframe_and_check(
+            [ds.df_cg_shift for ds in self.data_sheets]
+        )
+
+        self.timestamp_phugoid = mean_not_none([ds.timestamp_phugoid for ds in self.data_sheets])
+        self.timestamp_short_period = mean_not_none(
+            [ds.timestamp_short_period for ds in self.data_sheets]
+        )
+        self.timestamp_dutch_roll = mean_not_none(
+            [ds.timestamp_dutch_roll for ds in self.data_sheets]
+        )
+        self.timestamp_dutch_roll_yd = mean_not_none(
+            [ds.timestamp_dutch_roll_yd for ds in self.data_sheets]
+        )
+        self.timestamp_aperiodic_roll = mean_not_none(
+            [ds.timestamp_aperiodic_roll for ds in self.data_sheets]
+        )
+        self.timestamp_spiral = mean_not_none([ds.timestamp_spiral for ds in self.data_sheets])
+        self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
+
+    def _average_dataframe_and_check(
+        self, dfs: list[pd.DataFrame], threshold_pct=5
+    ) -> pd.DataFrame:
+        df_mean = sum(dfs) / len(dfs)
+        for df_idx, df in enumerate(dfs):
+            # Calculate mean absolute percentage error
+            error: pd.DataFrame = ((df - df_mean) / df_mean).abs() * 100
+            exceeds_error_threshold = np.argwhere(error.to_numpy() > threshold_pct)
+            if len(exceeds_error_threshold) > 0:
+                data_sheet_name = self.data_sheet_names[df_idx]
+                print(f"Some values in {data_sheet_name} exceed the {threshold_pct} % threshold")
+                for i in range(exceeds_error_threshold.shape[0]):
+                    row, col = exceeds_error_threshold[i]
+                    column_name = df.columns[col]
+                    print(
+                        f"Row {row}, column {column_name} ({error.iloc[row, col]:.3} %): "
+                        f"{data_sheet_name} = {df.iloc[row, col]:.3}, mean = {df_mean.iloc[row, col]:.3}"
+                    )
+                print()
+
+        return df_mean

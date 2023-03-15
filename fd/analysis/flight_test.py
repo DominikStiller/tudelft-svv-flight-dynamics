@@ -1,18 +1,19 @@
+from pathlib import Path
+
 import pandas as pd
 
-from fd.analysis.data_sheet import DataSheet
+from fd.analysis.data_sheet import DataSheet, AveragedDataSheet
 from fd.analysis.ftis_measurements import process_ftis_measurements
-from fd.analysis.thrust import calculate_thrust_from_row
 from fd.io import load_ftis_measurements
 from fd.simulation import constants
 from fd.structs import AerodynamicParameters
 
 
 class FlightTest:
-    df: pd.DataFrame
-    data_sheet: DataSheet
-
     """Stores raw measurements, data sheet and estimated parameters"""
+
+    df: pd.DataFrame
+    data_sheet: AveragedDataSheet
 
     def __init__(self, data_path: str):
         self._load(data_path)
@@ -20,7 +21,9 @@ class FlightTest:
 
     def _load(self, data_path: str):
         self.df = process_ftis_measurements(load_ftis_measurements(data_path))
-        self.data_sheet = DataSheet(data_path)
+        self.data_sheet = AveragedDataSheet(
+            {p.name: DataSheet(str(p)) for p in Path(data_path).glob("**/*.xlsx")}
+        )
 
     def _add_derived_timeseries(self):
         self.df["time_min"] = self.df.index / 60
@@ -46,15 +49,7 @@ class FlightTest:
     def get_timeseries(self, column_name: str) -> pd.Series:
         pass
 
-    @property
-    def get_clcd_measurements(self) -> pd.DataFrame:
-        # TODO return data from sheet or FTIS?
-        return self.measurements.df.iloc[self.data_sheet.clcd_timestamps]
 
-    @property
-    def get_elevator_trim_timestamps(self) -> pd.DataFrame:
-        return []
-
-    @property
-    def get_cg_shift_timestamps(self) -> pd.DataFrame:
-        return []
+if __name__ == "__main__":
+    # test = FlightTest("data/ref_2023")
+    test = FlightTest("data/B24")

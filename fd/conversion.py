@@ -46,6 +46,9 @@ def C_to_K(C):
 def timestamp_to_s(timestamp: Union[str, datetime.time]):
     """Convert datetime or [h.]mm[:ss] string (both from Excel sheet) to seconds"""
     # TODO check if this format is consistent across data sheets
+    if not timestamp:
+        return None
+
     if isinstance(timestamp, str):
         if "." in timestamp:
             # Format is h.mm:ss
