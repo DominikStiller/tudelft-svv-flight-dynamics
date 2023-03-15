@@ -476,22 +476,28 @@ def W_end4():
     return False
 
 
-def calculate_thrust(h, M, T, fuelflow):
+def calculate_thrust(h, M, T_static, fuelflow):
     """
     Calculates thrust based on operating conditions.
+
+    Notes:
+        - Must be used for each engine individually, using the sum
+        of left and right fuel flows as input gives the wrong results.
+        - T_static is the static temperature. The relation with dT (used in the
+        Excel sheet) is T_static = T_isa + dT (T_isa = 288.15 - 0.0065 * h).
 
     Args:
         h: Altitude [m]
         M: Mach number [-]
-        T: Static temperature [K]
+        T_static: Static temperature [K]
         fuelflow: Fuel mass flow [kg/s]
 
     Returns:
         Thrust [N]
     """
     global mfi
-    T_isa = atmos(h, M, T)
-    delta_T = T - T_isa
+    T_isa = atmos(h, M, T_static)
+    delta_T = T_static - T_isa
     mfi = fuelflow
     try:
         return stuw(h, M, delta_T)
