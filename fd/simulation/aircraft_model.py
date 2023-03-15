@@ -66,16 +66,17 @@ class AircraftModel:
         """
         Cma = self.aero_params.C_m_alpha
         Cmde = self.aero_params.C_m_delta
-        muc = self.get_non_dim_masses(m, rho)[0]
-        CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
+        #muc = self.get_non_dim_masses(m, rho)[0]
+        #CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
+        #x = [u_hat, alpha, theta, q]T
         C_1 = np.array(
             [
                 [-2 * muc, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
-                [0, Cmadot * c / V0, 0, -2 * muc * (KY2**2) * ((c / V0) ** 2)],
+                [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
             ]
         )
         C_2 = np.array(
@@ -123,14 +124,14 @@ class AircraftModel:
                 [
                     0,
                     0,
-                    -2 * mub * KX2**2 * (b / V0) ** 2,
+                    -2 * mub * KX2 * (b / V0) ** 2,
                     2 * mub * KXZ * (b / V0) ** 2,
                 ],
                 [
                     Cnbdot * b / V0,
                     0,
                     2 * mub * KXZ * (b / V0) ** 2,
-                    -2 * mub * KZ2**2 * (b / V0) ** 2,
+                    -2 * mub * KZ2 * (b / V0) ** 2,
                 ],
             ]
         )
