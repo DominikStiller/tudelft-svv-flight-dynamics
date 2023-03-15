@@ -29,9 +29,9 @@ def calc_CL_alpha(CL: float, alpha: float) -> float:
         CL_alpha_equals0 (float): CL at alpha = 0
         alpha_0 (float): alpha at CL = 0
     """
-    result = stats.theilslopes(CL, alpha)
-    CLalpha = result.slope
-    CL_alpha_equals0 = result.intercept
+    result = stats.theilslopes(CL, alpha, alpha=0.99)
+    CLalpha = result[0]
+    CL_alpha_equals0 = result[1]
     # low_slope = result.low_slope # Lower bound of the confidence interval on slope
     # high_slope = result.high_slope# Higher bound of the confidence interval on slope
     alpha_0 = -CL_alpha_equals0/CLalpha
@@ -66,8 +66,10 @@ def calc_CD0_e(CD: list, CL: list) ->float:
         CD0, e (float, float): Zero lift drag coefficient, CD0[-], oswald efficiency factor, e[-].
 
     """
-    TheilslopesResults = stats.theilslopes(CL**2, CD)
-    CD0 = TheilslopesResults.intercept
-    e = 1/(math.pi*constants.A*TheilslopesResults.slope)
+
+    TheilslopesResults = stats.theilslopes(CD, CL**2, alpha=0.99)
+
+    CD0 = TheilslopesResults[1]
+    e = 1/(math.pi*constants.A*TheilslopesResults[0])
     
     return CD0, e
