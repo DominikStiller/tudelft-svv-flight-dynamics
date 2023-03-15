@@ -1,9 +1,10 @@
 import numpy as np
 import numpy.linalg as alg
 from numpy.typing import ArrayLike
-
+from math import sin, cos, pi
+import control.matlab as ml
 from B24.fd.structs import AerodynamicParameters
-from B24.fd.simulation.constants import *
+from B24.fd.simulation.constants_Cessna_Ce500 import *
 
 
 class AircraftModel:
@@ -37,7 +38,7 @@ class AircraftModel:
 
         Returns:
             CX0: Gravity term coefficient in X-direction
-            CZ0: Gravity term coeficient in Z-direction
+            CZ0: Gravity term coefficient in Z-direction
 
         """
         W = m * g
@@ -64,13 +65,14 @@ class AircraftModel:
 
         """
         Cma = self.aero_params.C_m_alpha
-        muc = self.get_non_dim_masses(m, rho)
-        CX0, CZ0 = self.get_gravity_term_coeff(m, th0, rho, V0)
+        Cmde = self.aero_params.C_m_delta
+        muc = self.get_non_dim_masses(m, rho)[0]
+        CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array(
             [
-                [-2 * muc * c / (V0**2), 0, 0, 0],
+                [-2 * muc, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2**2) * ((c / V0) ** 2)],
@@ -78,10 +80,10 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu / V0, CXa, CZ0, CXq * c / V0],
-                [CZu / V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
+                [CXu, CXa, CZ0, CXq * c / V0],
+                [CZu, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
-                [Cmu / V0, Cma, 0, Cmq * c / V0],
+                [Cmu, Cma, 0, Cmq * c / V0],
             ]
         )
         C_3 = np.array([[CXde], [CZde], [0], [Cmde]])
@@ -89,7 +91,7 @@ class AircraftModel:
         B = np.matmul(-alg.inv(C_1), C_3)
         # In order to get the state variables as output:
         C = np.eye(4)
-        D = np.zeros((1, 1))
+        D = np.zeros((4, 1))
         return A, B, C, D
 
     def get_state_space_matrices_asymmetric(
@@ -111,7 +113,7 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        mub = self.get_non_dim_masses(m, rho)
+        mub = self.get_non_dim_masses(m, rho)[-1]
 
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array(
@@ -147,3 +149,21 @@ class AircraftModel:
         C = np.eye(4)
         D = np.zeros((2, 2))
         return A, B, C, D
+
+    def get_eigenvalue_and_eigenvector(
+            self, A: ArrayLike):
+        '''
+
+        Args:
+            A: State matrix
+            B: Control matrix
+            C: Output matrix
+            D: Feedthrough matrix
+
+        Returns:
+
+
+        '''
+        eigenvalues, eigenvectors = alg.eig(A)
+        return eigenvalues, eigenvectors
+
