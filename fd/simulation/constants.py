@@ -1,28 +1,8 @@
 # Citation 550 - Linear simulation
 
 from math import sin, cos, pi
-from B24.fd.structs import AerodynamicParameters
-
 
 # xcg = 0.25 * c
-
-# Stationary flight condition
-hp0 = None  # pressure altitude in the stationary flight condition [m]
-V0 = None  # true airspeed in the stationary flight condition [m/sec]
-alpha0 = None  # angle of attack in the stationary flight condition [rad]
-th0 = None  # pitch angle in the stationary flight condition [rad]
-
-# Aircraft mass
-m = None  # mass [kg]
-
-# Aerodynamic properties
-e = None  # Oswald factor [-]
-CD0 = None  # Zero lift drag coefficient [-]
-CLa = None  # Slope of CL-alpha curve [-]
-
-# Longitudinal stability
-Cma = None  # longitudinal stability [-]
-Cmde = None  # elevator effectiveness [-]
 
 # Aircraft geometry
 S = 30.00  # wing area [m^2]
@@ -59,23 +39,23 @@ KY2 = 1.25 * 1.114
 
 # Aerodynamic constants
 Cmac = 0  # Moment coefficient about the aerodynamic centre [-]
-CNwa = CLa  # Wing normal force slope [-]
+# CNwa = CLa  # Wing normal force slope [-]
 CNha = 2 * pi * Ah / (Ah + 2)  # Stabilizer normal force slope [-]
 depsda = 4 / (A + 2)  # Downwash gradient [-]
 
 # Lift and drag coefficient
-# CL_init = 2 * W / (rho * V0**2 * S)  # Steady flight Lift coefficient [-]
-# CD_init = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Steady flight Drag coefficient [-]
+# CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
+# CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
 
 # Stability derivatives
-#CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
+# CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-#CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
+# CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
 CZu = -0.37616
 CZa = -5.74340
 CZadot = -0.00350
