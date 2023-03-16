@@ -1,6 +1,8 @@
 import pandas as pd
 
 from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
+from fd.io import load_ftis_measurements
+from fd.simulation import constants
 
 COLUMNS = {
     "vane_AOA": "alpha",
@@ -22,18 +24,29 @@ COLUMNS = {
 }
 
 
-def process_ftis_measurements(df: pd.DataFrame):
-    df = df[COLUMNS.keys()].rename(columns=COLUMNS)
+class FTISMeasurements:
+    def __init__(self, data_path: str, mass_initial: float):
+        self.df = load_ftis_measurements(data_path)
+        self._process_ftis_measurements()
+        self._add_derived_timeseries(mass_initial)
 
-    # Convert to SI units
-    df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
-    df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
-    df["fuel_used_left"] = lbs_to_kg(df["fuel_used_left"])
-    df["fuel_used_right"] = lbs_to_kg(df["fuel_used_right"])
-    df["h"] = ft_to_m(df["h"])
-    df["cas"] = kts_to_ms(df["cas"])
-    df["tas"] = kts_to_ms(df["tas"])
-    df["T_static"] = C_to_K(df["T_static"])
-    df["T_total"] = C_to_K(df["T_total"])
+    def _process_ftis_measurements(self):
+        self.df = self.df[COLUMNS.keys()].rename(columns=COLUMNS)
 
-    return df
+        # Convert to SI units
+        self.df["fuel_flow_left"] = lbshr_to_kgs(self.df["fuel_flow_left"])
+        self.df["fuel_flow_right"] = lbshr_to_kgs(self.df["fuel_flow_right"])
+        self.df["fuel_used_left"] = lbs_to_kg(self.df["fuel_used_left"])
+        self.df["fuel_used_right"] = lbs_to_kg(self.df["fuel_used_right"])
+        self.df["h"] = ft_to_m(self.df["h"])
+        self.df["cas"] = kts_to_ms(self.df["cas"])
+        self.df["tas"] = kts_to_ms(self.df["tas"])
+        self.df["T_static"] = C_to_K(self.df["T_static"])
+        self.df["T_total"] = C_to_K(self.df["T_total"])
+
+        return self.df
+
+    def _add_derived_timeseries(self, mass_initial: float):
+        self.df["time_min"] = self.df.index / 60
+        self.df["m"] = mass_initial - self.df["fuel_used_left"] - self.df["fuel_used_right"]
+        self.df["W"] = self.df["m"] * constants.g

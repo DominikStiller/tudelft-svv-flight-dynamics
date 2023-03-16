@@ -4,8 +4,10 @@ import numpy as np
 import pandas as pd
 
 from fd.analysis.aerodynamic_analysis import calc_mach, calc_static_temp
+from fd.analysis.thrust import calculate_thrust_from_df
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
+from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty
 from fd.util import mean_not_none
 
@@ -13,7 +15,6 @@ from fd.util import mean_not_none
 class DataSheet:
     def __init__(self, data_path: str):
         self._extract(load_data_sheet(data_path))
-        self._add_derived_timeseries()
 
     def _extract(self, ws: list[list[Any]]):
         """
@@ -24,9 +25,9 @@ class DataSheet:
         """
         self._extract_mass(ws)
 
-        self.df_clcd = extract_single_timeseries(ws, 27, 33)
-        self.df_elevator_trim = extract_single_timeseries(ws, 58, 64)
-        self.df_cg_shift = extract_single_timeseries(ws, 74, 75)
+        self.df_clcd = DataSheet._extract_data_sheet_series(ws, 27, 33)
+        self.df_elevator_trim = DataSheet._extract_data_sheet_series(ws, 58, 64)
+        self.df_cg_shift = DataSheet._extract_data_sheet_series(ws, 74, 75)
 
         self.timestamp_phugoid = timestamp_to_s(ws[82][3])
         self.timestamp_short_period = timestamp_to_s(ws[83][3])
@@ -61,68 +62,73 @@ class DataSheet:
             + self.mass_observer_3r
         )
 
-    def _add_derived_timeseries(self):
-        for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
-            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["ias"]), axis=1)
-            df["T_static"] = df.apply(
-                lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
-            )
+    @staticmethod
+    def _extract_data_sheet_series(
+        ws: list[list[Any]], row_start: int, row_end: int
+    ) -> pd.DataFrame:
+        # Extract column names
+        if ws[row_start - 1][1] is None:
+            column_names = ws[row_start - 3]
+        else:
+            # Empty row between header and data missing for cg shift data
+            column_names = ws[row_start - 2]
 
+        # Build DataFrame from rows
+        rows = ws[row_start : row_end + 1]
+        df = pd.DataFrame(rows, columns=column_names).drop(
+            columns=["nr.", "ET*", None], errors="ignore"
+        )
+        df = df.dropna(subset="time").reset_index(drop=True)
+        df["time"] = df["time"].apply(timestamp_to_s)
+        df["time_min"] = df["time"] / 60
+        # Force as float since Excel sheet may store numbers as strings
+        df = df.astype("float64")
+        df = DataSheet._process_data_sheet_series(df)
 
-def extract_single_timeseries(ws: list[list[Any]], row_start: int, row_end: int) -> pd.DataFrame:
-    if ws[row_start - 1][1] is None:
-        column_names = ws[row_start - 3]
-    else:
-        # Empty row between header and data missing for cg shift data
-        column_names = ws[row_start - 2]
-    rows = ws[row_start : row_end + 1]
+        return df
 
-    df = pd.DataFrame(rows, columns=column_names).drop(
-        columns=["nr.", "ET*", None], errors="ignore"
-    )
-    df = df.dropna(subset="time").reset_index(drop=True)
-    df["time"] = df["time"].apply(timestamp_to_s)
-    df["time_min"] = df["time"] / 60
-    # Force as float since Excel sheet stores them as string
-    df = df.astype("float64")
+    @staticmethod
+    def _process_data_sheet_series(df: pd.DataFrame) -> pd.DataFrame:
+        df = df.rename(
+            columns={
+                "hp": "h",
+                "IAS": "ias",
+                "a": "alpha",
+                "de": "delta_e",
+                "detr": "delta_e_t",
+                "Fe": "F_e",
+                "FFl": "fuel_flow_left",
+                "FFr": "fuel_flow_right",
+                "F. used": "fuel_used",
+                "TAT": "T_total",
+            }
+        )
 
-    df = df.rename(
-        columns={
-            "hp": "h",
-            "IAS": "ias",
-            "a": "alpha",
-            "de": "delta_e",
-            "detr": "delta_e_t",
-            "Fe": "F_e",
-            "FFl": "fuel_flow_left",
-            "FFr": "fuel_flow_right",
-            "F. used": "fuel_used",
-            "TAT": "T_total",
-        }
-    )
+        df["h"] = ft_to_m(df["h"])
+        df["ias"] = kts_to_ms(df["ias"])
+        df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
+        df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
+        df["fuel_used"] = lbs_to_kg(df["fuel_used"])
+        df["T_total"] = C_to_K(df["T_total"])
 
-    df["h"] = ft_to_m(df["h"])
-    df["ias"] = kts_to_ms(df["ias"])
-    df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
-    df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
-    df["fuel_used"] = lbs_to_kg(df["fuel_used"])
-    df["T_total"] = C_to_K(df["T_total"])
-
-    return df
+        return df
 
 
 class AveragedDataSheet:
     def __init__(self, data_sheets: dict[str, DataSheet]):
         self.data_sheet_names = list(data_sheets.keys())
         self.data_sheets = list(data_sheets.values())
-        self._average()
+        self._calculate_averages()
+        self._add_derived_timeseries()
 
-    def _average(self):
-        self.df_clcd = self._average_dataframe_and_check([ds.df_clcd for ds in self.data_sheets])
-        self.df_elevator_trim = self._average_dataframe_and_check(
+    def _calculate_averages(self):
+        self.df_clcd = self._calculate_dataframe_average_and_check_deviation(
+            [ds.df_clcd for ds in self.data_sheets]
+        )
+        self.df_elevator_trim = self._calculate_dataframe_average_and_check_deviation(
             [ds.df_elevator_trim for ds in self.data_sheets]
         )
-        self.df_cg_shift = self._average_dataframe_and_check(
+        self.df_cg_shift = self._calculate_dataframe_average_and_check_deviation(
             [ds.df_cg_shift for ds in self.data_sheets]
         )
 
@@ -142,15 +148,19 @@ class AveragedDataSheet:
         self.timestamp_spiral = mean_not_none([ds.timestamp_spiral for ds in self.data_sheets])
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
-    def _average_dataframe_and_check(
+    def _calculate_dataframe_average_and_check_deviation(
         self, dfs: list[pd.DataFrame], threshold_pct=5
     ) -> pd.DataFrame:
+        """
+        Average data from multiple data sheets and check if any values deviate more than threshold_pct % from per-cell mean
+        """
         # Calculate mean of non-NA values
         df_mean = dfs[0]
         for ds in dfs[1:]:
             df_mean = df_mean.add(ds, fill_value=0)
         df_mean /= len(dfs)
 
+        # Check deviations
         for df_idx, df in enumerate(dfs):
             # Calculate mean absolute percentage error
             error: pd.DataFrame = ((df - df_mean) / df_mean).abs() * 100
@@ -168,3 +178,18 @@ class AveragedDataSheet:
                 print()
 
         return df_mean
+
+    def _add_derived_timeseries(self):
+        for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
+            df["time_min"] = df.index / 60
+            df["m"] = self.mass_initial - df["fuel_used"]
+            df["W"] = df["m"] * constants.g
+
+            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["ias"]), axis=1)
+            df["T_static"] = df.apply(
+                lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
+            )
+
+            df[["T_left", "T_right"]] = calculate_thrust_from_df(df)
+            # df[["T_left", "T_right"]] = calculate_thrust_from_df_exe(df)
+            df["T"] = df["T_left"] + df["T_right"]
