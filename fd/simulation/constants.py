@@ -20,10 +20,12 @@ ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
+p0 = 101325 # air pressure at sea level [Pa]
 Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
 g = 9.81  # [m/s^2] (gravity constant)
+gamma = 1.4 #
 
 # air density [kg/m^3]
 # rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
