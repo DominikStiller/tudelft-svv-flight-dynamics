@@ -4,24 +4,6 @@ from math import sin, cos, pi
 
 # xcg = 0.25 * c
 
-# Stationary flight condition
-hp0 = None  # pressure altitude in the stationary flight condition [m]
-V0 = None  # true airspeed in the stationary flight condition [m/sec]
-alpha0 = None  # angle of attack in the stationary flight condition [rad]
-th0 = None  # pitch angle in the stationary flight condition [rad]
-
-# Aircraft mass
-m = None  # mass [kg]
-
-# Aerodynamic properties
-e = None  # Oswald factor [-]
-CD0 = None  # Zero lift drag coefficient [-]
-CLa = None  # Slope of CL-alpha curve [-]
-
-# Longitudinal stability
-Cma = None  # longitudinal stability [-]
-Cmde = None  # elevator effectiveness [-]
-
 # Aircraft geometry
 S = 30.00  # wing area [m^2]
 Sh = 0.2 * S  # stabilizer area [m^2]
@@ -38,18 +20,20 @@ ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
+p0 = 101325  # air pressure at sea level [Pa]
 Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
 g = 9.81  # [m/s^2] (gravity constant)
+gamma = 1.4  #
 
 # air density [kg/m^3]
-rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
-W = m * g  # [N]       (aircraft weight)
+# rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
+# W = m * g  # [N]       (aircraft weight)
 
 # Constant values concerning aircraft inertia
-muc = m / (rho * S * c)
-mub = m / (rho * S * b)
+# muc = m / (rho * S * c)
+# mub = m / (rho * S * b)
 KX2 = 0.019
 KZ2 = 0.042
 KXZ = 0.002
@@ -57,23 +41,26 @@ KY2 = 1.25 * 1.114
 
 # Aerodynamic constants
 Cmac = 0  # Moment coefficient about the aerodynamic centre [-]
-CNwa = CLa  # Wing normal force slope [-]
+# CNwa = CLa  # Wing normal force slope [-]
 CNha = 2 * pi * Ah / (Ah + 2)  # Stabilizer normal force slope [-]
 depsda = 4 / (A + 2)  # Downwash gradient [-]
 
 # Lift and drag coefficient
-CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
-CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
+# CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
+# CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
+
+# standard values
+Ws = 60500  # standard weight from the assignment
 
 # Stability derivatives
-CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
+# CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
+# CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
 CZu = -0.37616
 CZa = -5.74340
 CZadot = -0.00350
