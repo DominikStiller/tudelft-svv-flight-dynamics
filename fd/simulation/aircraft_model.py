@@ -3,8 +3,9 @@ import numpy.linalg as alg
 from numpy.typing import ArrayLike
 from math import sin, cos, pi
 import control.matlab as ml
-from B24.fd.structs import AerodynamicParameters
-from B24.fd.simulation.constants_Cessna_Ce500 import *
+from fd.structs import AerodynamicParameters
+from fd.simulation.constants_Cessna_Ce500 import *
+import matplotlib.pyplot as plt
 
 
 class AircraftModel:
@@ -223,4 +224,53 @@ class AircraftModel:
         C = np.eye(4)
         D = np.zeros((4, 2))
         return A, B, C, D
+
+    def get_step_input(self, maneuvre_duration, dt, input_duration, input_value, plot = False):
+        t = np.arange(0, maneuvre_duration + dt, dt)
+        u = np.zeros(t.shape)
+        u[:int(input_duration / dt)] = input_value * np.ones(u[:int(input_duration / dt)].size)
+        if plot:
+            fig = plt.figure()
+            ax = fig.add_subplot(1, 1, 1)
+            ax.plot(t, u)
+            ax.set_xlabel("Time [s]")
+            ax.set_ylabel("$delta_e$")
+        return t, u
+    def get_response_plots_symmetric(self, sys, x0, t, u ):
+
+        yout, t, xout = ml.lsim(sys, u, t, x0)
+        fig, axs = plt.subplots(2, 2, sharex=True)
+
+        axs[0, 0].plot(t, xout[:, 0] + V0 * np.ones(t.size))
+        axs[0, 0].set_title("V [m/sec")
+
+        axs[1, 0].plot(t, xout[:, 1])
+        axs[1, 0].set_title("$alpha$ [rad]")
+
+        axs[0, 1].plot(t, xout[:, 2])
+        axs[0, 1].set_title("$theta$ [rad]")
+
+        axs[1, 1].plot(t, xout[:, 3])
+        axs[1, 1].set_title("q [rad/sec]")
+
+        plt.show()
+
+    def get_response_plots_asymmetric(self, sys, x0, t, u):
+        yout, t, xout = ml.lsim(sys, u, t, x0)
+        fig, axs = plt.subplots(2, 2, sharex=True)
+
+        axs[0, 0].plot(t, xout[:, 0] + V0 * np.ones(t.size))
+        axs[0, 0].set_title("$beta$ [rad]")
+
+        axs[1, 0].plot(t, xout[:, 1])
+        axs[1, 0].set_title("$phi$ [rad]")
+
+        axs[0, 1].plot(t, xout[:, 2])
+        axs[0, 1].set_title("p [rad/sec]")
+
+        axs[1, 1].plot(t, xout[:, 3])
+        axs[1, 1].set_title("r [rad/sec]")
+
+        plt.show()
+
 
