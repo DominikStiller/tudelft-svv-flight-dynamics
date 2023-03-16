@@ -1,5 +1,6 @@
 import datetime
 import math
+import re
 from typing import Union
 
 
@@ -44,33 +45,41 @@ def C_to_K(C):
 
 
 def timestamp_to_s(timestamp: Union[str, datetime.time]):
-    """Convert datetime or [h.]mm[:ss] string (both from Excel sheet) to seconds"""
-    # TODO check if this format is consistent across data sheets
+    """
+    Convert datetime.time or timestamp string (both from Excel sheet) to seconds.
+    There is no consistent format:
+     - datetime.time: mm:ss timestamp is parsed but incorrectly as hh:mm
+     - h.mm:ss
+     - h.mm
+     - h:mm:ss
+     - mm:ss
+     - mm
+    """
     if not timestamp:
         return None
 
     if isinstance(timestamp, str):
-        if "." in timestamp:
-            # Format is h.mm:ss
-            hour, minute_second = timestamp.split(".")
-            hour = float(hour)
-        else:
-            # Format is mm:ss
-            minute_second = timestamp
-            hour = 0
+        hour = 0
+        minute = 0
+        second = 0
 
-        minute_second = minute_second.split(":")[:2]
-        if len(minute_second) == 2:
-            minute, second = minute_second
-            second = float(second)
+        if match := re.fullmatch(r"(\d+)\.(\d+):(\d+)", timestamp):
+            # h.mm:ss
+            hour, minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+)\.(\d+)", timestamp):
+            # h.mm
+            hour, minute = match.groups()
+        elif match := re.fullmatch(r"(\d+):(\d+):(\d+)", timestamp):
+            # h:mm:ss
+            hour, minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+):(\d+)", timestamp):
+            # mm:ss
+            minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+)", timestamp):
+            # mm
+            minute = match.group(0)
         else:
-            # Did not include ss part
-            minute = minute_second[0]
-            second = 0
-        minute = float(minute)
-
-        assert minute < 60
-        assert second < 60
+            raise "Invalid time format"
     elif isinstance(timestamp, datetime.time):
         hour = 0
         # This is not a mistake, the datetime is interpreted incorrectly
@@ -78,5 +87,13 @@ def timestamp_to_s(timestamp: Union[str, datetime.time]):
         second = timestamp.minute
     else:
         raise "Unsupported time type"
+
+    hour = float(hour)
+    minute = float(minute)
+    second = float(second)
+
+    assert 0 <= hour
+    assert 0 <= minute < 60
+    assert 0 <= second < 60
 
     return hour * 3600 + minute * 60 + second

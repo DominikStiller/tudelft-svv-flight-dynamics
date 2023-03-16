@@ -28,11 +28,16 @@ class TestUnitconversion(TestCase):
         assert_allclose(conversion.C_to_K(-67.9), 205.25)
         assert_allclose(conversion.C_to_K(0), 273.15)
 
+    def test_timestamp_to_s(self):
         assert_allclose(conversion.timestamp_to_s("00:00"), 0)
         assert_allclose(conversion.timestamp_to_s("2.0:00"), 7200)
         assert_allclose(conversion.timestamp_to_s("1.15:00"), 4500)
         assert_allclose(conversion.timestamp_to_s("1.15:15"), 4515)
+        assert_allclose(conversion.timestamp_to_s("1:15:00"), 4500)
+        assert_allclose(conversion.timestamp_to_s("1:15:15"), 4515)
         assert_allclose(conversion.timestamp_to_s("1.15"), 4500)
+        assert_allclose(conversion.timestamp_to_s("2"), 120)
+        assert_allclose(conversion.timestamp_to_s("5"), 300)
         assert_allclose(conversion.timestamp_to_s(datetime.time(0, 0)), 0)
         assert_allclose(conversion.timestamp_to_s(datetime.time(2, 0)), 120)
         assert_allclose(conversion.timestamp_to_s(datetime.time(1, 15)), 75)
