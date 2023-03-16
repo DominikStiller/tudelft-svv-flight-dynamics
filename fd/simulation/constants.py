@@ -49,6 +49,9 @@ depsda = 4 / (A + 2)  # Downwash gradient [-]
 # CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
 # CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
 
+#standard values
+Ws = 60500 # standard weight from the assignment
+
 # Stability derivatives
 # CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
 CXu = -0.09500

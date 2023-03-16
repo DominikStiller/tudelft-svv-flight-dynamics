@@ -37,6 +37,55 @@ def calc_static_temp(Ttot, M):
     """
     return Ttot/(1 + (constants.gamma-1)/2*M**2)
 
+def calc_true_V(T, M):
+    """
+
+    Args:
+        T (float): Static temperature[K]
+        M (float): Mach number[-]
+
+    Returns (float): True airspeed[m/s]
+
+    """
+    return M*np.sqrt(constants.gamma*constants.R*T)
+
+def calc_rho(p, T):
+    """
+
+    Args:
+        p (float): Static pressure[Pa]
+        T (float): Static temperature[K]
+
+    Returns (float): Density[kg/m^3]
+
+    """
+    return p/(constants.R*T)
+
+def calc_equivalent_V(Vt, rho):
+    """
+
+    Args:
+        Vt (float): True airspeed[m/s]
+        rho (float): Density[kg/m^3]
+
+    Returns (float): Equivalent airspeed[m/s]
+
+    """
+    return Vt*np.sqrt(rho/constants.rho0)
+
+def calc_reduced_equivalent_V(Ve, W):
+    """
+
+    Args:
+        Ve (float): Equivalent velocity[m/s]
+        W (float): Weight of the aircraft[N]
+
+    Returns (float): Reduced equivalent airspeed[m/s]
+
+    """
+    return Ve*np.sqrt(constants.Ws/W)
+
+
 def calc_CL(W: float, V: float, S=constants.S, rho=constants.rho0) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
