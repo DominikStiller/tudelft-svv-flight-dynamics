@@ -3,6 +3,7 @@ import scipy.stats as stats
 import math
 import numpy as np
 
+
 def calc_stat_pres(hp):
     """
     Calculate the static pressure from the pressure height
@@ -12,7 +13,11 @@ def calc_stat_pres(hp):
     Returns (float): The static pressure for the pressure height given[Pa]
 
     """
-    return constants.p0*(1 + constants.Tempgrad*hp/constants.Temp0)**(-constants.g/(constants.Tempgrad*constants.R))
+    return constants.p0 * (1 + constants.Tempgrad * hp / constants.Temp0) ** (
+        -constants.g / (constants.Tempgrad * constants.R)
+    )
+
+
 def calc_mach(hp, Vc):
     """
 
@@ -23,7 +28,32 @@ def calc_mach(hp, Vc):
     Returns (float): Mach number for the conditions given[-]
 
     """
-    return np.sqrt(2/(constants.gamma-1)*((1+constants.p0/calc_stat_pres(hp)*((1+(constants.gamma-1)/(2*constants.gamma)*constants.rho0/constants.p0*Vc**2)**(constants.gamma/(constants.gamma-1))-1))**((constants.gamma-1)/constants.gamma)-1))
+    return np.sqrt(
+        2
+        / (constants.gamma - 1)
+        * (
+            (
+                1
+                + constants.p0
+                / calc_stat_pres(hp)
+                * (
+                    (
+                        1
+                        + (constants.gamma - 1)
+                        / (2 * constants.gamma)
+                        * constants.rho0
+                        / constants.p0
+                        * Vc**2
+                    )
+                    ** (constants.gamma / (constants.gamma - 1))
+                    - 1
+                )
+            )
+            ** ((constants.gamma - 1) / constants.gamma)
+            - 1
+        )
+    )
+
 
 def calc_static_temp(Ttot, M):
     """
@@ -35,7 +65,8 @@ def calc_static_temp(Ttot, M):
     Returns (float): Static temperature[K]
 
     """
-    return Ttot/(1 + (constants.gamma-1)/2*M**2)
+    return Ttot / (1 + (constants.gamma - 1) / 2 * M**2)
+
 
 def calc_true_V(T, M):
     """
@@ -47,7 +78,8 @@ def calc_true_V(T, M):
     Returns (float): True airspeed[m/s]
 
     """
-    return M*np.sqrt(constants.gamma*constants.R*T)
+    return M * np.sqrt(constants.gamma * constants.R * T)
+
 
 def calc_rho(p, T):
     """
@@ -59,7 +91,8 @@ def calc_rho(p, T):
     Returns (float): Density[kg/m^3]
 
     """
-    return p/(constants.R*T)
+    return p / (constants.R * T)
+
 
 def calc_equivalent_V(Vt, rho):
     """
@@ -71,7 +104,8 @@ def calc_equivalent_V(Vt, rho):
     Returns (float): Equivalent airspeed[m/s]
 
     """
-    return Vt*np.sqrt(rho/constants.rho0)
+    return Vt * np.sqrt(rho / constants.rho0)
+
 
 def calc_reduced_equivalent_V(Ve, W):
     """
@@ -83,7 +117,7 @@ def calc_reduced_equivalent_V(Ve, W):
     Returns (float): Reduced equivalent airspeed[m/s]
 
     """
-    return Ve*np.sqrt(constants.Ws/W)
+    return Ve * np.sqrt(constants.Ws / W)
 
 
 def calc_CL(W: float, V: float, S=constants.S, rho=constants.rho0) -> float:
@@ -160,7 +194,10 @@ def calc_CD0_e(CD: list, CL: list) -> float:
 
     return CD0, e
 
-def clac_Cmdelta(xcg1: float, xcg2: float, deltae1: float, deltae2: float, W1: float, W2: float, V: float):
+
+def clac_Cmdelta(
+    xcg1: float, xcg2: float, deltae1: float, deltae2: float, W1: float, W2: float, V: float
+):
     """
 
     Args:
@@ -175,8 +212,14 @@ def clac_Cmdelta(xcg1: float, xcg2: float, deltae1: float, deltae2: float, W1: f
     Returns: Cmdelta (float): The moment coefficient change due to the elevator deflection.[-]
 
     """
-    W_avg = (W1+W2)/2
+    W_avg = (W1 + W2) / 2
     Delta_cg = xcg2 - xcg1
     Delta_delta_e = deltae2 - deltae1
-    return -1/Delta_delta_e*W_avg/(0.5*constants.rho0*V**2*constants.S)*Delta_cg/constants.c
-
+    return (
+        -1
+        / Delta_delta_e
+        * W_avg
+        / (0.5 * constants.rho0 * V**2 * constants.S)
+        * Delta_cg
+        / constants.c
+    )
