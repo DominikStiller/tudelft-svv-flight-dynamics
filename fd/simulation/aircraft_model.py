@@ -70,10 +70,10 @@ class AircraftModel:
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
-        #x = [u_hat, alpha, theta, q]T
+        #x = [u, alpha, theta, q]T
         C_1 = np.array(
             [
-                [-2 * muc*c/V0, 0, 0, 0],
+                [-2 * muc*c/V0**2, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
@@ -81,10 +81,10 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu, CXa, CZ0, CXq * c / V0],
-                [CZu, CZa, -CX0, (CZq + 2 * muc) * c / V0],
+                [CXu/V0, CXa, CZ0, CXq * c / V0],
+                [CZu/V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
-                [Cmu, Cma, 0, Cmq * c / V0],
+                [Cmu/V0, Cma, 0, Cmq * c / V0],
             ]
         )
         C_3 = np.array([[CXde], [CZde], [0], [Cmde]])
@@ -151,7 +151,7 @@ class AircraftModel:
         D = np.zeros((4, 2))
         return A, B, C, D
 
-    def get_eigenvalue_and_eigenvector(
+    def get_eigenvalues_and_eigenvectors(
             self, A: ArrayLike):
         '''
 
@@ -162,8 +162,7 @@ class AircraftModel:
             D: Feedthrough matrix
 
         Returns:
-
-
+            Eigenvalues and Eigenvectors
         '''
         eigenvalues, eigenvectors = alg.eig(A)
         return eigenvalues, eigenvectors
