@@ -1,10 +1,11 @@
 from pathlib import Path
 
-import pandas as pd
-
 from fd.analysis.data_sheet import DataSheet, AveragedDataSheet
 from fd.analysis.ftis_measurements import FTISMeasurements
 from fd.structs import AerodynamicParameters
+
+DURATION_PHUGOID = 120
+DURATION_DUTCH_ROLL = 20
 
 
 class FlightTest:
@@ -32,6 +33,10 @@ class FlightTest:
         pass
 
     @property
+    def df_ftis(self):
+        return self.ftis_measurements.df
+
+    @property
     def df_clcd(self):
         return self.data_sheet.df_clcd
 
@@ -45,7 +50,16 @@ class FlightTest:
 
     @property
     def df_phugoid(self):
-        return self.ftis_measurements.df[self.data_sheet.timestamp_phugoid]
+        return self.ftis_measurements.df.loc[
+            self.data_sheet.timestamp_phugoid : self.data_sheet.timestamp_phugoid + DURATION_PHUGOID
+        ]
+
+    @property
+    def df_dutch_roll(self):
+        return self.ftis_measurements.df.loc[
+            self.data_sheet.timestamp_dutch_roll : self.data_sheet.timestamp_dutch_roll
+            + DURATION_DUTCH_ROLL
+        ]
 
 
 if __name__ == "__main__":

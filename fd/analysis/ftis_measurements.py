@@ -1,5 +1,3 @@
-import pandas as pd
-
 from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
 from fd.io import load_ftis_measurements
 from fd.simulation import constants
@@ -21,6 +19,11 @@ COLUMNS = {
     "Dadc1_tas": "tas",
     "Dadc1_sat": "T_static",
     "Dadc1_tat": "T_total",
+    "Ahrs1_Roll": "phi",
+    "Ahrs1_Pitch": "theta",
+    "Ahrs1_bRollRate": "p",
+    "Ahrs1_bPitchRate": "q",
+    "Ahrs1_bYawRate": "r",
 }
 
 
