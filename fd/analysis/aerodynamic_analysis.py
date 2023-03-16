@@ -120,13 +120,13 @@ def calc_reduced_equivalent_V(Ve, W):
     return Ve * np.sqrt(constants.Ws / W)
 
 
-def calc_CL(W: float, V: float, S=constants.S, rho=constants.rho0) -> float:
+def calc_CL(W: float, V: float, rho: float, S=constants.S) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
     Args:
         W (array_like): Weight [-]
-        rho (float): Air density (set to sea level) [kg/m3]
-        V (array_like): Velocity (calibrated one since we are using rho at sea level) [m/s]
+        rho (float): Air density [kg/m3]
+        V (array_like): True airspeed [m/s]
         S (float): Surface area [m2]
 
     Returns:
@@ -158,19 +158,19 @@ def calc_CL_alpha(CL: float, alpha: float) -> float:
     return CLalpha, CL_alpha_equals0, alpha_0  # low_slope, high_slope
 
 
-def calc_CD(T: float, Vc: float) -> float:
+def calc_CD(T: float, V: float, rho) -> float:
     """
     This function calculates the drag coefficient CD[-]
 
     Args:
         T (array_like): Thrust[N].
-        Vc (array_like): computed airspeed[ms-1].
+        V (array_like): True airspeed[m/s].
 
     Returns:
         CD (array_like): Drag coefficient CD[-].
 
     """
-    return T / (0.5 * constants.rho0 * Vc * Vc * constants.S)
+    return T / (0.5 * rho * V * V * constants.S)
 
 
 def calc_CD0_e(CD: list, CL: list) -> float:
@@ -195,8 +195,15 @@ def calc_CD0_e(CD: list, CL: list) -> float:
     return CD0, e
 
 
-def clac_Cmdelta(
-    xcg1: float, xcg2: float, deltae1: float, deltae2: float, W1: float, W2: float, V: float
+def calc_Cmdelta(
+    xcg1: float,
+    xcg2: float,
+    deltae1: float,
+    deltae2: float,
+    W1: float,
+    W2: float,
+    V: float,
+    rho: float,
 ):
     """
 
@@ -208,6 +215,7 @@ def clac_Cmdelta(
         W1 (float): Weight of the aircraft during the first test.[N]
         W2 (float): Weight of the aircraft during the second test.[N]
         V (float): Velocity of the aircraft during the tests.[m/s]
+        rho (float): Air density.[kg/m^3]
 
     Returns: Cmdelta (float): The moment coefficient change due to the elevator deflection.[-]
 
@@ -215,11 +223,22 @@ def clac_Cmdelta(
     W_avg = (W1 + W2) / 2
     Delta_cg = xcg2 - xcg1
     Delta_delta_e = deltae2 - deltae1
-    return (
-        -1
-        / Delta_delta_e
-        * W_avg
-        / (0.5 * constants.rho0 * V**2 * constants.S)
-        * Delta_cg
-        / constants.c
-    )
+    return -1 / Delta_delta_e * W_avg / (0.5 * rho * V**2 * constants.S) * Delta_cg / constants.c
+
+
+def calc_Cmalpha(alpha, delta_e, Cmdelta):
+    """
+
+    Args:
+        alpha (array_like): Angle of attack[deg]
+        delta_e (array_like): Elevator deflection[deg]
+        Cmdelta (float): Change in moment coefficient due to elevator deflection[-]
+
+    Returns (float): Change in moment coefficient due to angle of attack[-]
+
+    """
+
+    TheilslopesResults = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    slope = TheilslopesResults[0]
+    print(slope)
+    return -slope * Cmdelta
