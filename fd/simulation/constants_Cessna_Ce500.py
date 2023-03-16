@@ -1,4 +1,4 @@
-
+import numpy as np
 
 #Aircraft geometry:
 S = 24.2 # wing area [m^2]
@@ -35,4 +35,12 @@ Cmde = -1.5530
 
 b = 15
 g = 9.80665
+
+A_prim = 4*(muc**2)*(KY2)*(CZadot-2*muc)
+B_prim = Cmadot*2*muc*(CZq+2*muc)-Cmq*2*muc*(CZadot-2*muc)-2*muc*(KY2)*(CXu*(CZadot-2*muc)-2*muc*CZa)
+C_prim = Cma*2*muc*(CZq+2*muc)-Cmadot*(2*muc*CX0+CXu*(CZq+2*muc))+Cmq*(CXu*(CZadot-2*muc)-2*muc*CZa)+2*muc*(KY2)*(CXa*CZu-CZa*CXu)
+D_prim = Cmu*(CXa*(CZq+2*muc)-CZ0*(CZadot-2*muc))-Cma*(2*muc*CX0+CXu*(CZq+2*muc))+Cmadot*(CX0*CXu-CZ0*CZu)+Cmq*(CXu*CZa-CZu*CXa)
+E_prim = -Cmu*(CX0*CXa+CZ0*CZa)+Cma*(CX0*CXu+CZ0*CZu)
+p = (A_prim, B_prim, C_prim, D_prim, E_prim)
+print("analytic", np.roots(p)*V0/c)
 

@@ -73,7 +73,7 @@ class AircraftModel:
         #x = [u_hat, alpha, theta, q]T
         C_1 = np.array(
             [
-                [-2 * muc, 0, 0, 0],
+                [-2 * muc*c/V0, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
