@@ -3,6 +3,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from fd.analysis.aerodynamic_analysis import calc_mach, calc_static_temp
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation.constants import mass_basic_empty
@@ -12,6 +13,7 @@ from fd.util import mean_not_none
 class DataSheet:
     def __init__(self, data_path: str):
         self._extract(load_data_sheet(data_path))
+        self._add_derived_timeseries()
 
     def _extract(self, ws: list[list[Any]]):
         """
@@ -59,6 +61,13 @@ class DataSheet:
             + self.mass_observer_3r
         )
 
+    def _add_derived_timeseries(self):
+        for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
+            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["ias"]), axis=1)
+            df["T_static"] = df.apply(
+                lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
+            )
+
 
 def extract_single_timeseries(ws: list[list[Any]], row_start: int, row_end: int) -> pd.DataFrame:
     if ws[row_start - 1][1] is None:
@@ -105,7 +114,7 @@ def extract_single_timeseries(ws: list[list[Any]], row_start: int, row_end: int)
 class AveragedDataSheet:
     def __init__(self, data_sheets: dict[str, DataSheet]):
         self.data_sheet_names = list(data_sheets.keys())
-        self.data_sheets = data_sheets.values()
+        self.data_sheets = list(data_sheets.values())
         self._average()
 
     def _average(self):
