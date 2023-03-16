@@ -136,7 +136,12 @@ class AveragedDataSheet:
     def _average_dataframe_and_check(
         self, dfs: list[pd.DataFrame], threshold_pct=5
     ) -> pd.DataFrame:
-        df_mean = sum(dfs) / len(dfs)
+        # Calculate mean of non-NA values
+        df_mean = dfs[0]
+        for ds in dfs[1:]:
+            df_mean = df_mean.add(ds, fill_value=0)
+        df_mean /= len(dfs)
+
         for df_idx, df in enumerate(dfs):
             # Calculate mean absolute percentage error
             error: pd.DataFrame = ((df - df_mean) / df_mean).abs() * 100
