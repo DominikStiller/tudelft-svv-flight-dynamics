@@ -1,18 +1,24 @@
 from statistics import mean
 
+import pandas as pd
 
-def get_closest(df, time):
+
+def get_closest(df: pd.DataFrame, time) -> pd.DataFrame:
     """
-    Gets the row in df that is closest before time given. df's index should be timestamps.
+    Gets the rows in df that is closest after the time given. If time is past the
+    last timestamp, return the last row.
+
+    df's index should be float timestamps.
 
     Args:
-        time: time
+        time: single or multiple timestamps
         df: DataFrame
 
     Returns:
-        Row corresponding to the closest time
+        Rows corresponding to the closest next time
     """
     closest_idx = df.index.searchsorted(time)
+    closest_idx = closest_idx.clip(0, len(df.index) - 1)
     return df.iloc[closest_idx]
 
 
