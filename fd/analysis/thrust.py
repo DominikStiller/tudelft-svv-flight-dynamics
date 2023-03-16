@@ -476,7 +476,7 @@ def W_end4():
     return False
 
 
-def calculate_thrust(h, M, T_static, fuelflow):
+def calculate_thrust(h: float, M: float, T_static: float, fuelflow: float) -> float:
     """
     Calculates thrust based on operating conditions.
 
@@ -506,18 +506,29 @@ def calculate_thrust(h, M, T_static, fuelflow):
         return None
 
 
-def calculate_thrust_from_row(row: pd.Series):
-    return calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_left"])
+def calculate_thrust_from_row(row: pd.Series) -> tuple[float, float]:
+    return (
+        calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_left"]),
+        calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_right"]),
+    )
 
 
-def calculate_thrust_exe(h, M, dT, fuelflow):
+def calculate_thrust_from_df(df: pd.DataFrame) -> pd.DataFrame:
+    return df.apply(calculate_thrust_from_row, axis=1, result_type="expand")
+
+
+def calculate_thrust_exe(
+    h: float, M: float, T_static: float, fuel_flow_left: float, fuel_flow_right: float
+):
     thrust_exe = Path(".") / "bin/thrust.exe"
     cwd = Path(tempfile.gettempdir())
     input_file = cwd / "matlab.dat"
     output_file = cwd / "thrust.dat"
 
     with input_file.open("w") as f:
-        f.write(f"{h:f} {M:f} {dT:f} {fuelflow:f} 0")
+        T_isa = 288.15 - 0.0065 * h
+        dT = T_static - T_isa
+        f.write(f"{h:f} {M:f} {dT:f} {fuel_flow_left:f} {fuel_flow_right:f}")
 
     try:
         subprocess.run(thrust_exe.absolute(), cwd=cwd, stdout=subprocess.DEVNULL, timeout=5)
@@ -525,22 +536,22 @@ def calculate_thrust_exe(h, M, dT, fuelflow):
         return None
 
     with output_file.open("r") as f:
-        thrust = float(f.readline().split()[0])
+        thrusts = f.readline().split()
 
     # Delete temporary files
     input_file.unlink()
     output_file.unlink()
 
-    return thrust
+    return float(thrusts[0]), float(thrusts[1])
 
 
-def calculate_thrust_from_row_exe(row: pd.Series):
-    T_isa = 288.15 - 0.0065 * row["h"]
-    dT = row["T_static"] - T_isa
-    return calculate_thrust_exe(row["h"], row["M"], dT, row["fuel_flow_left"])
+def calculate_thrust_from_row_exe(row: pd.Series) -> tuple[float, float]:
+    return calculate_thrust_exe(
+        row["h"], row["M"], row["T_static"], row["fuel_flow_left"], row["fuel_flow_right"]
+    )
 
 
-def calculate_thrust_from_df_exe(df: pd.DataFrame) -> list[float]:
+def calculate_thrust_from_df_exe(df: pd.DataFrame) -> pd.DataFrame:
     thrust_exe = Path(".") / "bin/thrust.exe"
     cwd = Path(tempfile.gettempdir())
     input_file = cwd / "matlab.dat"
@@ -550,7 +561,7 @@ def calculate_thrust_from_df_exe(df: pd.DataFrame) -> list[float]:
         for row in df.itertuples():
             T_isa = 288.15 - 0.0065 * row.h
             dT = row.T_static - T_isa
-            f.write(f"{row.h:f} {row.M:f} {dT:f} {row.fuel_flow_left:f} 0\n")
+            f.write(f"{row.h:f} {row.M:f} {dT:f} {row.fuel_flow_left:f}  {row.fuel_flow_right:f}\n")
 
     try:
         subprocess.run(
@@ -560,13 +571,13 @@ def calculate_thrust_from_df_exe(df: pd.DataFrame) -> list[float]:
         return None
 
     with output_file.open("r") as f:
-        thrusts = [float(line.split()[0]) for line in f.readlines()]
+        thrusts = [[float(t) for t in line.split()] for line in f.readlines()]
 
     # Delete temporary files
     input_file.unlink()
     output_file.unlink()
 
-    return thrusts
+    return pd.DataFrame(thrusts, index=df.index)
 
 
 if __name__ == "__main__":
