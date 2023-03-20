@@ -7,9 +7,9 @@ from fd.analysis import aerodynamic_analysis as ana
 
 class TestUnitconversion(TestCase):
     def test_unitconversion(self):
-        assert_allclose(ana.calc_CL(1000, 10), 0.54421769)
+        assert_allclose(ana.calc_CL(1000, 10, 1.225), 0.54421769)
         assert_allclose(
-            ana.calc_CL(np.array([1000, 15000]), np.array([10, 30])),
+            ana.calc_CL(np.array([1000, 15000]), np.array([10, 30]), 1.225),
             np.array([0.54421769, 0.90702948]),
             rtol=1e-01,
         )
@@ -24,9 +24,9 @@ class TestUnitconversion(TestCase):
             [0.02, 0.1, -5.0],
             rtol=1e-01,
         )
-        assert_allclose(ana.calc_CD(1000, 10), 0.54421769, rtol=1e-01)
+        assert_allclose(ana.calc_CD(1000, 10, 1.225), 0.54421769, rtol=1e-01)
         assert_allclose(
-            ana.calc_CD(np.array([1000, 15000]), np.array([10, 30])),
+            ana.calc_CD(np.array([1000, 15000]), np.array([10, 30]), 1.225),
             np.array([0.54421769, 0.90702948]),
             rtol=1e-01,
         )
@@ -44,3 +44,10 @@ class TestUnitconversion(TestCase):
             [0.02, 0.8],
             rtol=1e-01,
         )
+        assert_allclose(ana.calc_Cmdelta(20, 19, 2, 1, 10000, 10000, 120, 0.6), -0.037513002)
+        assert_allclose(ana.calc_Cmdelta(20, 19, 2, 1, 8000, 12000, 120, 0.6), -0.037513002)
+        assert_allclose(
+            ana.calc_Cmdelta(20.01, 19.99, 1.6, 1, 8000, 12000, 110, 0.2), -0.00446435726
+        )
+        assert_allclose(ana.calc_Cmalpha([1, 2, 3], [0.5, 1, 1.5], -0.01), 0.005)
+        assert_allclose(ana.calc_Cmalpha([1.01, 2, 3], [0.5, 1.01, 1.5], -0.01), 0.005, rtol=1e-1)
