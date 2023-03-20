@@ -119,4 +119,4 @@ def test_Cessna_Ce500_asymmetric():
     print(np.polynomial.polynomial.polyroots(p))
 
 
-test_Cessna_Ce500_asymmetric()
+

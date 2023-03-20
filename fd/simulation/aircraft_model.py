@@ -1,10 +1,9 @@
-import numpy as np
 import numpy.linalg as alg
 from numpy.typing import ArrayLike
-from math import sin, cos, pi
+from math import sin, cos
 import control.matlab as ml
 from fd.structs import AerodynamicParameters
-from fd.simulation.constants_Cessna_Ce500 import *
+from tests.test_simulation.constants_Cessna_Ce500 import *
 import matplotlib.pyplot as plt
 
 
@@ -65,6 +64,7 @@ class AircraftModel:
             D: Feedthrough matrix
 
         """
+
         Cma = self.aero_params.C_m_alpha
         Cmde = self.aero_params.C_m_delta
         muc = self.get_non_dim_masses(m, rho)[0]
@@ -82,7 +82,7 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu / V0, CXa, CZ0, CXq * c / V0],
+                [CXu / V0, CXa, CZ0, 0],
                 [CZu / V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
                 [Cmu / V0, Cma, 0, Cmq * c / V0],

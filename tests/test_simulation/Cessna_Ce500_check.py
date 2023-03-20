@@ -1,9 +1,6 @@
 from fd.structs import AerodynamicParameters
 from fd.simulation.aircraft_model import AircraftModel
 import control.matlab as ml
-import numpy as np
-from fd.simulation.constants_Cessna_Ce500 import *
-import matplotlib.pyplot as plt
 
 aero_params = AerodynamicParameters
 aero_params.C_m_alpha = -0.4300
@@ -16,6 +13,6 @@ CL = 1.1360
 b = 13.36
 model = AircraftModel(aero_params)
 A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
-print(model.get_eigenvalues_and_eigenvectors(A)[0] * b / V0)
+print(model.get_eigenvalues_and_eigenvectors(A)[0])
 sys = ml.ss(A, B, C, D)
 ml.damp(sys, doprint=True)
