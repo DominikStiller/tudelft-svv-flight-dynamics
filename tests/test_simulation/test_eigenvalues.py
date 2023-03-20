@@ -73,11 +73,11 @@ class MyTestCase(unittest.TestCase):
         )
         E_prim = -Cmu * (CX0 * CXa + CZ0 * CZa) + Cma * (CX0 * CXu + CZ0 * CZu)
         p = (A_prim, B_prim, C_prim, D_prim, E_prim)
-        roots = np.polynomial.polynomial.polyroots(p)
+        roots = np.polynomial.polynomial.polyroots(p)*c/V0
         print(roots)
         print(eigenvalues)
 
-        self.assertTupleEqual(tuple(roots*c/V0), tuple(eigenvalues))
+        self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
 
 if __name__ == '__main__':
     unittest.main()
