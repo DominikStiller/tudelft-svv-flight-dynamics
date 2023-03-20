@@ -3,6 +3,7 @@ import scipy.stats as stats
 import math
 import numpy as np
 
+
 def calc_reduced_equivalent_V(Ve, W):
     """
 
@@ -16,7 +17,7 @@ def calc_reduced_equivalent_V(Ve, W):
     return Ve * np.sqrt(constants.Ws / W)
 
 
-def calc_reduced_elev_deflec(delta_e_meas, Cmdelta,  Tcs, Tc):
+def calc_reduced_elev_deflec(delta_e_meas, Cmdelta, Tcs, Tc):
     """
 
     Args:
@@ -29,7 +30,8 @@ def calc_reduced_elev_deflec(delta_e_meas, Cmdelta,  Tcs, Tc):
 
     """
 
-    return delta_e_meas - constants.CmTc/Cmdelta*(Tcs - Tc)
+    return delta_e_meas - constants.CmTc / Cmdelta * (Tcs - Tc)
+
 
 def calc_reduced_stick_force(Fe_aer, W):
     """
@@ -42,5 +44,4 @@ def calc_reduced_stick_force(Fe_aer, W):
 
     """
 
-    return Fe_aer*constants.Ws/W
-
+    return Fe_aer * constants.Ws / W
