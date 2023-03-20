@@ -22,14 +22,28 @@ def get_closest(df: pd.DataFrame, time) -> pd.DataFrame:
     return df.iloc[closest_idx]
 
 
-def mean_not_none(x: list[float]) -> float:
+def mean_not_none(l: list[float]) -> float:
     """
     Calculate the mean of all non-None values in x.
 
     Args:
-        x: List of elements
+        l: List of elements
 
     Returns:
         Mean
     """
-    return mean(filter(lambda e: e is not None, x))
+    return mean(filter(lambda e: e is not None, l))
+
+
+def mean_not_nan_df(dfs: list[pd.DataFrame]) -> pd.DataFrame:
+    """
+    Calculate the cell-wise mean of all non-NAN values in dfs.
+
+    Args:
+        dfs: List of DataFrames
+
+    Returns:
+        Means as DataFrame
+    """
+    df_mean = pd.concat(dfs).groupby(level=0).mean()
+    return df_mean.astype(dfs[0].dtypes)
