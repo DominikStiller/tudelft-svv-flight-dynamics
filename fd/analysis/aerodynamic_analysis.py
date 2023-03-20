@@ -1,7 +1,9 @@
-from fd.simulation import constants
-import scipy.stats as stats
 import math
+
 import numpy as np
+import scipy.stats as stats
+
+from fd.simulation import constants
 
 
 def calc_stat_pres(hp):
@@ -223,3 +225,19 @@ def clac_Cmdelta(
         * Delta_cg
         / constants.c
     )
+
+
+def calc_Tc(T: float, V: float, S=constants.S, rho: float = constants.rho0) -> float:
+    """
+    Calculate Tc for a given combination of T, rho, V and S.
+    Args:
+        T (array_like): Thrust [N]
+        rho (float): Air density (set to sea level) [kg/m^3]
+        V (array_like): Velocity (calibrated one since we are using rho at sea level) [m/s]
+        S (float): Surface area [m^2]
+
+    Returns:
+        (array_like): Tc [-]
+    """
+
+    return 2 * T / (rho * V * V * S)

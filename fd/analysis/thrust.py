@@ -2,6 +2,7 @@ import subprocess
 import tempfile
 from math import exp, sqrt, pow
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 
@@ -506,15 +507,23 @@ def calculate_thrust(h: float, M: float, T_static: float, fuelflow: float) -> fl
         return None
 
 
-def calculate_thrust_from_row(row: pd.Series) -> tuple[float, float]:
+def calculate_thrust_from_row(
+    row: pd.Series, fuel_flow: Optional[float] = None
+) -> tuple[float, float]:
+    if fuel_flow is None:
+        fuel_flow_left = row["fuel_flow_left"]
+        fuel_flow_right = row["fuel_flow_right"]
+    else:
+        fuel_flow_left = fuel_flow
+        fuel_flow_right = fuel_flow
     return (
-        calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_left"]),
-        calculate_thrust(row["h"], row["M"], row["T_static"], row["fuel_flow_right"]),
+        calculate_thrust(row["h"], row["M"], row["T_static"], fuel_flow_left),
+        calculate_thrust(row["h"], row["M"], row["T_static"], fuel_flow_right),
     )
 
 
-def calculate_thrust_from_df(df: pd.DataFrame) -> pd.DataFrame:
-    return df.apply(calculate_thrust_from_row, axis=1, result_type="expand")
+def calculate_thrust_from_df(df: pd.DataFrame, fuel_flow: Optional[float] = None) -> pd.DataFrame:
+    return df.apply(calculate_thrust_from_row, args=(fuel_flow,), axis=1, result_type="expand")
 
 
 def calculate_thrust_exe(
@@ -545,13 +554,24 @@ def calculate_thrust_exe(
     return float(thrusts[0]), float(thrusts[1])
 
 
-def calculate_thrust_from_row_exe(row: pd.Series) -> tuple[float, float]:
-    return calculate_thrust_exe(
-        row["h"], row["M"], row["T_static"], row["fuel_flow_left"], row["fuel_flow_right"]
+def calculate_thrust_from_row_exe(
+    row: pd.Series, fuel_flow: Optional[float] = None
+) -> tuple[float, float]:
+    if fuel_flow is None:
+        fuel_flow_left = row["fuel_flow_left"]
+        fuel_flow_right = row["fuel_flow_right"]
+    else:
+        fuel_flow_left = fuel_flow
+        fuel_flow_right = fuel_flow
+    return (
+        calculate_thrust_exe(row["h"], row["M"], row["T_static"], fuel_flow_left),
+        calculate_thrust_exe(row["h"], row["M"], row["T_static"], fuel_flow_right),
     )
 
 
-def calculate_thrust_from_df_exe(df: pd.DataFrame) -> pd.DataFrame:
+def calculate_thrust_from_df_exe(
+    df: pd.DataFrame, fuel_flow: Optional[float] = None
+) -> pd.DataFrame:
     thrust_exe = Path(".") / "bin/thrust.exe"
     cwd = Path(tempfile.gettempdir())
     input_file = cwd / "matlab.dat"
@@ -561,7 +581,15 @@ def calculate_thrust_from_df_exe(df: pd.DataFrame) -> pd.DataFrame:
         for row in df.itertuples():
             T_isa = 288.15 - 0.0065 * row.h
             dT = row.T_static - T_isa
-            f.write(f"{row.h:f} {row.M:f} {dT:f} {row.fuel_flow_left:f}  {row.fuel_flow_right:f}\n")
+
+            if fuel_flow is None:
+                fuel_flow_left = row.fuel_flow_left
+                fuel_flow_right = row.fuel_flow_right
+            else:
+                fuel_flow_left = fuel_flow
+                fuel_flow_right = fuel_flow
+
+            f.write(f"{row.h:f} {row.M:f} {dT:f} {fuel_flow_left:f}  {fuel_flow_right:f}\n")
 
     try:
         subprocess.run(

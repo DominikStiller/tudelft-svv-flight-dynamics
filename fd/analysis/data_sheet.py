@@ -3,12 +3,12 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from fd.analysis.aerodynamic_analysis import calc_mach, calc_static_temp
+from fd.analysis.aerodynamic_analysis import calc_mach, calc_static_temp, calc_Tc
 from fd.analysis.thrust import calculate_thrust_from_df
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation import constants
-from fd.simulation.constants import mass_basic_empty
+from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
 
 
@@ -190,3 +190,11 @@ class AveragedDataSheet:
             df[["T_left", "T_right"]] = calculate_thrust_from_df(df)
             # df[["T_left", "T_right"]] = calculate_thrust_from_df_exe(df)
             df["T"] = df["T_left"] + df["T_right"]
+            df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["ias"]), axis=1)
+
+            df[["T_s_left", "T_s_right"]] = calculate_thrust_from_df(
+                df, fuel_flow=fuel_flow_standard
+            )
+            # df[["T_s_left", "T_s_right"]] = calculate_thrust_from_df_exe(df, fuel_flow=fuel_flow_standard)
+            df["T_s"] = df["T_s_left"] + df["T_s_right"]
+            df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["ias"]), axis=1)

@@ -1,5 +1,5 @@
 from unittest import TestCase
-import numpy as np
+
 from numpy.testing import assert_allclose
 
 from fd.analysis import aerodynamic_analysis as ana
@@ -28,3 +28,4 @@ class Testaeroparameters(TestCase):
         assert_allclose(ana.calc_reduced_equivalent_V(300, 60500), 300)
         assert_allclose(ana.calc_reduced_equivalent_V(95, 100000), 73.892658634)
         assert_allclose(ana.calc_reduced_equivalent_V(245, 20000), 426.116914708)
+        assert_allclose(ana.calc_Tc(2000, 300, 15, 1.225), 2.41874527589e-3)

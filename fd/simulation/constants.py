@@ -23,6 +23,8 @@ Ah = bh**2 / Sh  # stabilizer aspect ratio [-]
 Vh_V = 1  # [-]
 ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
 
+fuel_flow_standard = 0.048  # [kg/s]
+
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
 p0 = 101325  # air pressure at sea level [Pa]
