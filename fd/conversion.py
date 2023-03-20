@@ -39,3 +39,7 @@ def ft_to_m(ft):
 def C_to_K(C):
     """Convert temperature in Celcius to Kelvin"""
     return 273.15 + C
+
+def inchpound_to_kgm(inchpound):
+    """Convert inchpound moment to kgm moment"""
+    return inchpound*0.0254*0.45359237
