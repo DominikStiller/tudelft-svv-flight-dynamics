@@ -71,10 +71,10 @@ class AircraftModel:
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
-        #x = [u, alpha, theta, q]T
+        # x = [u, alpha, theta, q]T
         C_1 = np.array(
             [
-                [-2 * muc*c/V0**2, 0, 0, 0],
+                [-2 * muc * c / V0**2, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
@@ -82,10 +82,10 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu/V0, CXa, CZ0, CXq * c / V0],
-                [CZu/V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
+                [CXu / V0, CXa, CZ0, CXq * c / V0],
+                [CZu / V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
-                [Cmu/V0, Cma, 0, Cmq * c / V0],
+                [Cmu / V0, Cma, 0, Cmq * c / V0],
             ]
         )
         C_3 = np.array([[CXde], [CZde], [0], [Cmde]])
@@ -115,7 +115,7 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        #mub = self.get_non_dim_masses(m, rho)[-1]
+        # mub = self.get_non_dim_masses(m, rho)[-1]
 
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array(
@@ -152,9 +152,8 @@ class AircraftModel:
         D = np.zeros((4, 2))
         return A, B, C, D
 
-    def get_eigenvalues_and_eigenvectors(
-            self, A: ArrayLike):
-        '''
+    def get_eigenvalues_and_eigenvectors(self, A: ArrayLike):
+        """
 
         Args:
             A: State matrix
@@ -164,7 +163,7 @@ class AircraftModel:
 
         Returns:
             Eigenvalues and Eigenvectors
-        '''
+        """
         eigenvalues, eigenvectors = alg.eig(A)
         return eigenvalues, eigenvectors
 
@@ -187,7 +186,7 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        #mub = self.get_non_dim_masses(m, rho)[-1]
+        # mub = self.get_non_dim_masses(m, rho)[-1]
 
         # C_1*x_dot + C_2*x +C_3*u = 0
         # X = [beta, phi, pb/2V, rb/2V]T
@@ -211,10 +210,10 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CYb, CL, CYp , (CYr - 4 * mub) ],
+                [CYb, CL, CYp, (CYr - 4 * mub)],
                 [0, 0, 1, 0],
-                [Clb, 0, Clp , Clr ],
-                [Cnb, 0, Cnp , Cnr ],
+                [Clb, 0, Clp, Clr],
+                [Cnb, 0, Cnp, Cnr],
             ]
         )
         C_3 = np.array([[CYda, CYdr], [0, 0], [Clda, Cldr], [Cnda, Cndr]])
@@ -225,10 +224,14 @@ class AircraftModel:
         D = np.zeros((4, 2))
         return A, B, C, D
 
-    def get_step_input(self, maneuvre_duration, dt, input_duration, input_value, plot = False):
+    def get_step_input(
+        self, maneuvre_duration, dt, input_duration, input_value, plot=False
+    ):
         t = np.arange(0, maneuvre_duration + dt, dt)
         u = np.zeros(t.shape)
-        u[:int(input_duration / dt)] = input_value * np.ones(u[:int(input_duration / dt)].size)
+        u[: int(input_duration / dt)] = input_value * np.ones(
+            u[: int(input_duration / dt)].size
+        )
         if plot:
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
@@ -236,7 +239,8 @@ class AircraftModel:
             ax.set_xlabel("Time [s]")
             ax.set_ylabel("$delta_e$")
         return t, u
-    def get_response_plots_symmetric(self, sys, x0, t, u ):
+
+    def get_response_plots_symmetric(self, sys, x0, t, u):
 
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
@@ -272,5 +276,3 @@ class AircraftModel:
         axs[1, 1].set_title("r [rad/sec]")
 
         plt.show()
-
-
