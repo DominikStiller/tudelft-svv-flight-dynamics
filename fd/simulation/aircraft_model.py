@@ -89,6 +89,7 @@ class AircraftModel:
             ]
         )
         C_3 = np.array([[CXde], [CZde], [0], [Cmde]])
+
         A = np.matmul(-alg.inv(C_1), C_2)
         B = np.matmul(-alg.inv(C_1), C_3)
         # In order to get the state variables as output:
@@ -115,8 +116,8 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        # mub = self.get_non_dim_masses(m, rho)[-1]
-
+        mub = self.get_non_dim_masses(m, rho)[-1]
+        # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
         C_1 = np.array(
             [
@@ -125,28 +126,96 @@ class AircraftModel:
                 [
                     0,
                     0,
-                    -2 * mub * KX2 * (b**2 / V0**2),
-                    2 * mub * KXZ * (b**2 / V0**2),
+                    -4 * mub * KX2 * (b / V0) * (b / (2 * V0)),
+                    4 * mub * KXZ * (b / V0) * (b / (2 * V0)),
                 ],
                 [
                     Cnbdot * b / V0,
                     0,
-                    2 * mub * KXZ * (b**2 / V0**2),
-                    -2 * mub * KZ2 * (b**2 / V0**2),
+                    4 * mub * KXZ * (b / V0) * (b / (2 * V0)),
+                    -4 * mub * KZ2 * (b / V0) * (b / (2 * V0)),
                 ],
             ]
         )
         C_2 = np.array(
             [
-                [CYb, CL, CYp * b / (2 * V0), (CYr - 4 * mub) * b / (2 * V0)],
-                [0, 0, b / (2 * V0), 0],
-                [Clb, 0, Clp * b / (2 * V0), Clr * b / (2 * V0)],
-                [Cnb, 0, Cnp * b / (2 * V0), Cnr * b / (2 * V0)],
+                [CYb, CL, CYp * (b / (2 * V0)), (CYr - 4 * mub) * (b / (2 * V0))],
+                [0, 0, 1 * (b / (2 * V0)), 0],
+                [Clb, 0, Clp * (b / (2 * V0)), Clr * (b / (2 * V0))],
+                [Cnb, 0, Cnp * (b / (2 * V0)), Cnr * (b / (2 * V0))],
             ]
         )
         C_3 = np.array([[CYda, CYdr], [0, 0], [Clda, Cldr], [Cnda, Cndr]])
-        A = np.matmul(-alg.inv(C_1), C_2)
-        B = np.matmul(-alg.inv(C_1), C_3)
+
+        A = -alg.inv(C_1) @ C_2
+        B = -alg.inv(C_1) @ C_3
+        """
+
+        A = np.array(
+            [
+                [
+                    V0 / b * CYb / 2 / mub,
+                    V0 / b * CL / 2 / mub,
+                    V0 / b * CYp / 2 / mub,
+                    V0 / b * (CYr - 4 * mub) / 2 / mub,
+                ],
+                [0, 0, 2 * V0 / b, 0],
+                [
+                    V0
+                    / b
+                    * (Clb * KZ2 + Cnb * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    0,
+                    V0
+                    / b
+                    * (Clp * KZ2 + Cnp * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clr * KZ2 + Cnr * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                ],
+                [
+                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2)),
+                    0,
+                    V0
+                    / b
+                    * (Clp * KXZ + Cnp * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clr * KXZ + Cnr * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                ],
+            ]
+        )
+        B = np.array(
+            [
+                [0, V / b * (CYr - 4 * mub) / 2 / mub],
+                [0, 0],
+                [
+                    V0
+                    / b
+                    * (Clda * KZ2 + Cnda * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Cldr * KZ2 + Cndr * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                ],
+                [
+                    V0
+                    / b
+                    * (Clda * KXZ + Cnda * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Cldr * KXZ + Cndr * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                ],
+            ]
+        )
+        """
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
@@ -166,63 +235,6 @@ class AircraftModel:
         """
         eigenvalues, eigenvectors = alg.eig(A)
         return eigenvalues, eigenvectors
-
-    def get_state_space_matrices_asymmetric_reader(
-        self, m: float, V0: float, rho: float, th0: float, CL: float
-    ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
-        """
-
-        Args:
-            m: Aircraft mass
-            V0: Airspeed for the initial steady flight condition
-            rho: Air density for the initial steady conditions
-            th0: Pitch angle for the initial steady flight condition
-            CL: Lift coefficient for steady flight
-
-        Returns:
-            A: State matrix
-            B: Control matrix
-            C: Output matrix
-            D: Feedthrough matrix
-        """
-
-        # mub = self.get_non_dim_masses(m, rho)[-1]
-
-        # C_1*x_dot + C_2*x +C_3*u = 0
-        # X = [beta, phi, pb/2V, rb/2V]T
-        C_1 = np.array(
-            [
-                [(CYbdot - 2 * mub) * b / V0, 0, 0, 0],
-                [0, -b / (2 * V0), 0, 0],
-                [
-                    0,
-                    0,
-                    -4 * mub * KX2 * (b / V0),
-                    4 * mub * KXZ * (b / V0),
-                ],
-                [
-                    Cnbdot * b / V0,
-                    0,
-                    4 * mub * KXZ * (b / V0),
-                    4 * mub * KZ2 * (b / V0),
-                ],
-            ]
-        )
-        C_2 = np.array(
-            [
-                [CYb, CL, CYp, (CYr - 4 * mub)],
-                [0, 0, 1, 0],
-                [Clb, 0, Clp, Clr],
-                [Cnb, 0, Cnp, Cnr],
-            ]
-        )
-        C_3 = np.array([[CYda, CYdr], [0, 0], [Clda, Cldr], [Cnda, Cndr]])
-        A = np.matmul(-alg.inv(C_1), C_2)
-        B = np.matmul(-alg.inv(C_1), C_3)
-        # In order to get the state variables as output:
-        C = np.eye(4)
-        D = np.zeros((4, 2))
-        return A, B, C, D
 
     def get_step_input(
         self, maneuvre_duration, dt, input_duration, input_value, plot=False
@@ -247,15 +259,19 @@ class AircraftModel:
 
         axs[0, 0].plot(t, xout[:, 0] + V0 * np.ones(t.size))
         axs[0, 0].set_title("V [m/sec")
+        axs[0, 0].grid()
 
         axs[1, 0].plot(t, xout[:, 1])
         axs[1, 0].set_title("$alpha$ [rad]")
+        axs[1, 0].grid()
 
         axs[0, 1].plot(t, xout[:, 2])
         axs[0, 1].set_title("$theta$ [rad]")
+        axs[0, 1].grid()
 
         axs[1, 1].plot(t, xout[:, 3])
         axs[1, 1].set_title("q [rad/sec]")
+        axs[1, 1].grid()
 
         plt.show()
 
