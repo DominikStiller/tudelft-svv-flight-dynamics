@@ -63,6 +63,8 @@ def timestamp_to_s(timestamp: Union[str, datetime.time]):
         minute = 0
         second = 0
 
+        timestamp = timestamp.strip()
+
         if match := re.fullmatch(r"(\d+)\.(\d+):(\d+)", timestamp):
             # h.mm:ss
             hour, minute, second = match.groups()
