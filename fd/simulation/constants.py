@@ -20,10 +20,12 @@ ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
+p0 = 101325  # air pressure at sea level [Pa]
 Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
 g = 9.81  # [m/s^2] (gravity constant)
+gamma = 1.4  #
 
 # air density [kg/m^3]
 # rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
@@ -46,6 +48,9 @@ depsda = 4 / (A + 2)  # Downwash gradient [-]
 # Lift and drag coefficient
 # CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
 # CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
+
+# standard values
+Ws = 60500  # standard weight from the assignment
 
 # Stability derivatives
 # CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
