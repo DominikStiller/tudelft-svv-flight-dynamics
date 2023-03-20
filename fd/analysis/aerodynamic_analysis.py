@@ -107,19 +107,6 @@ def calc_equivalent_V(Vt, rho):
     return Vt * np.sqrt(rho / constants.rho0)
 
 
-def calc_reduced_equivalent_V(Ve, W):
-    """
-
-    Args:
-        Ve (float): Equivalent velocity[m/s]
-        W (float): Weight of the aircraft[N]
-
-    Returns (float): Reduced equivalent airspeed[m/s]
-
-    """
-    return Ve * np.sqrt(constants.Ws / W)
-
-
 def calc_CL(W: float, V: float, rho: float, S=constants.S) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
