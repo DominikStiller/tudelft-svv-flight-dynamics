@@ -9,7 +9,8 @@ COLUMNS = {
     "rh_engine_FMF": "fuel_flow_right",
     "lh_engine_FU": "fuel_used_left",
     "rh_engine_FU": "fuel_used_right",
-    "column_Se": "se",
+    "column_Se": "s_e",
+    "column_fe": "F_e",
     "delta_a": "delta_a",
     "delta_e": "delta_e",
     "delta_r": "delta_r",
@@ -24,6 +25,7 @@ COLUMNS = {
     "Ahrs1_bRollRate": "p",
     "Ahrs1_bPitchRate": "q",
     "Ahrs1_bYawRate": "r",
+    "Fms1_trueHeading": "chi",
 }
 
 

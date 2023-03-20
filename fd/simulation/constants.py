@@ -1,6 +1,11 @@
 # Citation 550 - Linear simulation
 
-from math import sin, cos, pi
+from math import pi
+
+g = 9.81  # [m/s^2] (gravity constant)
+
+# Aircraft mass
+mass_basic_empty = 9172.9 / g  # basic empty weight [kg]
 
 # xcg = 0.25 * c
 
@@ -24,7 +29,6 @@ p0 = 101325  # air pressure at sea level [Pa]
 Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
-g = 9.81  # [m/s^2] (gravity constant)
 gamma = 1.4  #
 
 # air density [kg/m^3]
@@ -92,3 +96,12 @@ Cnp = -0.0602
 Cnr = -0.2061
 Cnda = -0.0120
 Cndr = -0.0939
+
+# Durations of the eigenmotions
+# Used for data extraction and simulation
+duration_phugoid = 120  # [s]
+duration_short_period = 8  # [s]
+duration_dutch_roll = 20  # [s]
+duration_dutch_roll_yd = 10  # [s]
+duration_aperiodic_roll = 12  # [s]
+duration_spiral = 120  # [s]

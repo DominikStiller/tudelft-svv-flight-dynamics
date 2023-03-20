@@ -34,7 +34,7 @@ class DataSheet:
         self.timestamp_dutch_roll = timestamp_to_s(ws[82][6])
         self.timestamp_dutch_roll_yd = timestamp_to_s(ws[83][6])
         self.timestamp_aperiodic_roll = timestamp_to_s(ws[82][9])
-        self.timestamp_spiral = timestamp_to_s(ws[82][9])
+        self.timestamp_spiral = timestamp_to_s(ws[83][9])
 
     def _extract_mass(self, ws: list[list[Any]]):
         self.mass_pilot_1 = ws[7][7]
