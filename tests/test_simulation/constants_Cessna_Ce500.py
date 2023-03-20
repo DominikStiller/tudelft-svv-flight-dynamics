@@ -117,6 +117,3 @@ def test_Cessna_Ce500_asymmetric():
     E_prim = CL * (Clb * Cnr - Cnb * Clr)
     p = (A_prim, B_prim, C_prim, D_prim, E_prim)
     print(np.polynomial.polynomial.polyroots(p))
-
-
-

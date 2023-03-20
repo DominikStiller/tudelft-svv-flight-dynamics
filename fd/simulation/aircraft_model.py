@@ -64,12 +64,10 @@ class AircraftModel:
             D: Feedthrough matrix
 
         """
-
         Cma = self.aero_params.C_m_alpha
         Cmde = self.aero_params.C_m_delta
         muc = self.get_non_dim_masses(m, rho)[0]
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
-
         # C_1*x_dot + C_2*x +C_3*u = 0
         # x = [u, alpha, theta, q]T
         C_1 = np.array(
