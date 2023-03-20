@@ -10,9 +10,7 @@ check_has_proper_extension = lambda f: f.suffix in [".py", ".yml"]
 check_is_not_init = lambda f: f.name != "__init__.py"
 
 paths = filter(
-    lambda f: check_is_file(f)
-    and check_has_proper_extension(f)
-    and check_is_not_init(f),
+    lambda f: check_is_file(f) and check_has_proper_extension(f) and check_is_not_init(f),
     paths,
 )
 

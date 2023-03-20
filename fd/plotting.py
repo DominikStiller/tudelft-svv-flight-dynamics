@@ -49,18 +49,14 @@ def format_plot(
         xlocator_ax = xlocator
         if not xlocator_ax:
             if ax.get_xscale() == "log":
-                xlocator_ax = matplotlib.ticker.LogLocator(
-                    base=10, subs="auto", numticks=100
-                )
+                xlocator_ax = matplotlib.ticker.LogLocator(base=10, subs="auto", numticks=100)
             else:
                 xlocator_ax = matplotlib.ticker.AutoMinorLocator()
 
         ylocator_ax = ylocator
         if not ylocator_ax:
             if ax.get_yscale() == "log":
-                ylocator_ax = matplotlib.ticker.LogLocator(
-                    base=10, subs="auto", numticks=100
-                )
+                ylocator_ax = matplotlib.ticker.LogLocator(base=10, subs="auto", numticks=100)
             else:
                 ylocator_ax = matplotlib.ticker.AutoMinorLocator()
 

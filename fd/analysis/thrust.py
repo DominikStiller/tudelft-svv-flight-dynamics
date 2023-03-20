@@ -132,9 +132,7 @@ def stuw(h, M, dtemp, mfi):
     )
     dmhnr = 0
     if M >= 0.2:
-        dmhnr = (-0.12 * pow(M, 2) + 0.024 * M) * (
-            -0.0625 * pow((h / 3048), 2) + 0.5 * h / 3048
-        )
+        dmhnr = (-0.12 * pow(M, 2) + 0.024 * M) * (-0.0625 * pow((h / 3048), 2) + 0.5 * h / 3048)
     nr = 0.989
     nf = 0.7
     nc = 0.73
@@ -167,9 +165,7 @@ def stuw(h, M, dtemp, mfi):
                 d = d + 1
                 ttb = nb * 41.865 * pow(10, 6) * mfi / 1147 / mhd
                 fi = 0.3452334 * (1 + ttb / tt3d)
-                ehpc = pow(
-                    1 + fi * (pow(6.5625, (0.4 / 1.4 / nc)) - 1), (nc * 1.4 / 0.4)
-                )
+                ehpc = pow(1 + fi * (pow(6.5625, (0.4 / 1.4 / nc)) - 1), (nc * 1.4 / 0.4))
                 mht3p3 = 0.0011217 * ehpc / sqrt(fi) / 6.5625
                 pt3 = mhd * sqrt(tt3d) / mht3p3
                 elpc = pt3 / pt2
@@ -204,9 +200,7 @@ def stuw(h, M, dtemp, mfi):
                     d = d + 1
                     ttb = nb * 41.865 * pow(10, 6) * mfi / 1147 / mhd
                     fi = 0.3452334 * (1 + ttb / tt3d)
-                    ehpc = pow(
-                        1 + fi * (pow(6.5625, (0.4 / 1.4 / nc)) - 1), (nc * 1.4 / 0.4)
-                    )
+                    ehpc = pow(1 + fi * (pow(6.5625, (0.4 / 1.4 / nc)) - 1), (nc * 1.4 / 0.4))
                     mht3p3 = 0.0011217 * ehpc / sqrt(fi) / 6.5625
                     pt3 = mhd * sqrt(tt3d) / mht3p3
                     elpc = pt3 / pt2
@@ -232,9 +226,7 @@ def stuw(h, M, dtemp, mfi):
                 - 0.00072636 * pow(NLcort, 3)
                 + 0.0000027318 * pow(NLcort, 4)
             ) / 100
-            dncn = -0.1209875 * (NLcort - 104) + 0.0005625 * (
-                pow(NLcort, 2) - pow(104, 2)
-            )
+            dncn = -0.1209875 * (NLcort - 104) + 0.0005625 * (pow(NLcort, 2) - pow(104, 2))
             nf1 = (
                 -14803
                 - 0.2407085
@@ -312,9 +304,7 @@ def W_end0():
             else:
                 p7krit = pow((1 - 0.33 / 2.33 / nnh), (-1.33 / 0.33))
                 if pt7 / po < p7krit:
-                    wh = sqrt(
-                        2 * nnh * 1147 * tt7 * (1 - pow((po / pt7), (0.33 / 1.33)))
-                    )
+                    wh = sqrt(2 * nnh * 1147 * tt7 * (1 - pow((po / pt7), (0.33 / 1.33))))
                     t8 = tt7 * (1 - nnh * (1 - pow((po / pt7), (0.33 / 1.33))))
                     phe = po
                 else:
@@ -332,12 +322,7 @@ def W_end0():
                 elif delmh > 1.001:
                     mhd = mhd + 0.05 * (mh - mhd)
                 else:
-                    Tn = (
-                        mc * (wc - vo)
-                        + mh * (wh - vo)
-                        + Ac * (pce - po)
-                        + Ah * (phe - po)
-                    )
+                    Tn = mc * (wc - vo) + mh * (wh - vo) + Ac * (pce - po) + Ah * (phe - po)
                     # echo "Tn (1): ", Tn, "<br>"
                     mf = ttb / nb / 41.875 * pow(10, 6) * 1147 * mh
                     itt = tt7 + 3 * (tt3 - tt2) - 273.15
@@ -443,9 +428,7 @@ def W_end4():
             else:
                 p7krit = pow((1 - 0.33 / 2.33 / nnh), (-1.33 / 0.33))
                 if pt7 / po < p7krit:
-                    wh = sqrt(
-                        2 * nnh * 1147 * tt7 * (1 - pow((po / pt7), (0.33 / 1.33)))
-                    )
+                    wh = sqrt(2 * nnh * 1147 * tt7 * (1 - pow((po / pt7), (0.33 / 1.33))))
                     t8 = tt7 * (1 - nnh * (1 - pow((po / pt7), (0.33 / 1.33))))
                     phe = po
                 else:
@@ -462,12 +445,7 @@ def W_end4():
                     elif delmh > 1.001:
                         mhd = mhd + 0.05 * (mh - mhd)
                 else:
-                    Tn = (
-                        mc * (wc - vo)
-                        + mh * (wh - vo)
-                        + Ac * (pce - po)
-                        + Ah * (phe - po)
-                    )
+                    Tn = mc * (wc - vo) + mh * (wh - vo) + Ac * (pce - po) + Ah * (phe - po)
                     # echo "Tn (2): ", Tn, "<br>"
                     mf = ttb / nb / 41.875 * pow(10, 6) * 1147 * mh
                     itt = tt7 + 3 * (tt3 - tt2) - 273.15

@@ -236,14 +236,10 @@ class AircraftModel:
         eigenvalues, eigenvectors = alg.eig(A)
         return eigenvalues, eigenvectors
 
-    def get_step_input(
-        self, maneuvre_duration, dt, input_duration, input_value, plot=False
-    ):
+    def get_step_input(self, maneuvre_duration, dt, input_duration, input_value, plot=False):
         t = np.arange(0, maneuvre_duration + dt, dt)
         u = np.zeros(t.shape)
-        u[: int(input_duration / dt)] = input_value * np.ones(
-            u[: int(input_duration / dt)].size
-        )
+        u[: int(input_duration / dt)] = input_value * np.ones(u[: int(input_duration / dt)].size)
         if plot:
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
@@ -253,7 +249,6 @@ class AircraftModel:
         return t, u
 
     def get_response_plots_symmetric(self, sys, x0, t, u):
-
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 
