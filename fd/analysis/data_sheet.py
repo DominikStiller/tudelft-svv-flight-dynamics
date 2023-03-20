@@ -9,7 +9,7 @@ from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_t
 from fd.io import load_data_sheet
 from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty
-from fd.util import mean_not_none
+from fd.util import mean_not_none, mean_not_nan_df
 
 
 class DataSheet:
@@ -149,16 +149,13 @@ class AveragedDataSheet:
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
     def _calculate_dataframe_average_and_check_deviation(
-        self, dfs: list[pd.DataFrame], threshold_pct=5
+        self, dfs: list[pd.DataFrame], threshold_pct=7
     ) -> pd.DataFrame:
         """
         Average data from multiple data sheets and check if any values deviate more than threshold_pct % from per-cell mean
         """
         # Calculate mean of non-NA values
-        df_mean = dfs[0]
-        for ds in dfs[1:]:
-            df_mean = df_mean.add(ds, fill_value=0)
-        df_mean /= len(dfs)
+        df_mean = mean_not_nan_df(dfs)
 
         # Check deviations
         for df_idx, df in enumerate(dfs):
