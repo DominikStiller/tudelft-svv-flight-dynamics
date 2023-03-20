@@ -229,4 +229,3 @@ def calc_Cmalpha(alpha, delta_e, Cmdelta):
     slope = TheilslopesResults[0]
     print(slope)
     return -slope * Cmdelta
-
