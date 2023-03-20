@@ -20,6 +20,20 @@ from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
 
 
+COLUMNS = {
+    "hp": "h",
+    "IAS": "cas",
+    "a": "alpha",
+    "de": "delta_e",
+    "detr": "delta_e_t",
+    "Fe": "F_e",
+    "FFl": "fuel_flow_left",
+    "FFr": "fuel_flow_right",
+    "F. used": "fuel_used",
+    "TAT": "T_total",
+}
+
+
 class DataSheet:
     def __init__(self, data_path: str):
         self._extract(load_data_sheet(data_path))
@@ -88,7 +102,6 @@ class DataSheet:
         )
         df = df.dropna(subset="time").reset_index(drop=True)
         df["time"] = df["time"].apply(timestamp_to_s)
-        df["time_min"] = df["time"] / 60
         # Force as float since Excel sheet may store numbers as strings
         df = df.astype("float64")
         df = DataSheet._process_data_sheet_series(df)
@@ -97,23 +110,10 @@ class DataSheet:
 
     @staticmethod
     def _process_data_sheet_series(df: pd.DataFrame) -> pd.DataFrame:
-        df = df.rename(
-            columns={
-                "hp": "h",
-                "IAS": "ias",
-                "a": "alpha",
-                "de": "delta_e",
-                "detr": "delta_e_t",
-                "Fe": "F_e",
-                "FFl": "fuel_flow_left",
-                "FFr": "fuel_flow_right",
-                "F. used": "fuel_used",
-                "TAT": "T_total",
-            }
-        )
+        df = df.rename(columns=COLUMNS)
 
         df["h"] = ft_to_m(df["h"])
-        df["ias"] = kts_to_ms(df["ias"])
+        df["cas"] = kts_to_ms(df["cas"])
         df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
         df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
         df["fuel_used"] = lbs_to_kg(df["fuel_used"])
@@ -130,13 +130,13 @@ class AveragedDataSheet:
         self._add_derived_timeseries()
 
     def _calculate_averages(self):
-        self.df_clcd = self._calculate_dataframe_average_and_check_deviation(
+        self.df_clcd = self._calculate_dataframe_average_and_check_deviations(
             [ds.df_clcd for ds in self.data_sheets]
         )
-        self.df_elevator_trim = self._calculate_dataframe_average_and_check_deviation(
+        self.df_elevator_trim = self._calculate_dataframe_average_and_check_deviations(
             [ds.df_elevator_trim for ds in self.data_sheets]
         )
-        self.df_cg_shift = self._calculate_dataframe_average_and_check_deviation(
+        self.df_cg_shift = self._calculate_dataframe_average_and_check_deviations(
             [ds.df_cg_shift for ds in self.data_sheets]
         )
 
@@ -156,8 +156,8 @@ class AveragedDataSheet:
         self.timestamp_spiral = mean_not_none([ds.timestamp_spiral for ds in self.data_sheets])
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
-    def _calculate_dataframe_average_and_check_deviation(
-        self, dfs: list[pd.DataFrame], threshold_pct=7
+    def _calculate_dataframe_average_and_check_deviations(
+        self, dfs: list[pd.DataFrame], threshold_pct=5, check_deviations=True
     ) -> pd.DataFrame:
         """
         Average data from multiple data sheets and check if any values deviate more than threshold_pct % from per-cell mean
@@ -166,31 +166,34 @@ class AveragedDataSheet:
         df_mean = mean_not_nan_df(dfs)
 
         # Check deviations
-        for df_idx, df in enumerate(dfs):
-            # Calculate mean absolute percentage error
-            error: pd.DataFrame = ((df - df_mean) / df_mean).abs() * 100
-            exceeds_error_threshold = np.argwhere(error.to_numpy() > threshold_pct)
-            if len(exceeds_error_threshold) > 0:
-                data_sheet_name = self.data_sheet_names[df_idx]
-                print(f"Some values in {data_sheet_name} exceed the {threshold_pct} % threshold")
-                for i in range(exceeds_error_threshold.shape[0]):
-                    row, col = exceeds_error_threshold[i]
-                    column_name = df.columns[col]
+        if check_deviations:
+            for df_idx, df in enumerate(dfs):
+                # Calculate mean absolute percentage error
+                error: pd.DataFrame = ((df - df_mean) / df_mean).abs() * 100
+                exceeds_error_threshold = np.argwhere(error.to_numpy() > threshold_pct)
+                if len(exceeds_error_threshold) > 0:
+                    data_sheet_name = self.data_sheet_names[df_idx]
                     print(
-                        f"Row {row}, column {column_name} ({error.iloc[row, col]:.3} %): "
-                        f"{data_sheet_name} = {df.iloc[row, col]:.3}, mean = {df_mean.iloc[row, col]:.3}"
+                        f"Some values in {data_sheet_name} exceed the {threshold_pct} % threshold"
                     )
-                print()
+                    for i in range(exceeds_error_threshold.shape[0]):
+                        row, col = exceeds_error_threshold[i]
+                        column_name = df.columns[col]
+                        print(
+                            f"Row {row}, column {column_name} ({error.iloc[row, col]:.3} %): "
+                            f"{data_sheet_name} = {df.iloc[row, col]:.3}, mean = {df_mean.iloc[row, col]:.3}"
+                        )
+                    print()
 
         return df_mean
 
     def _add_derived_timeseries(self):
         for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
-            df["time_min"] = df.index / 60
+            df["time_min"] = df["time"] / 60
             df["m"] = self.mass_initial - df["fuel_used"]
             df["W"] = df["m"] * constants.g
 
-            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["ias"]), axis=1)
+            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["cas"]), axis=1)
             df["T_static"] = df.apply(
                 lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
             )
@@ -212,7 +215,7 @@ class AveragedDataSheet:
             df["T_s"] = df["T_s_left"] + df["T_s_right"]
 
             # Calculate coefficients
-            # Using IAS + rho0 gives the same results as TAS + rho
-            df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
+            # Using CAS + rho0 gives the same results as TAS + rho
             df["C_l"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)
