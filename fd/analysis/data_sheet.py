@@ -3,7 +3,15 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from fd.analysis.aerodynamic_analysis import calc_mach, calc_static_temp, calc_Tc
+from fd.analysis.aerodynamic_analysis import (
+    calc_mach,
+    calc_static_temp,
+    calc_Tc,
+    calc_rho,
+    calc_stat_pres,
+    calc_true_V,
+    calc_CL,
+)
 from fd.analysis.thrust import calculate_thrust_from_df
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
@@ -186,15 +194,25 @@ class AveragedDataSheet:
             df["T_static"] = df.apply(
                 lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
             )
+            df["p"] = df.apply(lambda row: calc_stat_pres(row["h"]), axis=1)
+            df["rho"] = df.apply(lambda row: calc_rho(row["p"], row["T_static"]), axis=1)
 
+            df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
+            # No need to calculate equivalent airspeed, is already given in data as IAS
+
+            # Calculate thrust (actual + standardized)
             df[["T_left", "T_right"]] = calculate_thrust_from_df(df)
             # df[["T_left", "T_right"]] = calculate_thrust_from_df_exe(df)
             df["T"] = df["T_left"] + df["T_right"]
-            df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["ias"]), axis=1)
 
             df[["T_s_left", "T_s_right"]] = calculate_thrust_from_df(
                 df, fuel_flow=fuel_flow_standard
             )
             # df[["T_s_left", "T_s_right"]] = calculate_thrust_from_df_exe(df, fuel_flow=fuel_flow_standard)
             df["T_s"] = df["T_s_left"] + df["T_s_right"]
-            df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["ias"]), axis=1)
+
+            # Calculate coefficients
+            # Using IAS + rho0 gives the same results as TAS + rho
+            df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
+            df["C_l"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)

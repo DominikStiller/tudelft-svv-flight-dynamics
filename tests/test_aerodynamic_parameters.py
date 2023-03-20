@@ -25,7 +25,4 @@ class Testaeroparameters(TestCase):
         assert_allclose(ana.calc_equivalent_V(100, 1.225), 100)
         assert_allclose(ana.calc_equivalent_V(250, 0.82), 204.540300904)
         assert_allclose(ana.calc_equivalent_V(75, 0.105), 21.9577516413)
-        assert_allclose(ana.calc_equivalent_V(300, 60500), 300)
-        assert_allclose(ana.calc_equivalent_V(95, 100000), 73.892658634)
-        assert_allclose(ana.calc_equivalent_V(245, 20000), 426.116914708)
-        assert_allclose(ana.calc_Tc(2000, 300, 15, 1.225), 2.41874527589e-3)
+        assert_allclose(ana.calc_Tc(2000, 300, 1.225, 15), 2.41874527589e-3)

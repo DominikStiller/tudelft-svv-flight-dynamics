@@ -113,7 +113,7 @@ def calc_CL(W: float, V: float, rho: float, S=constants.S) -> float:
     """
     Calculate CL for a given combination of W, rho, V and S.
     Args:
-        W (array_like): Weight [-]
+        W (array_like): Weight [N]
         rho (float): Air density [kg/m3]
         V (array_like): True airspeed [m/s]
         S (float): Surface area [m2]
@@ -147,9 +147,9 @@ def calc_CL_alpha(CL: float, alpha: float) -> float:
     return CLalpha, CL_alpha_equals0, alpha_0  # low_slope, high_slope
 
 
-def calc_CD(T: float, V: float, rho) -> float:
+def calc_CD(T: float, V: float, rho: float, S: float = constants.S) -> float:
     """
-    This function calculates the drag coefficient CD[-]
+    This function calculates the drag coefficient CD[-] based on the thrust.
 
     Args:
         T (array_like): Thrust[N].
@@ -159,7 +159,7 @@ def calc_CD(T: float, V: float, rho) -> float:
         CD (array_like): Drag coefficient CD[-].
 
     """
-    return T / (0.5 * rho * V * V * constants.S)
+    return T / (0.5 * rho * V * V * S)
 
 
 def calc_CD0_e(CD: list, CL: list) -> float:
@@ -233,14 +233,15 @@ def calc_Cmalpha(alpha, delta_e, Cmdelta):
     return -slope * Cmdelta
 
 
-def calc_Tc(T: float, V: float, S=constants.S, rho: float = constants.rho0) -> float:
+def calc_Tc(T: float, V: float, rho: float, S: float = constants.S) -> float:
     """
     Calculate Tc for a given combination of T, rho, V and S.
+
     Args:
         T (array_like): Thrust [N]
-        rho (float): Air density (set to sea level) [kg/m^3]
-        V (array_like): Velocity (calibrated one since we are using rho at sea level) [m/s]
-        S (float): Surface area [m^2]
+        rho (float): Air density [kg/m3]
+        V (array_like): True airspeed [m/s]
+        S (float): Surface area [m2]
 
     Returns:
         (array_like): Tc [-]
