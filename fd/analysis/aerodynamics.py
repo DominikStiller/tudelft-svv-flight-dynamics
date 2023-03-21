@@ -148,20 +148,3 @@ def estimate_Cmalpha(alpha, delta_e, Cmdelta):
 
     slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
     return -slope * Cmdelta
-
-
-def calc_Tc(T: float, V: float, rho: float, S: float = constants.S) -> float:
-    """
-    Calculate Tc for a given combination of T, rho, V and S.
-
-    Args:
-        T (array_like): Thrust [N]
-        rho (float): Air density [kg/m3]
-        V (array_like): True airspeed [m/s]
-        S (float): Surface area [m2]
-
-    Returns:
-        (array_like): Tc [-]
-    """
-
-    return 2 * T / (rho * V * V * S)

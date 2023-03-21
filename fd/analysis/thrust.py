@@ -6,6 +6,8 @@ from typing import Optional
 
 import pandas as pd
 
+from fd.simulation import constants
+
 ittmax = 730
 Ne = 2
 NL = 104
@@ -608,15 +610,18 @@ def calculate_thrust_from_df_exe(
     return pd.DataFrame(thrusts, index=df.index)
 
 
-if __name__ == "__main__":
-    from fd.io import load_ftis_measurements
-    from fd.analysis.ftis_measurements import process_ftis_measurements
+def calc_Tc(T: float, V: float, rho: float, S: float = constants.S) -> float:
+    """
+    Calculate Tc for a given combination of T, rho, V and S.
 
-    df = process_ftis_measurements(load_ftis_measurements("data/ref_2023"))
-    # df = df.iloc[0:-1:3000].iloc[14:15]  # returns 0
-    # df = df.iloc[0:-1:100].iloc[97:98]  # math domain error (neg sqrt)
-    # df = df.iloc[0:-1:100].iloc[115:116]  # overflow error in pow
+    Args:
+        T (array_like): Thrust [N]
+        rho (float): Air density [kg/m3]
+        V (array_like): True airspeed [m/s]
+        S (float): Surface area [m2]
 
-    # print(df.apply(calculate_thrust_from_row_exe, axis=1))
-    # print(calculate_thrust_from_row_exe(df.iloc[3]))
-    print(calculate_thrust_from_row(df.iloc[3]))
+    Returns:
+        (array_like): Tc [-]
+    """
+
+    return 2 * T / (rho * V * V * S)

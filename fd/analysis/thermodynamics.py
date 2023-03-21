@@ -32,10 +32,10 @@ def calc_mach(hp, Vc):
         / (constants.gamma - 1)
         * (
             (
-                    1
-                    + constants.p0
-                    / calc_static_pressure(hp)
-                    * (
+                1
+                + constants.p0
+                / calc_static_pressure(hp)
+                * (
                     (
                         1
                         + (constants.gamma - 1)

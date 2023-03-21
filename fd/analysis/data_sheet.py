@@ -4,12 +4,16 @@ import numpy as np
 import pandas as pd
 
 from fd.analysis.aerodynamics import (
-    calc_Tc,
     calc_true_V,
     calc_CL,
 )
-from fd.analysis.thermodynamics import calc_static_pressure, calc_mach, calc_static_temperature, calc_density
-from fd.analysis.thrust import calculate_thrust_from_df
+from fd.analysis.thermodynamics import (
+    calc_static_pressure,
+    calc_mach,
+    calc_static_temperature,
+    calc_density,
+)
+from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation import constants
