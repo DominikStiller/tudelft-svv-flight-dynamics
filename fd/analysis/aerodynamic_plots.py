@@ -53,10 +53,11 @@ def plot_cl_cd(CL, CD, CD0, e):
 
 # plot_cl_cd([0.5, 0.84, 0.29, 0.955], [0.031, 0.0532, 0.0240, 0.0630], 0.02, 0.8)
 
+
 # Elevator curves
 # [TODO: add smooth plots once data is known to see how it should be done]
 # [TODO: add fully controlled parameters to plots once these are know and its known how we want to do this]
-def plot_deltae_Ve(delta_e, V, xlabel_input = "V_e^*", ylabel_input = "δ_e^*"):
+def plot_deltae_Ve(delta_e, V, xlabel_input="V_e^*", ylabel_input="δ_e^*"):
     """
     Plotting of the elevator trim curve. Depending on if V or V_e is used and the deflection or reduced deflection,
     the non-reduced or reduced elevator trim curve plots can be obtained.
@@ -75,7 +76,8 @@ def plot_deltae_Ve(delta_e, V, xlabel_input = "V_e^*", ylabel_input = "δ_e^*"):
     format_plot()
     plt.show()
 
-def plot_Fe_Ve(F_e, V, xlabel_input = "V_e^*", ylabel_input = "F_e^*"):
+
+def plot_Fe_Ve(F_e, V, xlabel_input="V_e^*", ylabel_input="F_e^*"):
     """
     Plotting of the elevator control force curve. Depending on if V or V_e is used and the F_e or reduced F_e,
     the non-reduced or reduced elevator control force curve plots can be obtained.
