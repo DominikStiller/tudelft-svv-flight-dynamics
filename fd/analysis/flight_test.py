@@ -24,13 +24,6 @@ class FlightTest:
             {p.name: DataSheet(str(p)) for p in Path(data_path).glob("**/*.xlsx")}
         )
         self.ftis_measurements = FTISMeasurements(data_path, self.data_sheet.mass_initial)
-        # TODO compare with FTIS, only visually by plotting both in Jupyter notebook
-
-    def _add_reduced_velocity_timeseries(self):
-        pass
-
-    def _add_reduced_delta_timeseries(self):
-        pass
 
     def analyze(self) -> AerodynamicParameters:
         # Estimate aerodynamic and eigenmotion parameters
@@ -88,9 +81,3 @@ class FlightTest:
         df.index -= df.index[0]
         df["time_min"] -= df["time_min"][0]
         return df
-
-
-if __name__ == "__main__":
-    # test = FlightTest("data/ref_2023")
-    test = FlightTest("data/B24")
-    print(test)
