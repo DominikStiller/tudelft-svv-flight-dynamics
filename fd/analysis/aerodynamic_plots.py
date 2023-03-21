@@ -28,7 +28,7 @@ def plot_cl_alpha(CL, alpha, Clalpha, alpha0):
     plt.show()
 
 
-plot_cl_alpha([0.1, 0.2, 0.3, 0.4, 0.5], [-1, 1, 3, 5, 7], 0.05, -3)
+# plot_cl_alpha([0.1, 0.2, 0.3, 0.4, 0.5], [-1, 1, 3, 5, 7], 0.05, -3)
 
 
 def plot_cl_cd(CL, CD, CD0, e):
@@ -95,3 +95,14 @@ def plot_Fe_Ve(F_e, V, xlabel_input="V_e^*", ylabel_input="F_e^*"):
 
     format_plot()
     plt.show()
+
+
+# Testing
+
+a = [5.2, 6.3, 7.1, 4.3, 3.616666667]
+delta_e = [0.1, -0.35, -0.7, 0.5, 0.7]
+IAS = [154.6666667,143,135.8333333,165.6666667,173.6666667]
+d_trim = [3,3,3,3,3]
+Fe = [-1, -18, -30, 22, 38]
+
+plot_Fe_Ve(Fe, a)
