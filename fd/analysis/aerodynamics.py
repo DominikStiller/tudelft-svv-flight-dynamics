@@ -6,70 +6,6 @@ import scipy.stats as stats
 from fd.simulation import constants
 
 
-def calc_stat_pres(hp):
-    """
-    Calculate the static pressure from the pressure height
-    Args:
-        hp (float): Pressure height[m]
-
-    Returns (float): The static pressure for the pressure height given[Pa]
-
-    """
-    return constants.p0 * (1 + constants.Tempgrad * hp / constants.Temp0) ** (
-        -constants.g / (constants.Tempgrad * constants.R)
-    )
-
-
-def calc_mach(hp, Vc):
-    """
-
-    Args:
-        hp (float): Pressure height[m]
-        Vc (float): The calibrated speed[m/s]
-
-    Returns (float): Mach number for the conditions given[-]
-
-    """
-    return np.sqrt(
-        2
-        / (constants.gamma - 1)
-        * (
-            (
-                1
-                + constants.p0
-                / calc_stat_pres(hp)
-                * (
-                    (
-                        1
-                        + (constants.gamma - 1)
-                        / (2 * constants.gamma)
-                        * constants.rho0
-                        / constants.p0
-                        * Vc**2
-                    )
-                    ** (constants.gamma / (constants.gamma - 1))
-                    - 1
-                )
-            )
-            ** ((constants.gamma - 1) / constants.gamma)
-            - 1
-        )
-    )
-
-
-def calc_static_temp(Ttot, M):
-    """
-
-    Args:
-        Ttot (float): Total temperature[K]
-        M (float): Mach number[-]
-
-    Returns (float): Static temperature[K]
-
-    """
-    return Ttot / (1 + (constants.gamma - 1) / 2 * M**2)
-
-
 def calc_true_V(T, M):
     """
 
@@ -81,19 +17,6 @@ def calc_true_V(T, M):
 
     """
     return M * np.sqrt(constants.gamma * constants.R * T)
-
-
-def calc_rho(p, T):
-    """
-
-    Args:
-        p (float): Static pressure[Pa]
-        T (float): Static temperature[K]
-
-    Returns (float): Density[kg/m^3]
-
-    """
-    return p / (constants.R * T)
 
 
 def calc_equivalent_V(Vt, rho):
@@ -125,7 +48,7 @@ def calc_CL(W: float, V: float, rho: float, S=constants.S) -> float:
     return 2 * W / (rho * V * V * S)
 
 
-def calc_CL_alpha(CL: float, alpha: float) -> float:
+def estimate_CL_alpha(CL: float, alpha: float) -> tuple[float, float, float]:
     """
     Calculate the slope, CL-intercept and alpha intercept of the CL-alpha plot using a Theil-Sen robust linear estimator.
     Args:
@@ -137,14 +60,10 @@ def calc_CL_alpha(CL: float, alpha: float) -> float:
         CL_alpha_equals0 (float): CL at alpha = 0
         alpha_0 (float): alpha at CL = 0
     """
-    result = stats.theilslopes(CL, alpha, alpha=0.99)
-    CLalpha = result[0]
-    CL_alpha_equals0 = result[1]
-    # low_slope = result.low_slope # Lower bound of the confidence interval on slope
-    # high_slope = result.high_slope# Higher bound of the confidence interval on slope
+    CLalpha, CL_alpha_equals0, _, _ = stats.theilslopes(CL, alpha, alpha=0.99)
     alpha_0 = -CL_alpha_equals0 / CLalpha
 
-    return CLalpha, CL_alpha_equals0, alpha_0  # low_slope, high_slope
+    return CLalpha, CL_alpha_equals0, alpha_0
 
 
 def calc_CD(T: float, V: float, rho: float, S: float = constants.S) -> float:
@@ -215,7 +134,7 @@ def calc_Cmdelta(
     return -1 / Delta_delta_e * W_avg / (0.5 * rho * V**2 * constants.S) * Delta_cg / constants.c
 
 
-def calc_Cmalpha(alpha, delta_e, Cmdelta):
+def estimate_Cmalpha(alpha, delta_e, Cmdelta):
     """
 
     Args:
@@ -227,9 +146,7 @@ def calc_Cmalpha(alpha, delta_e, Cmdelta):
 
     """
 
-    TheilslopesResults = stats.theilslopes(delta_e, alpha, alpha=0.99)
-    slope = TheilslopesResults[0]
-    print(slope)
+    slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
     return -slope * Cmdelta
 
 

@@ -3,22 +3,18 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from fd.analysis.aerodynamic_analysis import (
-    calc_mach,
-    calc_static_temp,
+from fd.analysis.aerodynamics import (
     calc_Tc,
-    calc_rho,
-    calc_stat_pres,
     calc_true_V,
     calc_CL,
 )
+from fd.analysis.thermodynamics import calc_static_pressure, calc_mach, calc_static_temperature, calc_density
 from fd.analysis.thrust import calculate_thrust_from_df
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
-
 
 COLUMNS = {
     "hp": "h",
@@ -195,10 +191,10 @@ class AveragedDataSheet:
 
             df["M"] = df.apply(lambda row: calc_mach(row["h"], row["cas"]), axis=1)
             df["T_static"] = df.apply(
-                lambda row: calc_static_temp(row["T_total"], row["M"]), axis=1
+                lambda row: calc_static_temperature(row["T_total"], row["M"]), axis=1
             )
-            df["p"] = df.apply(lambda row: calc_stat_pres(row["h"]), axis=1)
-            df["rho"] = df.apply(lambda row: calc_rho(row["p"], row["T_static"]), axis=1)
+            df["p"] = df.apply(lambda row: calc_static_pressure(row["h"]), axis=1)
+            df["rho"] = df.apply(lambda row: calc_density(row["p"], row["T_static"]), axis=1)
 
             df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
             # No need to calculate equivalent airspeed, is already given in data as IAS
