@@ -16,7 +16,7 @@ class MyTestCase(unittest.TestCase):
         th0 = 0
         model = AircraftModel(aero_params)
         A, B, C, D = model.get_state_space_matrices_symmetric(m, V0, rho, th0)
-        eigenvalues = model.get_eigenvalues_and_eigenvectors(A)[0]
+        eigenvalues, eigenvectors = model.get_eigenvalues_and_eigenvectors(A)
         first = eigenvalues[0] == np.conj(eigenvalues[1])
         second = eigenvalues[2] == np.conj(eigenvalues[3])
 
@@ -33,12 +33,14 @@ class MyTestCase(unittest.TestCase):
         CL = 1.1360
         model = AircraftModel(aero_params)
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
-        eigenvalues = model.get_eigenvalues_and_eigenvectors(A)[0]
+        eigenvalues, eigenvectors = model.get_eigenvalues_and_eigenvectors(A)
         first = eigenvalues[0] < 0
         second = eigenvalues[1] == np.conj(eigenvalues[2])
         third = eigenvalues[3] > 0
 
         self.assertTupleEqual((first, second, third), (True, True, True))
+
+
 """
     def test_analytic_eigenvalues_symmetric(self):
         aero_params = AerodynamicParameters
