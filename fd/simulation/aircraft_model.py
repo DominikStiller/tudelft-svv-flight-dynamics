@@ -1,9 +1,11 @@
 import numpy.linalg as alg
 from numpy.typing import ArrayLike
+import numpy as np
 from math import sin, cos
 import control.matlab as ml
 from fd.structs import AerodynamicParameters
-from tests.test_simulation.constants_Cessna_Ce500 import *
+from fd.simulation.constants import *
+#from tests.test_simulation.constants_Cessna_Ce500 import *
 import matplotlib.pyplot as plt
 
 
@@ -177,7 +179,7 @@ class AircraftModel:
         )
         B = np.array(
             [
-                [0, V / b * (CYr - 4 * mub) / 2 / mub],
+                [0, V0 / b * (CYr - 4 * mub) / 2 / mub],
                 [0, 0],
                 [
                     V0 / b * (Clda * KZ2 + Cnda * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
@@ -222,7 +224,7 @@ class AircraftModel:
             ax.set_ylabel("$delta_e$")
         return t, u
 
-    def get_response_plots_symmetric(self, sys, x0, u):
+    def get_response_plots_symmetric(self, sys, x0, u, V0):
         t = np.arange(0, len(u)/0.1+0.1, 0.1)
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
@@ -245,7 +247,7 @@ class AircraftModel:
 
         plt.show()
 
-    def get_response_plots_asymmetric(self, sys, x0, t, u):
+    def get_response_plots_asymmetric(self, sys, x0, t, u, V0):
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 

@@ -41,7 +41,7 @@ class MyTestCase(unittest.TestCase):
         self.assertTupleEqual((first, second, third), (True, True, True))
 
 
-"""
+    """
     def test_analytic_eigenvalues_symmetric(self):
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
@@ -76,7 +76,7 @@ class MyTestCase(unittest.TestCase):
         roots = np.polynomial.polynomial.polyroots(p) * c / V0
 
         self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
-
+    
     def test_analytic_eigenvalues_asymmetric(self):
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
@@ -119,7 +119,7 @@ class MyTestCase(unittest.TestCase):
         roots = np.polynomial.polynomial.polyroots(p) * c / V0
 
         self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
+    """
 
-"""
 if __name__ == "__main__":
     unittest.main()
