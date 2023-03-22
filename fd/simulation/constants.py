@@ -1,8 +1,11 @@
 # Citation 550 - Linear simulation
-from fd import conversion as conv
-from math import sin, cos, pi
 
-# xcg = 0.25 * c
+from math import pi
+
+g = 9.81  # [m/s^2] (gravity constant)
+
+# Aircraft mass
+mass_basic_empty = 9172.9 / g  # basic empty weight [kg]
 
 # Aircraft geometry
 S = 30.00  # wing area [m^2]
@@ -17,13 +20,6 @@ A = b**2 / S  # wing aspect ratio [-]
 Ah = bh**2 / Sh  # stabilizer aspect ratio [-]
 Vh_V = 1  # [-]
 ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
-OEW = 4160.75745  # operational empty weight[kg]
-xcgOEW = 7.410196  # centre of gravity for operational empty weight[m]
-xcgP = 131 * 0.0254
-xcgcoor = 170 * 0.0254
-xcg1 = 214 * 0.0254
-xcg2 = 251 * 0.0254
-xcg3 = 288 * 0.0254
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
@@ -31,16 +27,9 @@ p0 = 101325  # air pressure at sea level [Pa]
 Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
-g = 9.81  # [m/s^2] (gravity constant)
 gamma = 1.4  #
 
-# air density [kg/m^3]
-# rho = rho0 * (1 + (Tempgrad * hp0 / Temp0)) ** -((g / (Tempgrad * R)) + 1)
-# W = m * g  # [N]       (aircraft weight)
-
 # Constant values concerning aircraft inertia
-# muc = m / (rho * S * c)
-# mub = m / (rho * S * b)
 KX2 = 0.019
 KZ2 = 0.042
 KXZ = 0.002
@@ -48,16 +37,12 @@ KY2 = 1.25 * 1.114
 
 # Aerodynamic constants
 Cmac = 0  # Moment coefficient about the aerodynamic centre [-]
-# CNwa = CLa  # Wing normal force slope [-]
 CNha = 2 * pi * Ah / (Ah + 2)  # Stabilizer normal force slope [-]
 depsda = 4 / (A + 2)  # Downwash gradient [-]
 
-# Lift and drag coefficient
-# CL = 2 * W / (rho * V0**2 * S)  # Lift coefficient [-]
-# CD = CD0 + (CLa * alpha0) ** 2 / (pi * A * e)  # Drag coefficient [-]
-
 # standard values
 Ws = 60500  # standard weight from the assignment
+fuel_flow_standard = 0.048  # [kg/s]
 
 # Stability derivatives
 # CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
@@ -67,7 +52,6 @@ CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-# CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
 CZu = -0.37616
 CZa = -5.74340
 CZadot = -0.00350
@@ -99,3 +83,12 @@ Cnp = -0.0602
 Cnr = -0.2061
 Cnda = -0.0120
 Cndr = -0.0939
+
+# Durations of the eigenmotions
+# Used for data extraction and simulation
+duration_phugoid = 120  # [s]
+duration_short_period = 8  # [s]
+duration_dutch_roll = 20  # [s]
+duration_dutch_roll_yd = 10  # [s]
+duration_aperiodic_roll = 12  # [s]
+duration_spiral = 120  # [s]

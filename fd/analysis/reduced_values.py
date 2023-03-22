@@ -1,7 +1,6 @@
-from fd.simulation import constants
-import scipy.stats as stats
-import math
 import numpy as np
+
+from fd.simulation import constants
 
 
 def calc_reduced_equivalent_V(Ve, W):
@@ -17,7 +16,7 @@ def calc_reduced_equivalent_V(Ve, W):
     return Ve * np.sqrt(constants.Ws / W)
 
 
-def calc_reduced_elev_deflec(delta_e_meas, Cmdelta, Tcs, Tc):
+def calc_reduced_elevator_deflection(delta_e_meas, Cmdelta, Tcs, Tc):
     """
 
     Args:

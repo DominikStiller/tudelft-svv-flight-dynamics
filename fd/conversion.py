@@ -1,4 +1,7 @@
+import datetime
 import math
+import re
+from typing import Union
 
 
 def deg_to_rad(deg):
@@ -41,6 +44,58 @@ def C_to_K(C):
     return 273.15 + C
 
 
-def inchpound_to_kgm(inchpound):
-    """Convert inchpound moment to kgm moment"""
-    return inchpound * 0.0254 * 0.45359237
+def timestamp_to_s(timestamp: Union[str, datetime.time]):
+    """
+    Convert datetime.time or timestamp string (both from Excel sheet) to seconds.
+    There is no consistent format:
+     - datetime.time: mm:ss timestamp is parsed but incorrectly as hh:mm
+     - h.mm:ss
+     - h.mm
+     - h:mm:ss
+     - mm:ss
+     - mm
+    """
+    if not timestamp:
+        return None
+
+    if isinstance(timestamp, str):
+        hour = 0
+        minute = 0
+        second = 0
+
+        timestamp = timestamp.strip()
+
+        if match := re.fullmatch(r"(\d+)\.(\d+):(\d+)", timestamp):
+            # h.mm:ss
+            hour, minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+)\.(\d+)", timestamp):
+            # h.mm
+            hour, minute = match.groups()
+        elif match := re.fullmatch(r"(\d+):(\d+):(\d+)", timestamp):
+            # h:mm:ss
+            hour, minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+):(\d+)", timestamp):
+            # mm:ss
+            minute, second = match.groups()
+        elif match := re.fullmatch(r"(\d+)", timestamp):
+            # mm
+            minute = match.group(0)
+        else:
+            raise "Invalid time format"
+    elif isinstance(timestamp, datetime.time):
+        hour = 0
+        # This is not a mistake, the datetime is interpreted incorrectly
+        minute = timestamp.hour
+        second = timestamp.minute
+    else:
+        raise "Unsupported time type"
+
+    hour = float(hour)
+    minute = float(minute)
+    second = float(second)
+
+    assert 0 <= hour
+    assert 0 <= minute < 60
+    assert 0 <= second < 60
+
+    return hour * 3600 + minute * 60 + second

@@ -1,9 +1,9 @@
-# from fd.analysis.flight_test import FlightTest
-import matplotlib.pyplot as plt
+import math
+
 import numpy as np
+
 from fd.plotting import *
 from fd.simulation import constants
-import math
 
 
 def plot_cl_alpha(CL, alpha, Clalpha, alpha0):
