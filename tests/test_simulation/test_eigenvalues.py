@@ -115,10 +115,10 @@ class MyTestCase(unittest.TestCase):
         )
         E_prim = CL * (Clb * Cnr - Cnb * Clr)
         p = (A_prim, B_prim, C_prim, D_prim, E_prim)
-        roots = np.polynomial.polynomial.polyroots(p) * c / V0
+        roots = np.polynomial.polynomial.polyroots(p)
 
-        self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
-    
+        self.assertTupleEqual(tuple(roots), tuple(eigenvalues*b/V0))
+
 
 
 if __name__ == "__main__":

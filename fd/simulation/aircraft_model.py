@@ -120,8 +120,9 @@ class AircraftModel:
         """
 
         #mub = self.get_non_dim_masses(m, rho)[-1]
-        # x = [beta, phi, bp/2V, rb/2V]T
+        # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
+
         """
         C_1 = np.array(
             [
@@ -160,27 +161,27 @@ class AircraftModel:
                 [
                     V0 / b * CYb / 2 / mub,
                     V0 / b * CL / 2 / mub,
-                    V0 / b * CYp / 2 / mub,
-                    V0 / b * (CYr - 4 * mub) / 2 / mub,
+                    V0 / b * CYp / 2 / mub * (b/2/V0),
+                    V0 / b * (CYr - 4 * mub) / 2 / mub * (b/2/V0),
                 ],
-                [0, 0, 2 * V0 / b, 0],
+                [0, 0, 2 * V0 / b * (b/2/V0), 0],
                 [
                     V0 / b * (Clb * KZ2 + Cnb * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                     0,
-                    V0 / b * (Clp * KZ2 + Cnp * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Clr * KZ2 + Cnr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0 / b * (Clp * KZ2 + Cnp * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)) * (b/2/V0) ,
+                    V0 / b * (Clr * KZ2 + Cnr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)) * (b/2/V0),
                 ],
                 [
                     V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2)-KXZ**2),
                     0,
-                    V0 / b * (Clp * KXZ + Cnp * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Clr * KXZ + Cnr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0 / b * (Clp * KXZ + Cnp * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)) * (b/2/V0),
+                    V0 / b * (Clr * KXZ + Cnr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)) * (b/2/V0),
                 ],
             ]
         )
         B = np.array(
             [
-                [0, V0 / b * (CYr - 4 * mub) / 2 / mub],
+                [0, V0 / b * CYr / 2 / mub],
                 [0, 0],
                 [
                     V0 / b * (Clda * KZ2 + Cnda * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
