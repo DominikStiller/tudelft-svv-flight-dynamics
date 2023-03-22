@@ -18,17 +18,29 @@ def plot_cl_alpha(CL, alpha, Clalpha, alpha0):
     Returns:
 
     """
-    aa = np.linspace(min(alpha), max(alpha), 10)
-    plt.plot(aa, Clalpha * (aa - alpha0), "r")
-    plt.scatter(alpha, CL, marker="x", color="black", s=50)
-    plt.xlabel("α")
-    plt.ylabel("C_L")
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    aa = np.linspace(0, max(alpha), 20)
+
+    ax.plot(
+        aa,
+        Clalpha * (aa - alpha0),
+        "r",
+        label="Best fit ($C_{L_\\alpha}$ = "
+        + f"{Clalpha:.3} 1/°"
+        + ", $\\alpha_0$ = "
+        + f"{alpha0:.3} °)",
+    )
+    ax.scatter(alpha, CL, marker="x", color="black", s=50, label="Data")
+
+    ax.set_xlabel(r"$\alpha$")
+    ax.set_ylabel("$C_L$")
+
+    ax.legend()
 
     format_plot()
+    save_plot("data/", "cl_alpha")
     plt.show()
-
-
-plot_cl_alpha([0.1, 0.2, 0.3, 0.4, 0.5], [-1, 1, 3, 5, 7], 0.05, -3)
 
 
 def plot_cl_cd(CL, CD, CD0, e):
@@ -43,12 +55,26 @@ def plot_cl_cd(CL, CD, CD0, e):
     Returns:
 
     """
-    yy = np.linspace(min(CL), max(CL), 10)
-    plt.scatter(CD, CL)
-    plt.plot(CD0 + yy**2 / (math.pi * constants.A * e), yy)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+    yy = np.linspace(0, max(CL), 20)
+
+    ax1.plot(CD0 + yy / (math.pi * constants.A * e), yy, "r")
+    ax1.scatter(CD, CL**2, marker="x", color="black", s=50)
+    ax1.set_xlabel("$C_D$")
+    ax1.set_ylabel("$C_L^2$")
+
+    ax2.plot(
+        CD0 + yy**2 / (math.pi * constants.A * e),
+        yy,
+        "r",
+        label="Best fit ($C_{D_0}$ = " + f"{CD0:.3}" + ", $e$ = " + f"{e:.3})",
+    )
+    ax2.scatter(CD, CL, marker="x", color="black", s=50, label="Data")
+    ax2.set_xlabel("$C_D$")
+    ax2.set_ylabel("$C_L$")
+    ax2.legend()
 
     format_plot()
+    save_plot("data/", "cl_cd")
     plt.show()
-
-
-# plot_cl_cd([0.5, 0.84, 0.29, 0.955], [0.031, 0.0532, 0.0240, 0.0630], 0.02, 0.8)

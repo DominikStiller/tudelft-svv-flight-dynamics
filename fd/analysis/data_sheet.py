@@ -6,18 +6,12 @@ import pandas as pd
 from fd.analysis.aerodynamics import (
     calc_true_V,
     calc_CL,
-)
-from fd.analysis.thermodynamics import (
-    calc_static_pressure,
-    calc_mach,
-    calc_static_temperature,
-    calc_density,
+    calc_CD,
 )
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.analysis.util import add_common_derived_timeseries
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
-from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
 
@@ -210,6 +204,9 @@ class AveragedDataSheet:
 
             # Calculate coefficients
             # Using CAS + rho0 gives the same results as TAS + rho
-            df["C_l"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["C_L"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["C_D"] = df.apply(lambda row: calc_CD(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)
+
+            df["x_cg"] = 1
