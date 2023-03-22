@@ -81,7 +81,7 @@ def calc_CD(T: float, V: float, rho: float, S: float = constants.S) -> float:
     return T / (0.5 * rho * V * V * S)
 
 
-def calc_CD0_e(CD: list, CL: list) -> float:
+def estimate_CD0_e(CD: list, CL: list) -> tuple[float, float]:
     """
     This function uses the parabolic drag formula to calculate the zero lift drag, CD0[-], and the oswald
     efficiency factor, e[-].
@@ -95,12 +95,26 @@ def calc_CD0_e(CD: list, CL: list) -> float:
 
     """
 
-    TheilslopesResults = stats.theilslopes(CD, CL**2, alpha=0.99)
-
-    CD0 = TheilslopesResults[1]
-    e = 1 / (math.pi * constants.A * TheilslopesResults[0])
+    slope, CD0, _, _ = stats.theilslopes(CD, CL**2, alpha=0.99)
+    e = 1 / (math.pi * constants.A * slope)
 
     return CD0, e
+
+
+def estimate_Cmalpha(alpha, delta_e, Cmdelta):
+    """
+
+    Args:
+        alpha (array_like): Angle of attack[deg]
+        delta_e (array_like): Elevator deflection[deg]
+        Cmdelta (float): Change in moment coefficient due to elevator deflection[-]
+
+    Returns (float): Change in moment coefficient due to angle of attack[-]
+
+    """
+
+    slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    return -slope * Cmdelta
 
 
 def calc_Cmdelta(
@@ -132,19 +146,3 @@ def calc_Cmdelta(
     Delta_cg = xcg2 - xcg1
     Delta_delta_e = deltae2 - deltae1
     return -1 / Delta_delta_e * W_avg / (0.5 * rho * V**2 * constants.S) * Delta_cg / constants.c
-
-
-def estimate_Cmalpha(alpha, delta_e, Cmdelta):
-    """
-
-    Args:
-        alpha (array_like): Angle of attack[deg]
-        delta_e (array_like): Elevator deflection[deg]
-        Cmdelta (float): Change in moment coefficient due to elevator deflection[-]
-
-    Returns (float): Change in moment coefficient due to angle of attack[-]
-
-    """
-
-    slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
-    return -slope * Cmdelta

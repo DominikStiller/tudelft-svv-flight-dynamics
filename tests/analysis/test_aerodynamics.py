@@ -47,14 +47,16 @@ class TestAerodynamics(TestCase):
 
     def test_calc_CD0_e(self):
         assert_allclose(
-            calc_CD0_e(
+            estimate_CD0_e(
                 np.array([0.0318, 0.0532, 0.024, 0.063]), np.array([0.5, 0.84, 0.29, 0.955])
             ),
             [0.02, 0.8],
             rtol=1e-01,
         )
         assert_allclose(
-            calc_CD0_e(np.array([0.032, 0.053, 0.025, 0.065]), np.array([0.51, 0.83, 0.28, 0.95])),
+            estimate_CD0_e(
+                np.array([0.032, 0.053, 0.025, 0.065]), np.array([0.51, 0.83, 0.28, 0.95])
+            ),
             [0.02, 0.8],
             rtol=1e-01,
         )
