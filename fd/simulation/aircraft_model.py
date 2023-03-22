@@ -116,7 +116,7 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        # mub = self.get_non_dim_masses(m, rho)[-1]
+        mub = self.get_non_dim_masses(m, rho)[-1]
         # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
         """
