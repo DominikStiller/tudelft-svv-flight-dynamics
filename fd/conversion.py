@@ -39,6 +39,11 @@ def ft_to_m(ft):
     return 0.3048 * ft
 
 
+def in_to_m(ft):
+    """Convert distance in inch to meters"""
+    return 0.0254 * ft
+
+
 def C_to_K(C):
     """Convert temperature in Celcius to Kelvin"""
     return 273.15 + C
