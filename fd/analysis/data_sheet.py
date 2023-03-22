@@ -14,6 +14,7 @@ from fd.analysis.thermodynamics import (
     calc_density,
 )
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
+from fd.analysis.util import add_common_derived_timeseries
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
 from fd.io import load_data_sheet
 from fd.simulation import constants
@@ -191,14 +192,7 @@ class AveragedDataSheet:
         for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
             df["time_min"] = df["time"] / 60
             df["m"] = self.mass_initial - df["fuel_used"]
-            df["W"] = df["m"] * constants.g
-
-            df["M"] = df.apply(lambda row: calc_mach(row["h"], row["cas"]), axis=1)
-            df["T_static"] = df.apply(
-                lambda row: calc_static_temperature(row["T_total"], row["M"]), axis=1
-            )
-            df["p"] = df.apply(lambda row: calc_static_pressure(row["h"]), axis=1)
-            df["rho"] = df.apply(lambda row: calc_density(row["p"], row["T_static"]), axis=1)
+            df = add_common_derived_timeseries(df)
 
             df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
             # No need to calculate equivalent airspeed, is already given in data as IAS
