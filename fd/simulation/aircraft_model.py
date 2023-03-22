@@ -64,10 +64,12 @@ class AircraftModel:
             D: Feedthrough matrix
 
         """
+
         Cma = self.aero_params.C_m_alpha
         Cmde = self.aero_params.C_m_delta
         muc = self.get_non_dim_masses(m, rho)[0]
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
+
         # C_1*x_dot + C_2*x +C_3*u = 0
         # x = [u, alpha, theta, q]T
         C_1 = np.array(
@@ -114,9 +116,10 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        mub = self.get_non_dim_masses(m, rho)[-1]
+        #mub = self.get_non_dim_masses(m, rho)[-1]
         # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
+        """
         C_1 = np.array(
             [
                 [(CYbdot - 2 * mub) * b / V0, 0, 0, 0],
@@ -213,7 +216,7 @@ class AircraftModel:
                 ],
             ]
         )
-        """
+
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
