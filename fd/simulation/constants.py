@@ -25,7 +25,7 @@ xcgOEW = 291.74 * 0.0254
 xcgP = 131 * 0.0254
 xcgcoor = 170 * 0.0254
 xcg1 = 214 * 0.0254
-xcg2 =251 * 0.0254
+xcg2 = 251 * 0.0254
 xcg3 = 288 * 0.0254
 
 # Constant values concerning atmosphere and gravity

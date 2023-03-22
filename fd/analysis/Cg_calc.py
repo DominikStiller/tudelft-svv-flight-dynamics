@@ -17,56 +17,56 @@ def lin_moment_mass():
     mass = np.append(mass, 5008.0)
     moment = np.array(
         [
-            298.16,
-            591.18,
-            879.08,
-            1165.42,
-            1448.4,
-            1732.53,
-            2014.8,
-            2298.84,
-            2581.92,
-            2866.3,
-            3150.18,
-            3434.52,
-            3718.52,
-            4003.23,
-            4287.76,
-            4572.24,
-            4856.56,
-            5141.16,
-            5425.64,
-            5709.9,
-            5994.04,
-            6278.47,
-            6562.82,
-            6846.96,
-            7131.0,
-            7415.33,
-            7699.6,
-            7984.34,
-            8269.06,
-            8554.05,
-            8839.04,
-            9124.8,
-            9410.62,
-            9696.97,
-            9983.4,
-            10270.08,
-            10556.84,
-            10843.87,
-            11131.0,
-            11418.2,
-            11705.5,
-            11993.31,
-            12281.18,
-            12569.04,
-            12856.86,
-            13144.73,
-            13432.48,
-            13720.56,
-            14008.46,
-            14320.34,
+            29816,
+            59118,
+            87908,
+            116542,
+            144840,
+            173253,
+            201480,
+            229884,
+            258192,
+            286630,
+            315018,
+            343452,
+            371852,
+            400323,
+            428776,
+            457224,
+            485656,
+            514116,
+            542564,
+            570990,
+            599404,
+            627847,
+            656282,
+            684696,
+            713100,
+            741533,
+            769960,
+            798434,
+            826906,
+            855405,
+            883904,
+            912480,
+            941062,
+            969697,
+            998340,
+            1027008,
+            1055684,
+            1084387,
+            1113100,
+            1141820,
+            1170550,
+            1199331,
+            1228118,
+            1256904,
+            1285686,
+            1314473,
+            1343248,
+            1372056,
+            1400846,
+            1432034,
         ]
     )
 
@@ -74,6 +74,9 @@ def lin_moment_mass():
     momentSI = con.inchpound_to_kgm(moment)
 
     result = stats.theilslopes(momentSI, massSI, alpha=0.99)
+    plt.scatter(massSI, momentSI)
+    plt.plot(massSI, result[0] * massSI + result[1])
+    plt.show()
 
     return result[0], result[1]
 
@@ -82,17 +85,28 @@ slope, intersect = lin_moment_mass()
 
 
 def get_cg(
-    W, massP1, massP2, masscoor, mass1L, mass1R, mass2L, mass2R, mass3L, mass3R, shift=False
+    mfuel, massP1, massP2, masscoor, mass1L, mass1R, mass2L, mass2R, mass3L, mass3R, shift=False
 ):
-    mtot = W / constants.g
-    mfuel = mtot - sum(masscoor, mass1L, mass1R, mass2L, mass2R, mass3L, mass3R, massP1, massP2)
+    mtot = (
+        mfuel
+        + masscoor
+        + mass1L
+        + massP2
+        + mass2L
+        + mass3L
+        + mass3R
+        + mass1R
+        + mass2R
+        + massP1
+        + constants.OEW
+    )
     slope, intersect = lin_moment_mass()
     momentfuel = slope * mfuel + intersect
     if shift:
         xcg = (
             momentfuel
             + (massP1 + massP2) * constants.xcgP
-            + (constants.xcgP + constants.xcgcoor) / 2 * mass3R
+            + (constants.xcgP + (constants.xcgcoor - constants.xcgP) * 2 / 3) * mass3R
             + masscoor * constants.xcgcoor
             + (mass1R + mass1L) * constants.xcg1
             + (mass2R + mass2L) * constants.xcg2
