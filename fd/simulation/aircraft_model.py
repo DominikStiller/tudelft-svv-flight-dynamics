@@ -5,6 +5,8 @@ import control.matlab as ml
 from fd.structs import AerodynamicParameters
 from tests.test_simulation.constants_Cessna_Ce500 import *
 import matplotlib.pyplot as plt
+from tests.test_simulation.test_eigenvalues import *
+import fd.simulation.constants as c
 
 
 class AircraftModel:
@@ -261,3 +263,44 @@ class AircraftModel:
         axs[1, 1].set_title("r [rad/sec]")
 
         plt.show()
+
+    def get_idealized_shortperiod_eigenvalues(self, m, rho):
+        muc = self.get_non_dim_masses(m, rho)[0]
+        A = 2 * muc * (c.KY2) * (2 * muc - c.CZa)
+        B = -2 * muc * c.KY2 * c.CZa - (2 * muc + c.CZq) * c.Cma - (2 * muc + c.CZa) * c.Cmq
+        C = c.CZa * c.Cmq - (2 * muc + c.CZq) * c.Cma
+        eigenvalue_shortperiod1 = complex(-B/(2*A), + np.sqrt(4 * A * C - B**2)/(2*A))
+        eigenvalue_shortperiod2 = complex(-B / (2 * A), - np.sqrt(4 * A * C - B ** 2) / (2 * A))
+        return eigenvalue_shortperiod1, eigenvalue_shortperiod2
+
+    def get_idealized_phugoid_eigenvalues(self):
+        muc = self.get_non_dim_masses(m, rho)[0]
+        A = 2 * muc * ( c.CZa * c.Cmq - 2 * muc * c.Cma)
+        B = 2 * muc * ( c.CXu * c.Cma - c.Cmu * c.CXa) + c.Cmq *(c.CZu * c.CXa - c.CXu * c.Cza)
+        C = c.CZ0 * ( c.Cmu * c.CZa - c.CZu * c.Cma)
+        eigenvalue_phugoid1 = complex(-B / (2 * A) , + np.sqrt(4 * A * C - B ** 2) / (2 * A))
+        eigenvalue_phugoid2 = complex(-B / (2 * A) , - np.sqrt(4 * A * C - B ** 2) / (2 * A))
+        return eigenvalue_phugoid1, eigenvalue_phugoid2
+
+    def get_idealized_aperiodicroll_eigenvalues(self):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        eigenvalue_aperiodicroll = c.Clp / (4 * mub * c.KX**2)
+        return eigenvalue_aperiodicroll
+
+    def get_idealized_dutchroll_eigenvalues(self):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        A = 2 * (c.Cnr + 2 * c.KZ2 * c.CYb)
+        B = np.sqrt(64 * c.KZ2 * (4 * mub * c.Cnb + c.CYb * c.Cnr) - 4 * (c.Cnr + 2 * c.KZ2 * c.CYb)**2 )
+        C = 16 * mub * c.KZ2
+        eigenvalue_dutchroll1 = (A + B) / C
+        eigenvalue_dutchroll2 = (A - B) / C
+        return eigenvalue_dutchroll1, eigenvalue_dutchroll2
+
+    def get_idealized_spiral_eigenvalues(self, CL):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        CL =
+        A = 2 * CL * (c.Clb * c.Cnr - c.Cnb * c.Clr)
+        B = c.Clp * (c.CYb * c.Cnr + 4 * mub * c.Cnb)
+        C = c.Cnp * (c.CYb * c.Clr + 4 * mub * c.Clb)
+        eigenvalue_spiral = A / (B - C)
+        return eigenvalue_spiral
