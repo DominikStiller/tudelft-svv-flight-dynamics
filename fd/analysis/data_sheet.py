@@ -8,6 +8,7 @@ from fd.analysis.aerodynamics import (
     calc_CL,
     calc_CD,
 )
+from fd.analysis.center_of_gravity import calc_cg_position
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.analysis.util import add_common_derived_timeseries
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
@@ -149,6 +150,17 @@ class AveragedDataSheet:
             [ds.timestamp_aperiodic_roll for ds in self.data_sheets]
         )
         self.timestamp_spiral = mean_not_none([ds.timestamp_spiral for ds in self.data_sheets])
+
+        self.mass_pilot_1 = mean_not_none([ds.mass_pilot_1 for ds in self.data_sheets])
+        self.mass_pilot_2 = mean_not_none([ds.mass_pilot_2 for ds in self.data_sheets])
+        self.mass_coordinator = mean_not_none([ds.mass_coordinator for ds in self.data_sheets])
+        self.mass_observer_1l = mean_not_none([ds.mass_observer_1l for ds in self.data_sheets])
+        self.mass_observer_1r = mean_not_none([ds.mass_observer_1r for ds in self.data_sheets])
+        self.mass_observer_2l = mean_not_none([ds.mass_observer_2l for ds in self.data_sheets])
+        self.mass_observer_2r = mean_not_none([ds.mass_observer_2r for ds in self.data_sheets])
+        self.mass_observer_3l = mean_not_none([ds.mass_observer_3l for ds in self.data_sheets])
+        self.mass_observer_3r = mean_not_none([ds.mass_observer_3r for ds in self.data_sheets])
+        self.mass_block_fuel = mean_not_none([ds.mass_block_fuel for ds in self.data_sheets])
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
     def _calculate_dataframe_average_and_check_deviations(
@@ -186,6 +198,7 @@ class AveragedDataSheet:
         for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
             df["time_min"] = df["time"] / 60
             df["m"] = self.mass_initial - df["fuel_used"]
+            df["m_fuel"] = self.mass_block_fuel - df["fuel_used"]
             df = add_common_derived_timeseries(df)
 
             df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
@@ -209,4 +222,20 @@ class AveragedDataSheet:
             df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)
 
-            df["x_cg"] = 1
+        self.df_cg_shift["shift"] = [False, True]
+        df["x_cg"] = self.df_cg_shift.apply(
+            lambda row: calc_cg_position(
+                row["m_fuel"],
+                self.mass_pilot_1,
+                self.mass_pilot_2,
+                self.mass_coordinator,
+                self.mass_observer_1l,
+                self.mass_observer_1r,
+                self.mass_observer_2l,
+                self.mass_observer_2r,
+                self.mass_observer_3l,
+                self.mass_observer_3r,
+                row["shift"],
+            ),
+            axis=1,
+        )
