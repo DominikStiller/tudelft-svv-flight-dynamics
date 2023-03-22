@@ -9,6 +9,11 @@ from fd.analysis.aerodynamics import (
     calc_CD,
 )
 from fd.analysis.center_of_gravity import calc_cg_position
+from fd.analysis.reduced_values import (
+    calc_reduced_equivalent_V,
+    calc_reduced_elevator_deflection,
+    calc_reduced_stick_force,
+)
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.analysis.util import add_common_derived_timeseries
 from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
@@ -202,6 +207,9 @@ class AveragedDataSheet:
             df = add_common_derived_timeseries(df)
 
             df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
+            df["cas_reduced"] = df.apply(
+                lambda row: calc_reduced_equivalent_V(row["cas"], row["W"]), axis=1
+            )
             # No need to calculate equivalent airspeed, is already given in data as IAS
 
             # Calculate thrust (actual + standardized)
@@ -222,6 +230,12 @@ class AveragedDataSheet:
             df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)
 
+        for df in [self.df_elevator_trim, self.df_cg_shift]:
+            df["F_e_reduced"] = df.apply(
+                lambda row: calc_reduced_stick_force(row["F_e"], row["W"]), axis=1
+            )
+            # Reduced elevator deflection cannot be calculated here because C_m_delta is not known yet
+
         self.df_cg_shift["shift"] = [False, True]
         df["x_cg"] = self.df_cg_shift.apply(
             lambda row: calc_cg_position(
@@ -239,3 +253,12 @@ class AveragedDataSheet:
             ),
             axis=1,
         )
+
+    def add_reduced_elevator_deflection_timeseries(self, C_m_delta: float):
+        for df in [self.df_elevator_trim, self.df_cg_shift]:
+            df["delta_e_reduced"] = df.apply(
+                lambda row: calc_reduced_elevator_deflection(
+                    row["delta_e"], C_m_delta, row["T_c_s"], row["T_c"]
+                ),
+                axis=1,
+            )

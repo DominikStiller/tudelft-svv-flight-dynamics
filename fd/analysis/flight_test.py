@@ -33,11 +33,15 @@ class FlightTest:
         )
         self.ftis_measurements = FTISMeasurements(data_path, self.data_sheet.mass_initial)
         self._estimate_aerodynamic_parameters()
+        self.data_sheet.add_reduced_elevator_deflection_timeseries(
+            self.aerodynamic_parameters.C_m_delta
+        )
 
     def _estimate_aerodynamic_parameters(self):
         C_L_alpha, _, alpha_0 = estimate_CL_alpha(self.df_clcd["C_L"], self.df_clcd["alpha"])
         C_D_0, e = estimate_CD0_e(self.df_clcd["C_D"], self.df_clcd["C_L"])
 
+        # TODO check which parts should use reduced qties
         cg_aft = self.df_cg_shift.iloc[0]
         cg_front = self.df_cg_shift.iloc[1]
         C_m_delta = calc_Cmdelta(
