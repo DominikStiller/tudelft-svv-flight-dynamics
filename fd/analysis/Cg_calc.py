@@ -89,7 +89,24 @@ def get_cg(
     slope, intersect = lin_moment_mass()
     momentfuel = slope * mfuel + intersect
     if shift:
-        xcg = (momentfuel + (massP1 + massP2) * constants.xcgP + (constants.xcgP+constants.xcgcoor)/2*mass3R + masscoor * constants.xcgcoor + (mass1R + mass1L) * constants.xcg1 + (mass2R + mass2L) * constants.xcg2 + (mass3L) * constants.xcg3 + constants.OEW * constants.xcgOEW) / mtot
+        xcg = (
+            momentfuel
+            + (massP1 + massP2) * constants.xcgP
+            + (constants.xcgP + constants.xcgcoor) / 2 * mass3R
+            + masscoor * constants.xcgcoor
+            + (mass1R + mass1L) * constants.xcg1
+            + (mass2R + mass2L) * constants.xcg2
+            + (mass3L) * constants.xcg3
+            + constants.OEW * constants.xcgOEW
+        ) / mtot
     else:
-        xcg = (momentfuel + (massP1 + massP2) * constants.xcgP + masscoor * constants.xcgcoor + (mass1R + mass1L) * constants.xcg1 + (mass2R + mass2L) * constants.xcg2 + (mass3R + mass3L) * constants.xcg3 + constants.OEW * constants.xcgOEW) / mtot
+        xcg = (
+            momentfuel
+            + (massP1 + massP2) * constants.xcgP
+            + masscoor * constants.xcgcoor
+            + (mass1R + mass1L) * constants.xcg1
+            + (mass2R + mass2L) * constants.xcg2
+            + (mass3R + mass3L) * constants.xcg3
+            + constants.OEW * constants.xcgOEW
+        ) / mtot
     return xcg
