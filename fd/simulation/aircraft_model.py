@@ -4,9 +4,9 @@ import numpy as np
 from math import sin, cos
 import control.matlab as ml
 from fd.structs import AerodynamicParameters
-from fd.simulation.constants import *
+#from fd.simulation.constants import *
 
-# from tests.test_simulation.constants_Cessna_Ce500 import *
+from tests.test_simulation.constants_Cessna_Ce500 import *
 import matplotlib.pyplot as plt
 
 
@@ -119,8 +119,8 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        mub = self.get_non_dim_masses(m, rho)[-1]
-        # x = [beta, phi, p, r]T
+        #mub = self.get_non_dim_masses(m, rho)[-1]
+        # x = [beta, phi, bp/2V, rb/2V]T
         # C_1*x_dot + C_2*x +C_3*u = 0
         """
         C_1 = np.array(
@@ -171,7 +171,7 @@ class AircraftModel:
                     V0 / b * (Clr * KZ2 + Cnr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                 ],
                 [
-                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2)),
+                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2)-KXZ**2),
                     0,
                     V0 / b * (Clp * KXZ + Cnp * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                     V0 / b * (Clr * KXZ + Cnr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
