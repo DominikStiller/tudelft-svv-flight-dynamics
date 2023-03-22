@@ -87,36 +87,37 @@ class MyTestCase(unittest.TestCase):
         model = AircraftModel(aero_params)
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
         eigenvalues = model.get_eigenvalues_and_eigenvectors(A)[0]
-        A_prim = 16 * mub ** 3 * (KX2 * KZ2 - KXZ ** 2)
+        A_prim = 16 * mub**3 * (KX2 * KZ2 - KXZ**2)
         B_prim = (
-                -4
-                * mub ** 2
-                * (2 * CYb * (KX2 * KZ2 - KXZ ** 2) + Cnr * KX2 + Clp * KZ2 + (Clr + Cnp) * KXZ)
+            -4
+            * mub**2
+            * (2 * CYb * (KX2 * KZ2 - KXZ**2) + Cnr * KX2 + Clp * KZ2 + (Clr + Cnp) * KXZ)
         )
         C_prim = (
-                2
-                * mub
-                * (
-                        (CYb * Cnr - CYr * Cnb) * KX2
-                        + (CYb * Clp - Clb * CYp) * KZ2
-                        + ((CYb * Cnp - Cnb * CYp) + (CYb * Clr - Clb * CYr)) * KXZ
-                        + 4 * mub * Cnb * KX2
-                        + 4 * mub * Clb * KXZ
-                        + 0.5 * (Clp * Cnr - Cnp * Clr)
-                )
+            2
+            * mub
+            * (
+                (CYb * Cnr - CYr * Cnb) * KX2
+                + (CYb * Clp - Clb * CYp) * KZ2
+                + ((CYb * Cnp - Cnb * CYp) + (CYb * Clr - Clb * CYr)) * KXZ
+                + 4 * mub * Cnb * KX2
+                + 4 * mub * Clb * KXZ
+                + 0.5 * (Clp * Cnr - Cnp * Clr)
+            )
         )
         D_prim = (
-                -4 * mub * CL * (Clb * KZ2 + Cnb * KXZ)
-                + 2 * mub * (Clb * Cnp - Cnb * Clp)
-                + 0.5 * CYb * (Clr * Cnp - Cnr * Clp)
-                + 0.5 * CYp * (Clb * Cnr - Cnb * Clr)
-                + 0.5 * CYr * (Clp * Cnb - Cnp * Clb)
+            -4 * mub * CL * (Clb * KZ2 + Cnb * KXZ)
+            + 2 * mub * (Clb * Cnp - Cnb * Clp)
+            + 0.5 * CYb * (Clr * Cnp - Cnr * Clp)
+            + 0.5 * CYp * (Clb * Cnr - Cnb * Clr)
+            + 0.5 * CYr * (Clp * Cnb - Cnp * Clb)
         )
         E_prim = CL * (Clb * Cnr - Cnb * Clr)
         p = (A_prim, B_prim, C_prim, D_prim, E_prim)
         roots = np.polynomial.polynomial.polyroots(p) * c / V0
 
         self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
+
 
 if __name__ == "__main__":
     unittest.main()
