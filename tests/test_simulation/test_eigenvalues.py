@@ -40,7 +40,6 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTupleEqual((first, second, third), (True, True, True))
 
-
     """
     def test_analytic_eigenvalues_symmetric(self):
         aero_params = AerodynamicParameters
@@ -120,6 +119,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
     """
+
 
 if __name__ == "__main__":
     unittest.main()
