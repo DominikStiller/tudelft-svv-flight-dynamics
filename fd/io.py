@@ -20,7 +20,11 @@ def extract_ftis_column_descriptions(path: str):
     metadata = []
     for column_name, values in raw.items():
         metadata.append(
-            {"Column": column_name, "Description": values["description"], "Units": values["units"]}
+            {
+                "Column": column_name,
+                "Description": values["description"],
+                "Units": values["units"],
+            }
         )
     metadata = pd.DataFrame(metadata)
     metadata.to_excel("data/column_descriptions.xlsx", index=False)
