@@ -222,7 +222,8 @@ class AircraftModel:
             ax.set_ylabel("$delta_e$")
         return t, u
 
-    def get_response_plots_symmetric(self, sys, x0, t, u):
+    def get_response_plots_symmetric(self, sys, x0, u):
+        t = np.arange(0, len(u)/0.1+0.1, 0.1)
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 
