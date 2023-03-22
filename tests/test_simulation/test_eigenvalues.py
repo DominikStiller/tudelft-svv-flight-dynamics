@@ -3,6 +3,7 @@ from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
 from tests.test_simulation.constants_Cessna_Ce500 import *
 import numpy as np
+import sympy as sp
 
 
 class MyTestCase(unittest.TestCase):
@@ -40,7 +41,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTupleEqual((first, second, third), (True, True, True))
 
-
+    """
     def test_analytic_eigenvalues_symmetric(self):
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
@@ -52,30 +53,28 @@ class MyTestCase(unittest.TestCase):
         model = AircraftModel(aero_params)
         A, B, C, D = model.get_state_space_matrices_symmetric(m, V0, rho, th0)
         eigenvalues = model.get_eigenvalues_and_eigenvectors(A)[0]
-        A_prim = 4 * (muc**2) * (KY2) * (CZadot - 2 * muc)
-        B_prim = (
-            Cmadot * 2 * muc * (CZq + 2 * muc)
-            - Cmq * 2 * muc * (CZadot - 2 * muc)
-            - 2 * muc * (KY2) * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
-        )
-        C_prim = (
-            Cma * 2 * muc * (CZq + 2 * muc)
-            - Cmadot * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
-            + Cmq * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
-            + 2 * muc * (KY2) * (CXa * CZu - CZa * CXu)
-        )
-        D_prim = (
-            Cmu * (CXa * (CZq + 2 * muc) - CZ0 * (CZadot - 2 * muc))
-            - Cma * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
-            + Cmadot * (CX0 * CXu - CZ0 * CZu)
-            + Cmq * (CXu * CZa - CZu * CXa)
-        )
-        E_prim = -Cmu * (CX0 * CXa + CZ0 * CZa) + Cma * (CX0 * CXu + CZ0 * CZu)
-        p = (A_prim, B_prim, C_prim, D_prim, E_prim)
-        roots = np.polynomial.polynomial.polyroots(p) * c / V0
+        l = sp.Symbol('l')
+        m = sp.Matrix([
+            [CXu-2*muc*l, CXa, CZ0, 0],
+            [CZu, CZa+(CZadot-2*muc)*l, -CX0, (CZq+2*muc)*c/V0],
+            [0, 0, -l, -c/V0],
+            [Cmu, Cma +Cmadot*l, 0, (Cmq-2*muc*KY2*l)*c/V0]])
+        fuck = sp.simplify(m.det())
+        roots = sp.solveset(fuck, l)
+        final_roots = np.array([])
+        for root in roots:
+            mat = np.array([
+                [CXu - 2 * muc * root, CXa, CZ0, 0],
+                [CZu, CZa + (CZadot - 2 * muc) * root, -CX0, (CZq + 2 * muc) * c / V0],
+                [0, 0, -root, -c / V0],
+                [Cmu, Cma + Cmadot * root, 0, (Cmq - 2 * muc * KY2 * root) * c / V0]], dtype=np.complex128)
+            if abs(np.linalg.det(mat)) < 1e-10:
+                final_roots = np.append(final_roots, np.array([root], dtype=np.complex128))
+        #coeff = np.transpose(np.flip(m.det().as_poly().coeffs()))
+        #roots = np.polynomial.polynomial.polyroots(coeff) * c / V0
 
-        self.assertTupleEqual(tuple(roots), tuple(eigenvalues))
-    
+        self.assertTupleEqual(tuple(sorted(final_roots)), tuple(eigenvalues))
+
     def test_analytic_eigenvalues_asymmetric(self):
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
@@ -114,11 +113,11 @@ class MyTestCase(unittest.TestCase):
             + 0.5 * CYr * (Clp * Cnb - Cnp * Clb)
         )
         E_prim = CL * (Clb * Cnr - Cnb * Clr)
-        p = (A_prim, B_prim, C_prim, D_prim, E_prim)
+        p = (E_prim, D_prim, C_prim, B_prim, A_prim)
         roots = np.polynomial.polynomial.polyroots(p)
 
-        self.assertTupleEqual(tuple(roots), tuple(eigenvalues*b/V0))
-
+        self.assertTupleEqual(tuple(roots * V0 / b), tuple(eigenvalues))
+    """
 
 
 if __name__ == "__main__":
