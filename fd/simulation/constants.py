@@ -20,6 +20,13 @@ A = b**2 / S  # wing aspect ratio [-]
 Ah = bh**2 / Sh  # stabilizer aspect ratio [-]
 Vh_V = 1  # [-]
 ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
+OEW = 9172.9 * 0.45359237
+xcgOEW = 291.74 * 0.0254
+xcgP = 131 * 0.0254
+xcgcoor = 170 * 0.0254
+xcg1 = 214 * 0.0254
+xcg2 =251 * 0.0254
+xcg3 = 288 * 0.0254
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
