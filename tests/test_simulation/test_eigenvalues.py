@@ -44,6 +44,9 @@ class MyTestCase(unittest.TestCase):
 
     """
     def test_analytic_eigenvalues_symmetric(self):
+        #In order to perform this test you need to:
+        #1. Change the imported constants file in aircraft model with the ones for cessna Ce500
+        #2. Comment any mub calculation out from the aircraft model
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
         aero_params.C_m_delta = -1.5530
@@ -91,7 +94,7 @@ class MyTestCase(unittest.TestCase):
             * (2 * CYb * (KX2 * KZ2 - KXZ**2) + Cnr * KX2 + Clp * KZ2 + (Clr + Cnp) * KXZ)
         )
         C_prim = (
-            2
+            2 
             * mub
             * (
                 (CYb * Cnr - CYr * Cnb) * KX2
