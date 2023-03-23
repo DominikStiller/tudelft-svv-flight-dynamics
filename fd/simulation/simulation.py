@@ -154,7 +154,8 @@ if __name__ == "__main__":
     ax3.plot(df_out["t"], df_out["p"])
     ax3.set_ylabel("p")
     ax4.plot(df_out["t"], df_out["r"])
-    ax3.set_ylabel("r")
+    ax4.set_ylabel("r")
+    ax4.set_xlabel("t")
 
 
     format_plot()
