@@ -2,7 +2,7 @@
 
 from math import pi
 
-from fd.conversion import lbs_to_kg, in_to_m
+from fd.conversion import lbs_to_kg, in_to_m, kts_to_ms
 
 g = 9.81  # [m/s^2] (gravity constant)
 
@@ -38,6 +38,7 @@ Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
 gamma = 1.4  #
+cas_stall = kts_to_ms(106)  # equivalent stall speed [m/s]
 
 # Constant values concerning aircraft inertia
 KX2 = 0.019

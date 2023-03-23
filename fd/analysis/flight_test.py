@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from fd.analysis.aerodynamic_plots import plot_cl_alpha, plot_cl_cd
+from fd.analysis.aerodynamic_plots import (
+    plot_elevator_control_force,
+    plot_elevator_trim_curve,
+    plot_cl_alpha,
+    plot_cl_cd,
+)
 from fd.analysis.aerodynamics import (
     estimate_CL_alpha,
     estimate_CD0_e,
@@ -9,6 +14,7 @@ from fd.analysis.aerodynamics import (
 )
 from fd.analysis.data_sheet import DataSheet, AveragedDataSheet
 from fd.analysis.ftis_measurements import FTISMeasurements
+from fd.simulation import constants
 from fd.simulation.constants import (
     duration_phugoid,
     duration_dutch_roll,
@@ -48,8 +54,7 @@ class FlightTest:
             cg_front["x_cg"],
             cg_aft["delta_e"],
             cg_front["delta_e"],
-            cg_aft["W"],
-            cg_front["W"],
+            self.df_cg_shift["W"].mean(),
             self.df_cg_shift["tas"].mean(),
             self.df_cg_shift["rho"].mean(),
         )
@@ -77,7 +82,20 @@ class FlightTest:
             self.aerodynamic_parameters.e,
         )
 
-        # TODO add elevator trim curve with reduced values
+        plot_elevator_trim_curve(
+            self.df_elevator_trim["delta_e_reduced"],
+            self.df_elevator_trim["alpha"],
+            self.df_elevator_trim["cas_reduced"],
+            constants.Cm0,
+            self.aerodynamic_parameters.C_m_delta,
+            constants.cas_stall,
+        )
+
+        plot_elevator_control_force(
+            self.df_elevator_trim["F_e_reduced"],
+            self.df_elevator_trim["cas_reduced"],
+            constants.cas_stall,
+        )
 
     @property
     def df_ftis(self):
