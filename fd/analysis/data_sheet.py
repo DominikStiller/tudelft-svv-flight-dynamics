@@ -139,6 +139,8 @@ class DataSheet:
 
 class AveragedDataSheet:
     def __init__(self, data_sheets: dict[str, DataSheet]):
+        assert len(data_sheets) > 0, "No data sheets found, check your working directory"
+
         self.data_sheet_names = list(data_sheets.keys())
         self.data_sheets = list(data_sheets.values())
         self._calculate_averages()

@@ -96,6 +96,7 @@ def estimate_CD0_e(CD: list, CL: list) -> tuple[float, float]:
     """
 
     slope, CD0, _, _ = stats.theilslopes(CD, CL**2, alpha=0.99)
+    # slope, CD0, _, _, _ = stats.linregress(CL**2, CD)
     e = 1 / (math.pi * constants.A * slope)
 
     return CD0, e
