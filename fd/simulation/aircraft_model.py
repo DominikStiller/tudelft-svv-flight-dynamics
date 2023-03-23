@@ -51,7 +51,7 @@ class AircraftModel:
         return CX0, CZ0
 
     def get_state_space_matrices_symmetric(
-        self, m: float, V0: float, rho: float, th0: float, reader_ac=False
+        self, m: float, V0: float, rho: float, th0: float
     ) -> tuple[ArrayLike, ArrayLike, ArrayLike, ArrayLike]:
         """
 
@@ -68,18 +68,18 @@ class AircraftModel:
             D: Feedthrough matrix
 
         """
-        """
+
         Cma = self.aero_params.C_m_alpha
         Cmde = self.aero_params.C_m_delta
         muc = self.get_non_dim_masses(m, rho)[0]
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
-        """
+
         # C_1*x_dot + C_2*x +C_3*u = 0
         # x = [u_hat, alpha, theta, q]T
         C_1 = np.array(
             [
                 [-2 * muc * c / V0, 0, 0, 0],
-                [0, (CZadot - 2 * muc) * c, 0, 0],
+                [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
             ]
@@ -120,11 +120,10 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        # mub = self.get_non_dim_masses(m, rho)[-1]
+        mub = self.get_non_dim_masses(m, rho)[-1]
         # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
 
-        """
         C_1 = np.array(
             [
                 [(CYbdot - 2 * mub) * b / V0, 0, 0, 0],
@@ -210,7 +209,7 @@ class AircraftModel:
                 ],
             ]
         )
-
+        """
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
