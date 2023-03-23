@@ -38,7 +38,6 @@ class Simulation:
 
         A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         eigen = self.model.get_eigenvalues_and_eigenvectors(A)[0]
-        print(eigen)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
@@ -92,7 +91,7 @@ class Simulation:
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
-        result = np.hstack((t, np.transpose(yout)))
+        result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
         return df_result
 
@@ -117,18 +116,18 @@ class Simulation:
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
-        result = np.hstack((t, np.transpose(yout)))
+        result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
         return df_result
 
     def simulate_phugoid(self, df_phugoid):
         data = df_phugoid
-        delta_u = data['delta_u']
-        input = delta_u
+        delta_e = data['delta_e']
+        input = delta_e
         t = data.index
         V0 = data["tas"].iloc[0]
         beta0 = 0
-        phi0 = data["phi"].iloc[0]
+        u_hat = data["phi"].iloc[0]
         theta0 = data["theta"].iloc[0]
         p0 = data["p"].iloc[0]
         r0 = data["r"].iloc[0]
@@ -158,22 +157,23 @@ if __name__ == "__main__":
             )
         )
     )
-    df_dutch_roll = FlightTest("data/B24").df_dutch_roll
-    df_out = sim.simulate_dutch_roll(df_dutch_roll)
+    df_spiral = FlightTest("data/B24").df_spiral
+    df_out = sim.simulate_spiral(df_spiral)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     # ax1.axvline(ft.data_sheet.timestamp_phugoid)
     ax1.plot(df_out.index, df_out["beta"])
     ax1.set_ylabel("beta")
     ax2.plot(df_out.index, df_out["phi"])
-    ax2.plot(df_out.index, df_dutch_roll["phi"])
+    ax2.plot(df_out.index, df_spiral["phi"])
     ax2.set_ylabel("phi")
     ax3.plot(df_out.index, df_out["p"])
-    ax3.plot(df_out.index, df_dutch_roll["phi"])
+    ax3.plot(df_out.index, df_spiral["phi"])
     ax3.set_ylabel("p")
     ax4.plot(df_out.index, df_out["r"])
-    ax4.plot(df_out.index, df_dutch_roll["phi"])
+    ax4.plot(df_out.index, df_spiral["phi"])
     ax4.set_ylabel("r")
     ax4.set_xlabel("t")
+
 
 
     format_plot()
