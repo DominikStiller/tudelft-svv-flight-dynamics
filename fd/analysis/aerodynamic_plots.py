@@ -57,7 +57,13 @@ def plot_cl_cd(CL, CD, CD0, e):
 
 # Elevator curves
 # [TODO: add fully controlled parameters to plots once these are know and its known how we want to do this]
-def plot_delta_e__alpha(delta_e, alpha, xlabel_input=r"$\alpha$ [deg]", ylabel_input="$\delta_e$ [deg]"):
+def plot_delta_e_alpha(
+    delta_e,
+    alpha,
+    delta_e_intercept_V_inv_squared,
+    xlabel_input=r"$\alpha$ [deg]",
+    ylabel_input="$\delta_e$ [deg]",
+):
     """
     Plotting of the elevator trim curve: delta_e vs alpha. Should be linear.
 
@@ -68,43 +74,65 @@ def plot_delta_e__alpha(delta_e, alpha, xlabel_input=r"$\alpha$ [deg]", ylabel_i
     Returns:
         delta-alpha elevator trim curve plot
     """
-    delta_e_alpha_slope, delta_e_intercept, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
-    xx = np.linspace(0, max(alpha)*1.05, 2)
-    plt.plot(xx, delta_e_alpha_slope * xx + delta_e_intercept, "r")
+    # Delta_e vs alpha
+    slope_alpha, y_intercept_alpha, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    xx = np.linspace(0, max(alpha) * 1.05, 2)
+    plt.plot(xx, slope_alpha * xx + y_intercept_alpha, "r", label=r"$\alpha$")
     plt.scatter(alpha, delta_e, marker="x", color="black", s=50)
+
+    # Delta_e vs alpha - alpha0
+    alpha0 = (delta_e_intercept_V_inv_squared - y_intercept_alpha) / slope_alpha
+    slope_alpha0, y_intercept_alpha0, _, _ = stats.theilslopes(delta_e, alpha - alpha0, alpha=0.99)
+    xx = np.linspace(0, max(alpha - alpha0) * 1.05, 2)
+    plt.plot(xx, slope_alpha0 * xx + y_intercept_alpha0, "b", label=r"$\alpha-\alpha_0$")
+    plt.scatter(alpha - alpha0, delta_e, marker="x", color="black", s=50)
+
+    plt.legend()
     plt.xlabel(xlabel_input)
     plt.ylabel(ylabel_input)
 
+    plt.gca().invert_yaxis()
     format_plot()
     plt.show()
 
-    delta_e_alpha_slope, delta_e_intercept, _, _ = stats.theilslopes(delta_e, alpha-(-1.3598111316603236), alpha=0.99)
+    return slope_alpha, y_intercept_alpha, slope_alpha0, y_intercept_alpha0, alpha0
 
-    return delta_e_alpha_slope, delta_e_intercept
 
-def plot_delta_e__Vinv(delta_e, Vsquaredinv, xlabel_input="$1/V^2$ [m/s]", ylabel_input="$\delta_e$ [deg]"):
+def plot_delta_e_V_inv_squared(
+    delta_e, V_inv_squared, xlabel_input="$1/V^2$ [1/(m/s)$^2$]", ylabel_input="$\delta_e$ [deg]"
+):
     """
-    Plotting of the elevator trim curve. Depending on if V or V_e is used and the deflection or reduced deflection,
-    the non-reduced or reduced elevator trim curve plots can be obtained. Should be proportional to 1/v^2
+    Plotting of the elevator trim curve for delta_e vs 1/v^2. Should be proportional to 1/v^2, so linear.
 
     Args:
         delta_e (array_like): elevator deflection [deg]
-        Vsquaredinv (array_like): airspeed squared and reciprocal [1/(m/s)^2]
+        V_inv_squared (array_like): reciprocal of airspeed squared [1/(m/s)^2]
 
     Returns:
-        delta-V elevator trim curve plot
+        delta vs 1/V^2 elevator trim curve plot
     """
-    delta_e_v_slope, delta_e_intercept, _, _ = stats.theilslopes(delta_e, Vsquaredinv, alpha=0.99)
-    xx = np.linspace(0, max(Vsquaredinv)*1.05, 2)
-    plt.plot(xx, delta_e_v_slope * xx + delta_e_intercept, "r")
-    plt.scatter(Vsquaredinv, delta_e, marker="x", color="black", s=50)
+    slope, y_intercept, _, _ = stats.theilslopes(delta_e, V_inv_squared, alpha=0.99)
+    xx = np.linspace(0, max(V_inv_squared) * 1.05, 2)
+    plt.plot(xx, slope * xx + y_intercept, "r")
+    plt.scatter(V_inv_squared, delta_e, marker="x", color="black", s=50)
     plt.xlabel(xlabel_input)
     plt.ylabel(ylabel_input)
 
+    plt.gca().invert_yaxis()
     format_plot()
     plt.show()
 
-def plot_delta_e__Ve(delta_e, V, xlabel_input="$V$ [m/s]", ylabel_input="$\delta_e$ [deg]"):
+    return slope, y_intercept
+
+
+def plot_delta_e_V(
+    delta_e,
+    V,
+    delta_e_asymptote,
+    V_stall=106,
+    xlabel_input="$V$ [m/s]",
+    ylabel_input="$\delta_e$ [deg]",
+):
     """
     Plotting of the elevator trim curve. Depending on if V or V_e is used and the deflection or reduced deflection,
     the non-reduced or reduced elevator trim curve plots can be obtained. Should be proportional to 1/v^2
@@ -112,21 +140,65 @@ def plot_delta_e__Ve(delta_e, V, xlabel_input="$V$ [m/s]", ylabel_input="$\delta
     Args:
         delta_e (array_like): elevator deflection [deg]
         V (array_like): airspeed [m/s]
+        V_stall (float): Stall speed in [kts]
 
     Returns:
         delta-V elevator trim curve plot
     """
-    delta_e_v_slope, delta_e_intercept, _, _ = stats.theilslopes(delta_e, 1/V**2, alpha=0.99)
-    xx = np.linspace(106*0.514444, 200, 100)
-    plt.plot(xx, delta_e_intercept + delta_e_v_slope * 1/ xx**2, "r")
+    slope, y_intercept, _, _ = stats.theilslopes(delta_e, 1 / V**2, alpha=0.99)
+    xx = np.linspace(0.95 * (V_stall * 0.514444), 200, 100)
+    plt.plot(xx, y_intercept + slope * 1 / xx**2, "r")
     plt.scatter(V, delta_e, marker="x", color="black", s=50)
+    plt.axvline(x=(V_stall * 0.514444), color="b", linestyle="--", label="$V_{stall}$")
+    plt.axhline(y=delta_e_asymptote, linestyle=":", color="black", label="$\delta_{e,asymptote}}$")
+    plt.legend()
     plt.xlabel(xlabel_input)
     plt.ylabel(ylabel_input)
 
+    plt.gca().invert_yaxis()
     format_plot()
     plt.show()
 
-def plot_Fe_Ve(F_e, V, xlabel_input="V_e^*", ylabel_input="F_e^*"):
+
+def plot_Fe_dyn_p(
+    F_e,
+    dynamic_pressure,
+    dynamic_pressure_stall,
+    xlabel_input=r"$\frac{1}{2}\rho_0 V^2$ [Pa]",
+    ylabel_input=r"$F_e$ [N]",
+):
+    """
+    Plotting of the elevator control force curve. Plotting of the force vs dynamic pressure, should be linear.
+
+    Args:
+        F_e (array_like): Control stick force [N]
+        dynamic_pressure (array_like): dynamic pressure [Pa]
+
+    Returns:
+        F_e-1/2rhoV^2 elevator control force curve
+    """
+    slope, y_intercept, _, _ = stats.theilslopes(F_e, dynamic_pressure, alpha=0.99)
+    xx = np.linspace(dynamic_pressure_stall, max(dynamic_pressure) * 1.05, 2)
+    plt.plot(xx, y_intercept + slope * xx, "r")
+    plt.scatter(dynamic_pressure, F_e, marker="x", color="black", s=50)
+    plt.axvline(
+        x=(dynamic_pressure_stall),
+        color="b",
+        linestyle="--",
+        label=r"$\frac{1}{2}\rho_0 V_{stall}^2$",
+    )
+    xx2 = np.linspace(0, dynamic_pressure_stall, 2)
+    plt.plot(xx2, y_intercept + slope * xx2, "r", linestyle=":")
+    plt.legend()
+    plt.xlabel(xlabel_input)
+    plt.ylabel(ylabel_input)
+
+    plt.gca().invert_yaxis()
+    format_plot()
+    plt.show()
+
+
+def plot_Fe_V(F_e, V, V_stall=106, xlabel_input="$V$ [m/s]", ylabel_input="$F_e$ [N]"):
     """
     Plotting of the elevator control force curve. Depending on if V or V_e is used and the F_e or reduced F_e,
     the non-reduced or reduced elevator control force curve plots can be obtained.
@@ -134,49 +206,22 @@ def plot_Fe_Ve(F_e, V, xlabel_input="V_e^*", ylabel_input="F_e^*"):
     Args:
         F_e (array_like): Control stick force [N]
         V (array_like): airspeed [m/s]
+        V_stall (float): Stall speed in [kts]
 
     Returns:
         F_e-V elevator control force curve plot
     """
+    slope, y_intercept, _, _ = stats.theilslopes(F_e, 0.5 * constants.rho0 * V**2, alpha=0.99)
+    xx = np.linspace((V_stall * 0.514444), 120, 100)
+    plt.plot(xx, y_intercept + slope * 0.5 * constants.rho0 * xx**2, "r")
     plt.scatter(V, F_e, marker="x", color="black", s=50)
+    plt.axvline(x=(V_stall * 0.514444), color="b", linestyle="--", label="$V_{stall}$")
+    xx2 = np.linspace(0, (V_stall * 0.514444), 100)
+    plt.plot(xx2, y_intercept + slope * 0.5 * constants.rho0 * xx2**2, "r", linestyle=":")
+    plt.legend()
     plt.xlabel(xlabel_input)
     plt.ylabel(ylabel_input)
 
+    plt.gca().invert_yaxis()
     format_plot()
     plt.show()
-
-
-# Testing
-import os
-if os.getcwd().endswith("private"):
-    os.chdir("..")
-
-import sys
-sys.path.append(".")
-
-from fd.analysis.flight_test import FlightTest
-from fd.plotting import format_plot
-
-import matplotlib.pyplot as plt
-
-ft = FlightTest("../../data/B24")
-print(vars(ft.df_elevator_trim))
-df = ft.df_elevator_trim
-alpha = df["alpha"]
-delta_e = df["delta_e"]
-cas = df["cas"]
-F_e = df["F_e"]
-
-# a = [5.2, 6.3, 7.1, 4.3, 3.616666667]
-# delta_e = [0.1, -0.35, -0.7, 0.5, 0.7]
-# IAS = [154.6666667,143,135.8333333,165.6666667,173.6666667]
-# d_trim = [3,3,3,3,3]
-# Fe = [-1, -18, -30, 22, 38]
-
-delta_e_alpha_slope, delta_e_intercept = plot_delta_e__alpha(delta_e,alpha)
-plot_delta_e__Vinv(delta_e,1/cas **2)
-plot_delta_e__Ve(delta_e, cas)
-# plot_deltae_Ve(delta_e, alpha, xlabel_input="alpha")
-# plot_deltae_Ve(delta_e, cas)
-# plot_Fe_Ve(F_e, alpha, xlabel_input="alpha")
-# plot_Fe_Ve(F_e, cas)
