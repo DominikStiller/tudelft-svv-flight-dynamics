@@ -18,25 +18,27 @@ class Simulation:
     def __init__(self, model: AircraftModel):
         self.model = model
 
-    def simulate_dutch_roll(self, df_dutch_roll) -> SimulationOutput:
-        input = np.transpose(np.hstack((df_dutch_roll["delta_a"], df_dutch_roll["delta_r"])))
-        t = np.arange(0, len(input) * 0.1, 0.1)
-        V0 = df_dutch_roll["tas"][0]
-        beta0 = 0
-        phi0 = df_dutch_roll["phi"][0]
-        theta0 = df_dutch_roll["theta"][0]
-        p0 = df_dutch_roll["p"][0]
-        r0 = df_dutch_roll["r"][0]
-        m = (df_dutch_roll["m"][0] + df_dutch_roll["m"][-1]) / 2
-        rho0 = df_dutch_roll["rho"][0]
-        CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.transpose(beta0, phi0, p0, r0)
 
-        model = AircraftModel(AerodynamicParameters)
-        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
+    def simulate_dutch_roll(self, df_dutch_roll) -> SimulationOutput:
+        delta_a = df_dutch_roll['delta_a']
+        delta_r = df_dutch_roll['delta_r']
+        input = np.column_stack((delta_a, delta_r))
+        t = np.arange(0, len(input) * 0.1, 0.1)
+        V0 = df_dutch_roll["tas"].iloc[0]
+        beta0 = 0
+        phi0 = df_dutch_roll["phi"].iloc[0]
+        theta0 = df_dutch_roll["theta"].iloc[0]
+        p0 = df_dutch_roll["p"].iloc[0]
+        r0 = df_dutch_roll["r"].iloc[0]
+        m = (df_dutch_roll["m"].iloc[0] + df_dutch_roll["m"].iloc[-1]) / 2
+        rho0 = df_dutch_roll["rho"].iloc[0]
+        CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
+        state0 = np.array([beta0, phi0, p0, r0])
+
+        A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
-        result = np.hstack((t, np.transpose(yout)))
+        result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
         return df_result
 
@@ -143,8 +145,17 @@ if __name__ == "__main__":
     )
     df_dutch_roll = FlightTest("data/B24").df_dutch_roll
     df_out = sim.simulate_dutch_roll(df_dutch_roll)
-    fig, (ax1, ax2) = plt.subplots(2, 1)
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     # ax1.axvline(ft.data_sheet.timestamp_phugoid)
-    ax1.plot(df_out.index, df_out["u"])
-    ax2.plot(df_out.index, df_out["alpha"])
+    ax1.plot(df_out["t"], df_out["beta"])
+    ax1.set_ylabel("beta")
+    ax2.plot(df_out["t"], df_out["phi"])
+    ax2.set_ylabel("phi")
+    ax3.plot(df_out["t"], df_out["p"])
+    ax3.set_ylabel("p")
+    ax4.plot(df_out["t"], df_out["r"])
+    ax3.set_ylabel("r")
+
+
     format_plot()
+    plt.show()
