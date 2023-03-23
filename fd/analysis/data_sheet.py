@@ -185,7 +185,7 @@ class AveragedDataSheet:
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
     def _calculate_dataframe_average_and_check_deviations(
-        self, dfs: list[pd.DataFrame], threshold_pct=5, check_deviations=True
+        self, dfs: list[pd.DataFrame], threshold_pct=5, check_deviations=False
     ) -> pd.DataFrame:
         """
         Average data from multiple data sheets and check if any values deviate more than threshold_pct % from per-cell mean
