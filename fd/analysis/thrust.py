@@ -6,6 +6,7 @@ from typing import Optional
 
 import pandas as pd
 
+from fd.analysis.aerodynamics import calc_dynamic_pressure
 from fd.simulation import constants
 
 ittmax = 730
@@ -624,4 +625,4 @@ def calc_Tc(T: float, V: float, rho: float, S: float = constants.S) -> float:
         (array_like): Tc [-]
     """
 
-    return 2 * T / (rho * V * V * S)
+    return T / (calc_dynamic_pressure(V, rho) * S)

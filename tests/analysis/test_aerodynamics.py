@@ -62,9 +62,8 @@ class TestAerodynamics(TestCase):
         )
 
     def test_calc_Cmdelta(self):
-        assert_allclose(calc_Cmdelta(20, 19, 2, 1, 10000, 10000, 120, 0.6), -0.037513002)
-        assert_allclose(calc_Cmdelta(20, 19, 2, 1, 8000, 12000, 120, 0.6), -0.037513002)
-        assert_allclose(calc_Cmdelta(20.01, 19.99, 1.6, 1, 8000, 12000, 110, 0.2), -0.00446435726)
+        assert_allclose(calc_Cmdelta(20, 19, 2, 1, 10000, 120, 0.6), -0.037513002)
+        assert_allclose(calc_Cmdelta(20.01, 19.99, 1.6, 1, 10000, 110, 0.2), -0.00446435726)
 
     def test_estimate_Cmalpha(self):
         assert_allclose(estimate_Cmalpha([1, 2, 3], [0.5, 1, 1.5], -0.01), 0.005)
