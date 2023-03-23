@@ -5,6 +5,8 @@ import numpy as np
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
 
+from tests.test_simulation.constants_Cessna_Ce500 import c
+
 
 class MyTestCase(unittest.TestCase):
     def test_type_eigenvalues_symmetric(self):
@@ -40,6 +42,41 @@ class MyTestCase(unittest.TestCase):
         third = eigenvalues[3] > 0
 
         self.assertTupleEqual((first, second, third), (True, True, True))
+
+    def test_shortperiod_eigenvalues(self):
+        aero_params = AerodynamicParameters
+        aero_params.C_m_alpha = -0.4300
+        aero_params.C_m_delta = -1.5530
+        m = 4547.8
+        V0 = 59.9
+        rho = 0.904627056
+        th0 = 0
+        model = AircraftModel(aero_params)
+        A, B, C, D = model.get_state_space_matrices_symmetric(m, V0, rho, th0)
+        print(model.get_eigenvalues_and_eigenvectors(A)[0])
+        eig1, eig2 = model.get_shortperiod_eigenvalues(m, rho, A)
+        eigenvalues2 = complex(-0.039161, -0.037971) * V0 / c
+        eigenvalues1 = complex(-0.039161, -0.037971) * V0 / c
+        self.assertAlmostEqual(eig1, eigenvalues2)
+        self.assertAlmostEqual(eig2, eigenvalues1)
+
+
+    def test_phugoid_eigenvalues(self):
+        aero_params = AerodynamicParameters
+        aero_params.C_m_alpha = -0.4300
+        aero_params.C_m_delta = -1.5530
+        m = 4547.8
+        V0 = 59.9
+        rho = 0.904627056
+        th0 = 0
+        model = AircraftModel(aero_params)
+        A, B, C, D = model.get_state_space_matrices_symmetric(m, V0, rho, th0)
+        #print(model.get_eigenvalues_and_eigenvectors(A)[0])
+        eig1, eig2 = model.get_phugoid_eigenvalues(m, rho, V0, th0, A)
+        eigenvalues2 = complex(- 0.00029107, 0.0066006) * V0 / c
+        eigenvalues1 = complex(- 0.00029107, -0.0066006) * V0 / c
+        self.assertAlmostEqual(eig1, eigenvalues2)
+        self.assertAlmostEqual(eig2, eigenvalues1)
 
     """
     def test_analytic_eigenvalues_symmetric(self):
