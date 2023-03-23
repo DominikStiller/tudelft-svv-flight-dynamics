@@ -20,7 +20,7 @@ def plot_cl_alpha(CL, alpha, Clalpha, alpha0):
     """
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    aa = np.linspace(0, max(alpha), 20)
+    aa = np.linspace(alpha0, max(alpha), 20)
 
     ax.plot(
         aa,
