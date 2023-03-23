@@ -1,8 +1,12 @@
 import numpy.linalg as alg
 from numpy.typing import ArrayLike
+import numpy as np
 from math import sin, cos
 import control.matlab as ml
 from fd.structs import AerodynamicParameters
+
+# from fd.simulation.constants import *
+
 from tests.test_simulation.constants_Cessna_Ce500 import *
 import matplotlib.pyplot as plt
 from tests.test_simulation.test_eigenvalues import *
@@ -73,10 +77,10 @@ class AircraftModel:
         CX0, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
 
         # C_1*x_dot + C_2*x +C_3*u = 0
-        # x = [u, alpha, theta, q]T
+        # x = [u_hat, alpha, theta, q]T
         C_1 = np.array(
             [
-                [-2 * muc * c / V0**2, 0, 0, 0],
+                [-2 * muc * c / V0, 0, 0, 0],
                 [0, (CZadot - 2 * muc) * c / V0, 0, 0],
                 [0, 0, -c / V0, 0],
                 [0, Cmadot * c / V0, 0, -2 * muc * (KY2) * ((c / V0) ** 2)],
@@ -84,10 +88,10 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu / V0, CXa, CZ0, 0],
-                [CZu / V0, CZa, -CX0, (CZq + 2 * muc) * c / V0],
+                [CXu, CXa, CZ0, 0],
+                [CZu, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
-                [Cmu / V0, Cma, 0, Cmq * c / V0],
+                [Cmu, Cma, 0, Cmq * c / V0],
             ]
         )
         C_3 = np.array([[CXde], [CZde], [0], [Cmde]])
@@ -121,7 +125,7 @@ class AircraftModel:
         mub = self.get_non_dim_masses(m, rho)[-1]
         # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
-        """
+
         C_1 = np.array(
             [
                 [(CYbdot - 2 * mub) * b / V0, 0, 0, 0],
@@ -159,27 +163,43 @@ class AircraftModel:
                 [
                     V0 / b * CYb / 2 / mub,
                     V0 / b * CL / 2 / mub,
-                    V0 / b * CYp / 2 / mub,
-                    V0 / b * (CYr - 4 * mub) / 2 / mub,
+                    V0 / b * CYp / 2 / mub * (b / 2 / V0),
+                    V0 / b * (CYr - 4 * mub) / 2 / mub * (b / 2 / V0),
                 ],
-                [0, 0, 2 * V0 / b, 0],
+                [0, 0, 2 * V0 / b * (b / 2 / V0), 0],
                 [
                     V0 / b * (Clb * KZ2 + Cnb * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                     0,
-                    V0 / b * (Clp * KZ2 + Cnp * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Clr * KZ2 + Cnr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clp * KZ2 + Cnp * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    * (b / 2 / V0),
+                    V0
+                    / b
+                    * (Clr * KZ2 + Cnr * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    * (b / 2 / V0),
                 ],
                 [
-                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2)),
+                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2) - KXZ**2),
                     0,
-                    V0 / b * (Clp * KXZ + Cnp * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Clr * KXZ + Cnr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clp * KXZ + Cnp * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    * (b / 2 / V0),
+                    V0
+                    / b
+                    * (Clr * KXZ + Cnr * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    * (b / 2 / V0),
                 ],
             ]
         )
         B = np.array(
             [
-                [0, V / b * (CYr - 4 * mub) / 2 / mub],
+                [0, V0 / b * CYr / 2 / mub],
                 [0, 0],
                 [
                     V0 / b * (Clda * KZ2 + Cnda * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
@@ -191,7 +211,7 @@ class AircraftModel:
                 ],
             ]
         )
-
+        """
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
@@ -224,7 +244,7 @@ class AircraftModel:
             ax.set_ylabel("$delta_e$")
         return t, u
 
-    def get_response_plots_symmetric(self, sys, x0, t, u):
+    def get_response_plots_symmetric(self, sys, x0, t, u, V0):
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 
@@ -246,7 +266,7 @@ class AircraftModel:
 
         plt.show()
 
-    def get_response_plots_asymmetric(self, sys, x0, t, u):
+    def get_response_plots_asymmetric(self, sys, x0, t, u, V0):
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 

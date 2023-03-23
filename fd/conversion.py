@@ -99,3 +99,15 @@ def timestamp_to_s(timestamp: Union[str, datetime.time]):
     assert 0 <= second < 60
 
     return hour * 3600 + minute * 60 + second
+
+
+def inchpound_to_kgm(inchpound):
+    """
+
+    Args:
+        inchpound (float): Massmoment expressed in inchpounds
+
+    Returns (float): Massmoment expressed in kilogram meters
+
+    """
+    return inchpound * 0.45359237 * 0.0254

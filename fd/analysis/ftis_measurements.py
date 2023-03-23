@@ -1,3 +1,4 @@
+from fd.analysis.util import add_common_derived_timeseries
 from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
 from fd.io import load_ftis_measurements
 from fd.simulation import constants
@@ -54,4 +55,4 @@ class FTISMeasurements:
     def _add_derived_timeseries(self, mass_initial: float):
         self.df["time_min"] = self.df.index / 60
         self.df["m"] = mass_initial - self.df["fuel_used_left"] - self.df["fuel_used_right"]
-        self.df["W"] = self.df["m"] * constants.g
+        self.df = add_common_derived_timeseries(self.df)
