@@ -7,17 +7,18 @@ from fd.analysis.aerodynamics import (
     calc_true_V,
     calc_CL,
 )
-from fd.analysis.thermodynamics import (
-    calc_static_pressure,
-    calc_mach,
-    calc_static_temperature,
-    calc_density,
-)
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.analysis.util import add_common_derived_timeseries
-from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
+from fd.conversion import (
+    lbs_to_kg,
+    timestamp_to_s,
+    ft_to_m,
+    kts_to_ms,
+    lbshr_to_kgs,
+    C_to_K,
+    deg_to_rad,
+)
 from fd.io import load_data_sheet
-from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
 
@@ -26,7 +27,7 @@ COLUMNS = {
     "IAS": "cas",
     "a": "alpha",
     "de": "delta_e",
-    "detr": "delta_e_t",
+    "detr": "delta_t_e",
     "Fe": "F_e",
     "FFl": "fuel_flow_left",
     "FFr": "fuel_flow_right",
@@ -115,10 +116,16 @@ class DataSheet:
 
         df["h"] = ft_to_m(df["h"])
         df["cas"] = kts_to_ms(df["cas"])
+        df["alpha"] = deg_to_rad(df["alpha"])
         df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
         df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
         df["fuel_used"] = lbs_to_kg(df["fuel_used"])
         df["T_total"] = C_to_K(df["T_total"])
+
+        if "delta_e" in df.columns:
+            df["delta_e"] = deg_to_rad(df["delta_e"])
+        if "delta_t_e" in df.columns:
+            df["delta_t_e"] = deg_to_rad(df["delta_t_e"])
 
         return df
 
