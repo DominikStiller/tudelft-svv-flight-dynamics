@@ -298,7 +298,6 @@ class AircraftModel:
 
     def get_idealized_spiral_eigenvalues(self, CL):
         mub = self.get_non_dim_masses(m, rho)[1]
-        CL =
         A = 2 * CL * (c.Clb * c.Cnr - c.Cnb * c.Clr)
         B = c.Clp * (c.CYb * c.Cnr + 4 * mub * c.Cnb)
         C = c.Cnp * (c.CYb * c.Clr + 4 * mub * c.Clb)
