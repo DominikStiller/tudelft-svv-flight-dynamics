@@ -36,6 +36,10 @@ class TestConversion(TestCase):
         assert_allclose(conversion.ft_to_m(6.5), 1.9812)
         assert_allclose(conversion.ft_to_m(0), 0)
 
+    def test_in_to_m(self):
+        assert_allclose(conversion.in_to_m(6.5), 0.1651)
+        assert_allclose(conversion.in_to_m(0), 0)
+
     def test_C_to_K(self):
         assert_allclose(conversion.C_to_K(26.2), 299.35)
         assert_allclose(conversion.C_to_K(-67.9), 205.25)
