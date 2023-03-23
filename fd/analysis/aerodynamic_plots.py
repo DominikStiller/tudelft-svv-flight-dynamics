@@ -28,9 +28,9 @@ def plot_cl_alpha(CL, alpha, Clalpha, alpha0):
         Clalpha * (aa - alpha0),
         "r",
         label="Best fit ($C_{L_\\alpha}$ = "
-        + f"{Clalpha:.3} 1/°"
+        + f"{Clalpha:.3} 1/rad"
         + ", $\\alpha_0$ = "
-        + f"{alpha0:.3} °)",
+        + f"{alpha0:.3} rad)",
     )
     ax.scatter(alpha, CL, marker="x", color="black", s=50, label="Data")
 
