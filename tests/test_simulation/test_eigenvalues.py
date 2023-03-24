@@ -1,9 +1,10 @@
 import unittest
 
 import numpy as np
-
+from numpy.testing import assert_allclose
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
+from tests.test_simulation.constants_Cessna_Ce500 import *
 
 
 class MyTestCase(unittest.TestCase):
@@ -41,11 +42,10 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTupleEqual((first, second, third), (True, True, True))
 
-    """
     def test_analytic_eigenvalues_symmetric(self):
-        #In order to perform this test you need to:
-        #1. Change the imported constants file in aircraft model with the ones for cessna Ce500
-        #2. Comment any mub calculation out from the aircraft model
+        # In order to perform this test you need to:
+        # 1. Change the imported constants file in aircraft model with the ones for cessna Ce500
+        # 2. Comment any mub calculation out from the aircraft model
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
         aero_params.C_m_delta = -1.5530
@@ -57,20 +57,31 @@ class MyTestCase(unittest.TestCase):
         A, B, C, D = model.get_state_space_matrices_symmetric(m, V0, rho, th0)
         eigenvalues = model.get_eigenvalues_and_eigenvectors(A)[0]
 
-        A_prim = 4*muc**2*KY2*(CZadot-2*muc)
-        B_prim = Cmadot*2*muc*(CZq+2*muc)-Cmq*2*muc*(CZadot-2*muc)-2*muc*KY2*(CXu*(CZadot-2*muc)-2*muc*CZa)
-        C_prim = Cma*2*muc*(CZq+2*muc)-Cmadot*(2*muc*CX0+CXu*(CZq+2*muc))+Cmq*(CXu*(CZadot-2*muc)-2*muc*CZa)+2*muc*KY2*(CXa*CZu-CZa*CXu)
-        D_prim = Cmu*(CXa*(CZq+2*muc)-CZ0*(CZadot-2*muc))-Cma*(2*muc*CX0+CXu*(CZq+2*muc))+Cmadot*(CX0*CXu-CZ0*CZu)+Cmq*(CXu*CZa-CZu*CXa)
-        E_prim = -Cmu*(CX0*CXa+CZ0*CZa)+Cma*(CX0*CXu+CZ0*CZu)
+        A_prim = 4 * muc**2 * KY2 * (CZadot - 2 * muc)
+        B_prim = (
+            Cmadot * 2 * muc * (CZq + 2 * muc)
+            - Cmq * 2 * muc * (CZadot - 2 * muc)
+            - 2 * muc * KY2 * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
+        )
+        C_prim = (
+            Cma * 2 * muc * (CZq + 2 * muc)
+            - Cmadot * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
+            + Cmq * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
+            + 2 * muc * KY2 * (CXa * CZu - CZa * CXu)
+        )
+        D_prim = (
+            Cmu * (CXa * (CZq + 2 * muc) - CZ0 * (CZadot - 2 * muc))
+            - Cma * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
+            + Cmadot * (CX0 * CXu - CZ0 * CZu)
+            + Cmq * (CXu * CZa - CZu * CXa)
+        )
+        E_prim = -Cmu * (CX0 * CXa + CZ0 * CZa) + Cma * (CX0 * CXu + CZ0 * CZu)
         p = (E_prim, D_prim, C_prim, B_prim, A_prim)
         roots = np.polynomial.polynomial.polyroots(p)
 
         assert_allclose(roots * V0 / c, np.sort(eigenvalues), rtol=1e-8)
 
-        
-        
-
-
+    """"
     def test_analytic_eigenvalues_asymmetric(self):
         #In order to perform this test you need to:
         #1. Change the imported constants file in aircraft model with the ones for cessna Ce500
