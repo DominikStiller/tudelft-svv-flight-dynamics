@@ -130,7 +130,7 @@ class Simulation:
 
     def simulate_phugoid(self, df_phugoid):
         data = df_phugoid
-        delta_e = data["delta_e"]
+        delta_e = data["delta_e"] #- data["delta_e"].iloc[0]
         t = data.index
         input = delta_e  # .reshape((len(t), 1))
         V0 = data["tas"].iloc[0]
@@ -141,7 +141,7 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([u_hat0, alpha0, theta0, q0])
+        state0 = np.array([0, 0, 0, 0]) #np.array([u_hat0, alpha0, theta0, q0])
 
         A, B, C, D = self.model.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
         print(np.linalg.eig(A)[0])
@@ -149,6 +149,7 @@ class Simulation:
         sys = ml.ss(A, B, C, D)
         print(self.model.get_eigenvalues_and_eigenvectors(A)[0])
         yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([u_hat0, alpha0, theta0, q0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "u_hat", "alpha", "theta", "q"])
         df_result = df_result.set_index("t", drop=True)
@@ -160,6 +161,7 @@ if __name__ == "__main__":
         AircraftModel(
             AerodynamicParameters(
                 C_L_alpha=4.758556374647304,
+                alpha_0=-0.023124783070063493,
                 C_D_0=0.023439123324849084,
                 C_m_alpha=-0.5554065208385275,
                 C_m_delta=-1.3380975545274032,
@@ -170,18 +172,24 @@ if __name__ == "__main__":
     df = FlightTest("data/B24").df_phugoid
     df_out = sim.simulate_phugoid(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
+    y1 = "tas"
+    y2 = "alpha"
+    y3 = "theta"
+    y4 = "q"
+    print(df[y2])
+    print(df_out[y2])
     ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
-    ax1.plot(df_out.index, df["tas"], color="black")
-    ax1.set_ylabel("tas")
-    ax2.plot(df_out.index, df_out["alpha"])
-    ax2.plot(df_out.index, df["alpha"], color="black")
-    ax2.set_ylabel("x2")
-    ax3.plot(df_out.index, df_out["theta"])
-    ax3.plot(df_out.index, df["theta"], color="black")
-    ax3.set_ylabel("x3")
-    ax4.plot(df_out.index, df_out["q"])
-    ax4.plot(df_out.index, df["q"], color="black")
-    ax4.set_ylabel("x4")
+    ax1.plot(df_out.index, df[y1], color="black")
+    ax1.set_ylabel(y1)
+    ax2.plot(df_out.index, df_out[y2])
+    ax2.plot(df_out.index, df[y2], color="black")
+    ax2.set_ylabel(y2)
+    ax3.plot(df_out.index, df_out[y3])
+    ax3.plot(df_out.index, df[y3], color="black")
+    ax3.set_ylabel(y3)
+    ax4.plot(df_out.index, df_out[y4])
+    ax4.plot(df_out.index, df[y4], color="black")
+    ax4.set_ylabel(y4)
     # ax5.plot(df_out.index, df['delta_'])
     ax4.set_xlabel("t")
 

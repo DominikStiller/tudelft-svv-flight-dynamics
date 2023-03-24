@@ -45,8 +45,8 @@ class AircraftModel:
 
         """
         W = m * g
-        CX0 = -W * sin(th0) / (0.5 * rho * V0**2 * S)
-        CZ0 = W * cos(th0) / (0.5 * rho * V0**2 * S)
+        CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
+        CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
         return CX0, CZ0
 
     def get_state_space_matrices_symmetric(
