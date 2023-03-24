@@ -21,7 +21,7 @@ To get started with development:
 ## Usage
 To run the code from the console, make sure you are in the project directory and activated the virtual environment (`<venv>\Scripts\activate.bat` on Windows, `source <venv>/bin/activate` on Linux).
 
-The main script can then be executed using `python -m fd`. Alternatively, the scripts in `bin` can be used which automatically activate the virtual environment and offer the same parameters.
+The main script can then be executed using `python -m fd data/dataset_name`. `data/dataset_name/` is the path to the dataset as described below. Alternatively, `bin/run.sh data/dataset_name` can be used while automatically activating the virtual environment.
 
 
 ## Data folder structure

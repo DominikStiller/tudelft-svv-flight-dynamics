@@ -167,7 +167,7 @@ def plot_elevator_trim_curve(
         y=delta_e_asymptote,
         linestyle=":",
         color="black",
-        label=r"$\delta_{e,asymptote}}$ = " + f"{delta_e_asymptote:.3} rad",
+        label=r"$\delta_{e,V \to \infty}}$ = " + f"{delta_e_asymptote:.3} rad",
     )
     ax_V.set_xlabel(r"$\tilde V_e$ [m/s]")
     ax_V.legend()
