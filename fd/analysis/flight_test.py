@@ -1,7 +1,20 @@
 from pathlib import Path
 
+from fd.analysis.aerodynamic_plots import (
+    plot_elevator_control_force,
+    plot_elevator_trim_curve,
+    plot_cl_alpha,
+    plot_cl_cd,
+)
+from fd.analysis.aerodynamics import (
+    estimate_CL_alpha,
+    estimate_CD0_e,
+    estimate_Cmalpha,
+    calc_Cmdelta,
+)
 from fd.analysis.data_sheet import DataSheet, AveragedDataSheet
 from fd.analysis.ftis_measurements import FTISMeasurements
+from fd.simulation import constants
 from fd.simulation.constants import (
     duration_phugoid,
     duration_dutch_roll,
@@ -18,17 +31,71 @@ class FlightTest:
 
     ftis_measurements: FTISMeasurements
     data_sheet: AveragedDataSheet
+    aerodynamic_parameters: AerodynamicParameters
 
     def __init__(self, data_path: str):
         self.data_sheet = AveragedDataSheet(
             {p.name: DataSheet(str(p)) for p in Path(data_path).glob("**/*.xlsx")}
         )
         self.ftis_measurements = FTISMeasurements(data_path, self.data_sheet.mass_initial)
+        self._estimate_aerodynamic_parameters()
+        self.data_sheet.add_reduced_elevator_deflection_timeseries(
+            self.aerodynamic_parameters.C_m_delta
+        )
 
-    def analyze(self) -> AerodynamicParameters:
-        # Estimate aerodynamic and eigenmotion parameters
-        # Plot aerodynamic curves
-        pass
+    def _estimate_aerodynamic_parameters(self):
+        C_L_alpha, _, alpha_0 = estimate_CL_alpha(self.df_clcd["C_L"], self.df_clcd["alpha"])
+        C_D_0, e = estimate_CD0_e(self.df_clcd["C_D"], self.df_clcd["C_L"])
+
+        cg_aft = self.df_cg_shift.iloc[0]
+        cg_front = self.df_cg_shift.iloc[1]
+        C_m_delta = calc_Cmdelta(
+            cg_aft["x_cg"],
+            cg_front["x_cg"],
+            cg_aft["delta_e"],
+            cg_front["delta_e"],
+            self.df_cg_shift["W"].mean(),
+            self.df_cg_shift["tas"].mean(),
+            self.df_cg_shift["rho"].mean(),
+        )
+
+        C_m_alpha = estimate_Cmalpha(
+            self.df_elevator_trim["alpha"], self.df_elevator_trim["delta_e"], C_m_delta
+        )
+
+        self.aerodynamic_parameters = AerodynamicParameters(
+            C_L_alpha, alpha_0, C_D_0, C_m_alpha, C_m_delta, e
+        )
+
+    def make_aerodynamic_plots(self):
+        plot_cl_alpha(
+            self.df_clcd["C_L"],
+            self.df_clcd["alpha"],
+            self.aerodynamic_parameters.C_L_alpha,
+            self.aerodynamic_parameters.alpha_0,
+        )
+
+        plot_cl_cd(
+            self.df_clcd["C_L"],
+            self.df_clcd["C_D"],
+            self.aerodynamic_parameters.C_D_0,
+            self.aerodynamic_parameters.e,
+        )
+
+        plot_elevator_trim_curve(
+            self.df_elevator_trim["delta_e_reduced"],
+            self.df_elevator_trim["alpha"],
+            self.df_elevator_trim["cas_reduced"],
+            constants.Cm0,
+            self.aerodynamic_parameters.C_m_delta,
+            constants.cas_stall,
+        )
+
+        plot_elevator_control_force(
+            self.df_elevator_trim["F_e_reduced"],
+            self.df_elevator_trim["cas_reduced"],
+            constants.cas_stall,
+        )
 
     @property
     def df_ftis(self):

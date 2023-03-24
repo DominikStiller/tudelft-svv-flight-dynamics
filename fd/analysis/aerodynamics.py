@@ -19,6 +19,20 @@ def calc_true_V(T, M):
     return M * np.sqrt(constants.gamma * constants.R * T)
 
 
+def calc_dynamic_pressure(V: float, rho: float) -> float:
+    """
+    Calculate dynamic pressure
+
+    Args:
+        V: velocity (CAS or TAS) [m/s]
+        rho: air density (sea level or actual) [kg/m^3]
+
+    Returns:
+        Dynamic pressure [Pa]
+    """
+    return rho * V**2 / 2
+
+
 def calc_equivalent_V(Vt, rho):
     """
 
@@ -45,7 +59,7 @@ def calc_CL(W: float, V: float, rho: float, S=constants.S) -> float:
         (array_like): CL [-]
     """
 
-    return 2 * W / (rho * V * V * S)
+    return W / (calc_dynamic_pressure(V, rho) * S)
 
 
 def estimate_CL_alpha(CL: float, alpha: float) -> tuple[float, float, float]:
@@ -78,10 +92,10 @@ def calc_CD(T: float, V: float, rho: float, S: float = constants.S) -> float:
         CD (array_like): Drag coefficient CD[-].
 
     """
-    return T / (0.5 * rho * V * V * S)
+    return T / (calc_dynamic_pressure(V, rho) * S)
 
 
-def calc_CD0_e(CD: list, CL: list) -> float:
+def estimate_CD0_e(CD: list, CL: list) -> tuple[float, float]:
     """
     This function uses the parabolic drag formula to calculate the zero lift drag, CD0[-], and the oswald
     efficiency factor, e[-].
@@ -95,43 +109,11 @@ def calc_CD0_e(CD: list, CL: list) -> float:
 
     """
 
-    TheilslopesResults = stats.theilslopes(CD, CL**2, alpha=0.99)
-
-    CD0 = TheilslopesResults[1]
-    e = 1 / (math.pi * constants.A * TheilslopesResults[0])
+    slope, CD0, _, _ = stats.theilslopes(CD, CL**2, alpha=0.99)
+    # slope, CD0, _, _, _ = stats.linregress(CL**2, CD)
+    e = 1 / (math.pi * constants.A * slope)
 
     return CD0, e
-
-
-def calc_Cmdelta(
-    xcg1: float,
-    xcg2: float,
-    deltae1: float,
-    deltae2: float,
-    W1: float,
-    W2: float,
-    V: float,
-    rho: float,
-):
-    """
-
-    Args:
-        xcg1 (float): X-position of the center of gravity during the first test.(aft cg)[m]
-        xcg2 (float): X-position of the center of gravity during the second test.(front cg)[m]
-        deltae1 (float): Deflection of the elevator during the first test.[deg]
-        deltae2 (float): Deflection of the elevator during the second test.[deg]
-        W1 (float): Weight of the aircraft during the first test.[N]
-        W2 (float): Weight of the aircraft during the second test.[N]
-        V (float): Velocity of the aircraft during the tests.[m/s]
-        rho (float): Air density.[kg/m^3]
-
-    Returns: Cmdelta (float): The moment coefficient change due to the elevator deflection.[-]
-
-    """
-    W_avg = (W1 + W2) / 2
-    Delta_cg = xcg2 - xcg1
-    Delta_delta_e = deltae2 - deltae1
-    return -1 / Delta_delta_e * W_avg / (0.5 * rho * V**2 * constants.S) * Delta_cg / constants.c
 
 
 def estimate_Cmalpha(alpha, delta_e, Cmdelta):
@@ -148,3 +130,32 @@ def estimate_Cmalpha(alpha, delta_e, Cmdelta):
 
     slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
     return -slope * Cmdelta
+
+
+def calc_Cmdelta(
+    xcg1: float,
+    xcg2: float,
+    deltae1: float,
+    deltae2: float,
+    W: float,
+    V: float,
+    rho: float,
+):
+    """
+
+    Args:
+        xcg1 (float): X-position of the center of gravity during the first test.(aft cg)[m]
+        xcg2 (float): X-position of the center of gravity during the second test.(front cg)[m]
+        deltae1 (float): Deflection of the elevator during the first test.[deg]
+        deltae2 (float): Deflection of the elevator during the second test.[deg]
+        W (float): Weight of the aircraft during the tests.[N]
+        V (float): Velocity of the aircraft during the tests.[m/s]
+        rho (float): Air density.[kg/m^3]
+
+    Returns: Cmdelta (float): The moment coefficient change due to the elevator deflection.[-]
+
+    """
+    Delta_cg = xcg2 - xcg1
+    Delta_delta_e = deltae2 - deltae1
+    C_N = W / (calc_dynamic_pressure(V, rho) * constants.S)
+    return -1 / Delta_delta_e * C_N * Delta_cg / constants.c

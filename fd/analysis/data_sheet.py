@@ -6,18 +6,26 @@ import pandas as pd
 from fd.analysis.aerodynamics import (
     calc_true_V,
     calc_CL,
+    calc_CD,
 )
-from fd.analysis.thermodynamics import (
-    calc_static_pressure,
-    calc_mach,
-    calc_static_temperature,
-    calc_density,
+from fd.analysis.center_of_gravity import calc_cg_position
+from fd.analysis.reduced_values import (
+    calc_reduced_equivalent_V,
+    calc_reduced_elevator_deflection,
+    calc_reduced_stick_force,
 )
 from fd.analysis.thrust import calculate_thrust_from_df, calc_Tc
 from fd.analysis.util import add_common_derived_timeseries
-from fd.conversion import lbs_to_kg, timestamp_to_s, ft_to_m, kts_to_ms, lbshr_to_kgs, C_to_K
+from fd.conversion import (
+    lbs_to_kg,
+    timestamp_to_s,
+    ft_to_m,
+    kts_to_ms,
+    lbshr_to_kgs,
+    C_to_K,
+    deg_to_rad,
+)
 from fd.io import load_data_sheet
-from fd.simulation import constants
 from fd.simulation.constants import mass_basic_empty, fuel_flow_standard
 from fd.util import mean_not_none, mean_not_nan_df
 
@@ -26,7 +34,7 @@ COLUMNS = {
     "IAS": "cas",
     "a": "alpha",
     "de": "delta_e",
-    "detr": "delta_e_t",
+    "detr": "delta_t_e",
     "Fe": "F_e",
     "FFl": "fuel_flow_left",
     "FFr": "fuel_flow_right",
@@ -115,16 +123,24 @@ class DataSheet:
 
         df["h"] = ft_to_m(df["h"])
         df["cas"] = kts_to_ms(df["cas"])
+        df["alpha"] = deg_to_rad(df["alpha"])
         df["fuel_flow_left"] = lbshr_to_kgs(df["fuel_flow_left"])
         df["fuel_flow_right"] = lbshr_to_kgs(df["fuel_flow_right"])
         df["fuel_used"] = lbs_to_kg(df["fuel_used"])
         df["T_total"] = C_to_K(df["T_total"])
+
+        if "delta_e" in df.columns:
+            df["delta_e"] = deg_to_rad(df["delta_e"])
+        if "delta_t_e" in df.columns:
+            df["delta_t_e"] = deg_to_rad(df["delta_t_e"])
 
         return df
 
 
 class AveragedDataSheet:
     def __init__(self, data_sheets: dict[str, DataSheet]):
+        assert len(data_sheets) > 0, "No data sheets found, check your working directory"
+
         self.data_sheet_names = list(data_sheets.keys())
         self.data_sheets = list(data_sheets.values())
         self._calculate_averages()
@@ -155,10 +171,21 @@ class AveragedDataSheet:
             [ds.timestamp_aperiodic_roll for ds in self.data_sheets]
         )
         self.timestamp_spiral = mean_not_none([ds.timestamp_spiral for ds in self.data_sheets])
+
+        self.mass_pilot_1 = mean_not_none([ds.mass_pilot_1 for ds in self.data_sheets])
+        self.mass_pilot_2 = mean_not_none([ds.mass_pilot_2 for ds in self.data_sheets])
+        self.mass_coordinator = mean_not_none([ds.mass_coordinator for ds in self.data_sheets])
+        self.mass_observer_1l = mean_not_none([ds.mass_observer_1l for ds in self.data_sheets])
+        self.mass_observer_1r = mean_not_none([ds.mass_observer_1r for ds in self.data_sheets])
+        self.mass_observer_2l = mean_not_none([ds.mass_observer_2l for ds in self.data_sheets])
+        self.mass_observer_2r = mean_not_none([ds.mass_observer_2r for ds in self.data_sheets])
+        self.mass_observer_3l = mean_not_none([ds.mass_observer_3l for ds in self.data_sheets])
+        self.mass_observer_3r = mean_not_none([ds.mass_observer_3r for ds in self.data_sheets])
+        self.mass_block_fuel = mean_not_none([ds.mass_block_fuel for ds in self.data_sheets])
         self.mass_initial = mean_not_none([ds.mass_initial for ds in self.data_sheets])
 
     def _calculate_dataframe_average_and_check_deviations(
-        self, dfs: list[pd.DataFrame], threshold_pct=5, check_deviations=True
+        self, dfs: list[pd.DataFrame], threshold_pct=5, check_deviations=False
     ) -> pd.DataFrame:
         """
         Average data from multiple data sheets and check if any values deviate more than threshold_pct % from per-cell mean
@@ -192,9 +219,13 @@ class AveragedDataSheet:
         for df in [self.df_clcd, self.df_elevator_trim, self.df_cg_shift]:
             df["time_min"] = df["time"] / 60
             df["m"] = self.mass_initial - df["fuel_used"]
+            df["m_fuel"] = self.mass_block_fuel - df["fuel_used"]
             df = add_common_derived_timeseries(df)
 
             df["tas"] = df.apply(lambda row: calc_true_V(row["T_static"], row["M"]), axis=1)
+            df["cas_reduced"] = df.apply(
+                lambda row: calc_reduced_equivalent_V(row["cas"], row["W"]), axis=1
+            )
             # No need to calculate equivalent airspeed, is already given in data as IAS
 
             # Calculate thrust (actual + standardized)
@@ -210,6 +241,40 @@ class AveragedDataSheet:
 
             # Calculate coefficients
             # Using CAS + rho0 gives the same results as TAS + rho
-            df["C_l"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["C_L"] = df.apply(lambda row: calc_CL(row["W"], row["tas"], row["rho"]), axis=1)
+            df["C_D"] = df.apply(lambda row: calc_CD(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c"] = df.apply(lambda row: calc_Tc(row["T"], row["tas"], row["rho"]), axis=1)
             df["T_c_s"] = df.apply(lambda row: calc_Tc(row["T_s"], row["tas"], row["rho"]), axis=1)
+
+        for df in [self.df_elevator_trim, self.df_cg_shift]:
+            df["F_e_reduced"] = df.apply(
+                lambda row: calc_reduced_stick_force(row["F_e"], row["W"]), axis=1
+            )
+            # Reduced elevator deflection cannot be calculated here because C_m_delta is not known yet
+
+        self.df_cg_shift["shift"] = [False, True]
+        df["x_cg"] = self.df_cg_shift.apply(
+            lambda row: calc_cg_position(
+                row["m_fuel"],
+                self.mass_pilot_1,
+                self.mass_pilot_2,
+                self.mass_coordinator,
+                self.mass_observer_1l,
+                self.mass_observer_1r,
+                self.mass_observer_2l,
+                self.mass_observer_2r,
+                self.mass_observer_3l,
+                self.mass_observer_3r,
+                row["shift"],
+            ),
+            axis=1,
+        )
+
+    def add_reduced_elevator_deflection_timeseries(self, C_m_delta: float):
+        for df in [self.df_elevator_trim, self.df_cg_shift]:
+            df["delta_e_reduced"] = df.apply(
+                lambda row: calc_reduced_elevator_deflection(
+                    row["delta_e"], C_m_delta, row["T_c_s"], row["T_c"]
+                ),
+                axis=1,
+            )

@@ -1,7 +1,14 @@
 from fd.analysis.util import add_common_derived_timeseries
-from fd.conversion import lbshr_to_kgs, lbs_to_kg, ft_to_m, kts_to_ms, C_to_K
+from fd.conversion import (
+    lbshr_to_kgs,
+    lbs_to_kg,
+    ft_to_m,
+    kts_to_ms,
+    C_to_K,
+    deg_to_rad,
+    degs_to_rads,
+)
 from fd.io import load_ftis_measurements
-from fd.simulation import constants
 
 COLUMNS = {
     "vane_AOA": "alpha",
@@ -40,6 +47,17 @@ class FTISMeasurements:
         self.df = self.df[COLUMNS.keys()].rename(columns=COLUMNS)
 
         # Convert to SI units
+        self.df["alpha"] = deg_to_rad(self.df["alpha"])
+        self.df["delta_e"] = deg_to_rad(self.df["delta_e"])
+        self.df["delta_t_e"] = deg_to_rad(self.df["delta_t_e"])
+        self.df["delta_a"] = deg_to_rad(self.df["delta_a"])
+        self.df["delta_r"] = deg_to_rad(self.df["delta_r"])
+        self.df["s_e"] = deg_to_rad(self.df["s_e"])
+        self.df["phi"] = deg_to_rad(self.df["phi"])
+        self.df["theta"] = deg_to_rad(self.df["theta"])
+        self.df["p"] = degs_to_rads(self.df["p"])
+        self.df["q"] = degs_to_rads(self.df["q"])
+        self.df["r"] = degs_to_rads(self.df["r"])
         self.df["fuel_flow_left"] = lbshr_to_kgs(self.df["fuel_flow_left"])
         self.df["fuel_flow_right"] = lbshr_to_kgs(self.df["fuel_flow_right"])
         self.df["fuel_used_left"] = lbs_to_kg(self.df["fuel_used_left"])

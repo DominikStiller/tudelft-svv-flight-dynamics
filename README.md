@@ -21,4 +21,12 @@ To get started with development:
 ## Usage
 To run the code from the console, make sure you are in the project directory and activated the virtual environment (`<venv>\Scripts\activate.bat` on Windows, `source <venv>/bin/activate` on Linux).
 
-The main script can then be executed using `python -m fd`. Alternatively, the scripts in `bin` can be used which automatically activate the virtual environment and offer the same parameters.
+The main script can then be executed using `python -m fd data/dataset_name`. `data/dataset_name/` is the path to the dataset as described below. Alternatively, `bin/run.sh data/dataset_name` can be used while automatically activating the virtual environment.
+
+
+## Data folder structure
+Since data is not committed but has to be downloaded by every developer, there should be a common structure of the `data/` folder:
+* `dataset_name/` (e.g., `ref_2023`, `B24`)
+  * `sheet_XX.xlsx`: Post-flight data sheet (possibly with seat number `XX`)
+  * `measurements.mat`: Measurements from Flight Test Instrumentation System
+* `plots/`: plots will be automatically generated here

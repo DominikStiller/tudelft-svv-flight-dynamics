@@ -5,4 +5,4 @@ then
   source venv/bin/activate
 fi
 
-python -m fd
+python -m fd $@
