@@ -1,3 +1,5 @@
+from pandas import DataFrame
+
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import SimulationOutput
 import control.matlab as ml
@@ -18,7 +20,7 @@ class Simulation:
     def __init__(self, model: AircraftModel):
         self.model = model
 
-    def simulate_dutch_roll(self, df_dutch_roll) -> SimulationOutput:
+    def simulate_dutch_roll(self, df_dutch_roll) -> DataFrame:
         data = df_dutch_roll
         delta_a = data["delta_a"]
         delta_r = data["delta_r"]
@@ -33,18 +35,15 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([0, 0, 0, 0])
+        state0 = np.array([0, 0, p0, r0])
 
         A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         eigen = self.model.get_eigenvalues_and_eigenvectors(A)[0]
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([0, phi0, 0, 0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
-        df_result["beta"] = df_result["beta"] + beta0
-        df_result["phi"] = df_result["phi"] + phi0
-        df_result["p"] = df_result["p"] + p0
-        df_result["r"] = df_result["r"] + r0
         return df_result
 
     def simulate_dutch_roll_yd(self, df_dutch_roll_yd):
@@ -62,13 +61,14 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([beta0, phi0, p0, r0])
+        state0 = np.array([0, 0, p0, r0])
 
         A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         eigen = self.model.get_eigenvalues_and_eigenvectors(A)[0]
         print(eigen)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([0, phi0, 0, 0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
         return df_result
@@ -88,12 +88,14 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([beta0, phi0, p0, r0])
+        state0 = np.array([0, 0, p0, r0])
 
         model = AircraftModel(AerodynamicParameters)
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
+        print(np.linalg.eig(A)[0])
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([0, phi0, 0, 0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
         return df_result
@@ -113,24 +115,20 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([0, 0, 0, 0])
+        state0 = np.array([0, 0, p0, r0])
 
         model = AircraftModel(AerodynamicParameters)
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([0, phi0, 0, 0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
-        df_result["beta"] = df_result["beta"] + beta0
-        df_result["phi"] = df_result["phi"] + phi0
-        df_result["p"] = df_result["p"] + p0
-        df_result["r"] = df_result["r"] + r0
-
         return df_result
 
     def simulate_phugoid(self, df_phugoid):
         data = df_phugoid
-        delta_e = data["delta_e"] #- data["delta_e"].iloc[0]
+        delta_e = data["delta_e"]  # - data["delta_e"].iloc[0]
         t = data.index
         input = delta_e  # .reshape((len(t), 1))
         V0 = data["tas"].iloc[0]
@@ -141,7 +139,34 @@ class Simulation:
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         rho0 = data["rho"].iloc[0]
         CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
-        state0 = np.array([0, 0, 0, 0]) #np.array([u_hat0, alpha0, theta0, q0])
+        state0 = np.array([0, 0, 0, 0])  # np.array([u_hat0, alpha0, theta0, q0])
+
+        A, B, C, D = self.model.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
+        print(np.linalg.eig(A)[0])
+        print(np.linalg.eig(A)[1])
+        sys = ml.ss(A, B, C, D)
+        print(self.model.get_eigenvalues_and_eigenvectors(A)[0])
+        yout, t, xout = ml.lsim(sys, input, t, state0)
+        yout += np.array([u_hat0, alpha0, theta0, q0])
+        result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
+        df_result = pd.DataFrame(result, columns=["t", "u_hat", "alpha", "theta", "q"])
+        df_result = df_result.set_index("t", drop=True)
+        return df_result
+
+    def simulate_short_period(self, df_short_period):
+        data = df_short_period
+        delta_e = data["delta_e"]  # - data["delta_e"].iloc[0]
+        t = data.index
+        input = delta_e  # .reshape((len(t), 1))
+        V0 = data["tas"].iloc[0]
+        u_hat0 = 0
+        alpha0 = data["alpha"].iloc[0]
+        theta0 = data["theta"].iloc[0]
+        q0 = data["q"].iloc[0]
+        m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
+        rho0 = data["rho"].iloc[0]
+        CL = calc_CL(m * constants.g * np.cos(theta0), V0, rho0)
+        state0 = np.array([0, 0, 0, 0])  # np.array([u_hat0, alpha0, theta0, q0])
 
         A, B, C, D = self.model.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
         print(np.linalg.eig(A)[0])
@@ -169,16 +194,22 @@ if __name__ == "__main__":
             )
         )
     )
-    df = FlightTest("data/B24").df_phugoid
-    df_out = sim.simulate_phugoid(df)
+    df = FlightTest("data/B24").df_short_period
+    df_out = sim.simulate_short_period(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
+
     y1 = "tas"
     y2 = "alpha"
     y3 = "theta"
     y4 = "q"
-    print(df[y2])
-    print(df_out[y2])
+    """
+    y1 = "beta"
+    y2 = "phi"
+    y3 = "p"
+    y4 = "r"
+    """
     ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
+    # ax1.plot(df_out.index, df_out[y1])
     ax1.plot(df_out.index, df[y1], color="black")
     ax1.set_ylabel(y1)
     ax2.plot(df_out.index, df_out[y2])
