@@ -152,7 +152,6 @@ class AircraftModel:
 
         A = -alg.inv(C_1) @ C_2
         B = -alg.inv(C_1) @ C_3
-        """
 
         A = np.array(
             [
@@ -164,50 +163,58 @@ class AircraftModel:
                 ],
                 [0, 0, 2 * V0 / b * (b / 2 / V0), 0],
                 [
-                    V0 / b * (Clb * KZ2 + Cnb * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clb * KZ2 + Cnb * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
                     0,
-                    V0
-                    / b
-                    * (Clp * KZ2 + Cnp * KXZ)
-                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
-                    * (b / 2 / V0),
-                    V0
-                    / b
-                    * (Clr * KZ2 + Cnr * KXZ)
-                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
-                    * (b / 2 / V0),
+                    V0 / b * (Clp * KZ2 + Cnp * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0 / b * (Clr * KZ2 + Cnr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                 ],
                 [
-                    V0 / b * (Clb * KXZ + Cnb * KX2) / (4 * mub * (KX2 * KZ2) - KXZ**2),
+                    V0
+                    / b
+                    * (Clb * KXZ + Cnb * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
                     0,
-                    V0
-                    / b
-                    * (Clp * KXZ + Cnp * KX2)
-                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
-                    * (b / 2 / V0),
-                    V0
-                    / b
-                    * (Clr * KXZ + Cnr * KX2)
-                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
-                    * (b / 2 / V0),
+                    V0 / b * (Clp * KXZ + Cnp * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0 / b * (Clr * KXZ + Cnr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
                 ],
             ]
         )
         B = np.array(
             [
-                [0, V0 / b * CYr / 2 / mub],
+                [V0 / b * CYda / 2 / mub, V0 / b * CYdr / 2 / mub],
                 [0, 0],
                 [
-                    V0 / b * (Clda * KZ2 + Cnda * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Cldr * KZ2 + Cndr * KXZ) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clda * KZ2 + Cnda * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
+                    V0
+                    / b
+                    * (Cldr * KZ2 + Cndr * KXZ)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
                 ],
                 [
-                    V0 / b * (Clda * KXZ + Cnda * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
-                    V0 / b * (Cldr * KXZ + Cndr * KX2) / (4 * mub * (KX2 * KZ2 - KXZ**2)),
+                    V0
+                    / b
+                    * (Clda * KXZ + Cnda * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
+                    V0
+                    / b
+                    * (Cldr * KXZ + Cndr * KX2)
+                    / (4 * mub * (KX2 * KZ2 - KXZ**2))
+                    / (b / (2 * V0)),
                 ],
             ]
         )
-        """
+
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
