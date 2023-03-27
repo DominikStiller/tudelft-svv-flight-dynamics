@@ -1,19 +1,15 @@
+import control.matlab as ml
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 from pandas import DataFrame
 
-from fd.simulation.aircraft_model import AircraftModel
-from fd.structs import SimulationOutput
-import control.matlab as ml
-import pandas as pd
-import numpy as np
+from fd.analysis.aerodynamics import calc_CL
 from fd.analysis.flight_test import FlightTest
 from fd.plotting import format_plot
+from fd.simulation import constants
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
-from fd.analysis.aerodynamics import calc_CL
-from fd.simulation import constants
-
-
-import matplotlib.pyplot as plt
 
 
 class Simulation:

@@ -1,7 +1,8 @@
-from fd.simulation import constants
-import scipy.stats as stats
 import numpy as np
+import scipy.stats as stats
+
 from fd import conversion as con
+from fd.simulation import constants
 
 
 def lin_moment_mass():

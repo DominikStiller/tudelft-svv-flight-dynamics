@@ -1,15 +1,16 @@
+from math import sin, cos
+
+import control.matlab as ml
+import matplotlib.pyplot as plt
+import numpy as np
 import numpy.linalg as alg
 from numpy.typing import ArrayLike
-import numpy as np
-from math import sin, cos
-import control.matlab as ml
-from fd.structs import AerodynamicParameters
 
 from fd.simulation.constants import *
+from fd.structs import AerodynamicParameters
+
 
 # from tests.test_simulation.constants_Cessna_Ce500 import *
-
-import matplotlib.pyplot as plt
 
 
 class AircraftModel:

@@ -1,10 +1,9 @@
-from fd.analysis.flight_test import FlightTest
-from fd.simulation.aircraft_model import AircraftModel
-from fd.simulation.simulation import Simulation
-from fd.structs import AerodynamicParameters
-from fd.validation.comparison import SimulatedMeasuredComparison
 import control.matlab as ml
 import numpy as np
+
+from fd.analysis.flight_test import FlightTest
+from fd.simulation.aircraft_model import AircraftModel
+from fd.structs import AerodynamicParameters
 
 test = "pulse_elevator"
 
