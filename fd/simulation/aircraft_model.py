@@ -357,17 +357,17 @@ class AircraftModel:
 
         return eig1, eig2
 
-    def get_aperiodicroll_eigenvalues(self, m, rho, A):
-        eigenvalue_aperiodicroll = self.get_idealized_aperiodicroll_eigenvalues(m, rho)
+    def get_aperiodicroll_eigenvalues(self, m, rho, V0, A):
+        eigenvalue_aperiodicroll = self.get_idealized_aperiodicroll_eigenvalues(m, rho, V0)
         eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
 
         eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_aperiodicroll))]
 
         return eig1
 
-    def get_dutchroll_eigenvalues(self, m, rho, A):
+    def get_dutchroll_eigenvalues(self, m, rho, V0, A):
         eigenvalue_dutchroll1, eigenvalue_dutchroll2 = self.get_idealized_dutchroll_eigenvalues(
-            m, rho
+            m, rho, V0
         )
         eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
 
@@ -376,8 +376,8 @@ class AircraftModel:
 
         return eig1, eig2
 
-    def get_spiral_eigenvalues(self, m, rho, CL, A):
-        eigenvalue_spiral = self.get_idealized_spiral_eigenvalues(m, rho, CL)
+    def get_spiral_eigenvalues(self, m, rho, V0, CL, A):
+        eigenvalue_spiral = self.get_idealized_spiral_eigenvalues(m, rho, V0, CL)
         eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
 
         eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_spiral))]
