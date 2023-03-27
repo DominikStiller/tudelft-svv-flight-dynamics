@@ -25,12 +25,3 @@ Some more guidelines to follow:
 * Commit often, after finishing a small part of a feature, even if the code does not work fully yet. Since you commit to your own feature branch, no one else is affected, and you can keep a history of your changes in case something goes wrong.
 * Use descriptive commit messages (not just "fix bugs"). Follow [these guidelines](https://gist.github.com/robertpainsi/b632364184e70900af4ab688decf6f53). Use the imperative ("add" instead of "added") for verbs.
 * Use pull requests as platform for discussions and questions. You can open a pull request even if your code is not done yet. Tagging people in pull requests to get feedback on work-in-progress code is explicitly encouraged. Once you're done, the pull request will be approved for merging into main.
-
-
-
-## Data Structure
-Since data is not committed but has to be downloaded by every developer, there should be a common structure of the `data/` folder:
-* `measurements/`
-  * `dataset_name/` (e.g., `ref_2023`)
-    * `sheet.xlsx`: Post-flight data sheet
-    * `measurements.mat`: Measurements from Flight Test Instrumentation System
