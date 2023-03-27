@@ -22,8 +22,8 @@ class Simulation:
 
     def simulate_dutch_roll(self, df_dutch_roll) -> DataFrame:
         data = df_dutch_roll
-        delta_a = -(data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = -(data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = -(data["delta_a"] - data["delta_a"].iloc[0])
+        delta_r = -(data["delta_r"] - data["delta_a"].iloc[0])
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -50,8 +50,8 @@ class Simulation:
 
     def simulate_dutch_roll_yd(self, df_dutch_roll_yd):
         data = df_dutch_roll_yd
-        delta_a = -(data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = -(data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = -(data["delta_a"] - data["delta_a"].iloc[0])
+        delta_r = -(data["delta_r"] - data["delta_a"].iloc[0])
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -78,8 +78,8 @@ class Simulation:
 
     def simulate_spiral(self, df_spiral):
         data = df_spiral
-        delta_a = (data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = (data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = data["delta_a"] - data["delta_a"].iloc[0]
+        delta_r = data["delta_r"] - data["delta_a"].iloc[0]
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -107,8 +107,8 @@ class Simulation:
 
     def simulate_aperiodic_roll(self, df_aperiodic_roll):
         data = df_aperiodic_roll
-        delta_a = (data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = (data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = data["delta_a"] - data["delta_a"].iloc[0]
+        delta_r = data["delta_r"] - data["delta_a"].iloc[0]
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -134,7 +134,7 @@ class Simulation:
 
     def simulate_phugoid(self, df_phugoid):
         data = df_phugoid
-        delta_e = data["delta_e"]-data['delta_e'].iloc[0]  # - data["delta_e"].iloc[0]
+        delta_e = data["delta_e"] - data["delta_e"].iloc[0]  # - data["delta_e"].iloc[0]
         t = data.index
         input = delta_e  # .reshape((len(t), 1))
         V0 = data["tas"].iloc[0]
@@ -161,7 +161,7 @@ class Simulation:
 
     def simulate_short_period(self, df_short_period):
         data = df_short_period
-        delta_e = data["delta_e"]-data['delta_e'].iloc[0]  # - data["delta_e"].iloc[0]
+        delta_e = data["delta_e"] - data["delta_e"].iloc[0]  # - data["delta_e"].iloc[0]
         t = data.index
         input = delta_e  # .reshape((len(t), 1))
         V0 = data["tas"].iloc[0]
@@ -194,16 +194,17 @@ if __name__ == "__main__":
                 C_L_alpha=4.758556374647304,
                 alpha_0=-0.023124783070063493,
                 C_D_0=0.023439123324849084,
-                C_m_alpha=-0.5554065208385275,
+                # C_m_alpha=-0.5554065208385275,
+                C_m_alpha=-0.5,
                 C_m_delta=-1.3380975545274032,
                 e=1.0713238368125688,
             )
         )
     )
-    df = FlightTest("data/B24").df_dutch_roll
-    df_out = sim.simulate_dutch_roll(df)
+    df = FlightTest("data/B24").df_short_period
+    df_out = sim.simulate_short_period(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-    """
+
     y1 = "tas"
     y2 = "alpha"
     y3 = "theta"
@@ -213,18 +214,19 @@ if __name__ == "__main__":
     y2 = "phi"
     y3 = "p"
     y4 = "r"
+    """
 
-    #ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
-    ax1.plot(df_out.index, df_out[y1])
-    #ax1.plot(df_out.index, df[y1], color="black")
+    ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
+    # ax1.plot(df_out.index, df_out[y1])
+    ax1.plot(df_out.index, df[y1], color="black")
     ax1.set_ylabel(y1)
     ax2.plot(df_out.index, df_out[y2])
     ax2.plot(df_out.index, df[y2], color="black")
-    #ax2.set_ylim(-0.2, 2.7)
+    # ax2.set_ylim(-0.2, 2.7)
     ax2.set_ylabel(y2)
-    ax3.plot(df_out.index, df_out[y3])
-    ax3.plot(df_out.index, df[y3], color="black")
-    ax3.set_ylim(-0.3, 0.25)
+    ax3.plot(df_out.index, df["delta_e"])
+    # ax3.plot(df_out.index, df[y3], color="black")
+    # ax3.set_ylim(-0.3, 0.25)
     ax3.set_ylabel(y3)
     ax4.plot(df_out.index, df_out[y4])
     ax4.plot(df_out.index, df[y4], color="black")
