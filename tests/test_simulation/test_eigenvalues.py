@@ -1,5 +1,7 @@
 import unittest
 
+import numpy as np
+
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
 from tests.test_simulation.constants_Cessna_Ce500 import *
