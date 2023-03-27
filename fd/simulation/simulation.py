@@ -75,8 +75,8 @@ class Simulation:
 
     def simulate_spiral(self, df_spiral):
         data = df_spiral
-        delta_a = -(data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = -(data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = (data["delta_a"]-data['delta_a'].iloc[0])
+        delta_r = (data["delta_r"]-data['delta_a'].iloc[0])
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -102,8 +102,8 @@ class Simulation:
 
     def simulate_aperiodic_roll(self, df_aperiodic_roll):
         data = df_aperiodic_roll
-        delta_a = -(data["delta_a"]-data['delta_a'].iloc[0])
-        delta_r = -(data["delta_r"]-data['delta_a'].iloc[0])
+        delta_a = (data["delta_a"]-data['delta_a'].iloc[0])
+        delta_r = (data["delta_r"]-data['delta_a'].iloc[0])
         input = np.column_stack((delta_a, delta_r))
         t = data.index
         V0 = data["tas"].iloc[0]
@@ -194,8 +194,8 @@ if __name__ == "__main__":
             )
         )
     )
-    df = FlightTest("data/B24").df_dutch_roll
-    df_out = sim.simulate_dutch_roll(df)
+    df = FlightTest("data/B24").df_spiral
+    df_out = sim.simulate_spiral(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     """
     y1 = "tas"
