@@ -10,9 +10,6 @@ from fd.simulation.constants import *
 from fd.structs import AerodynamicParameters
 
 
-# from tests.test_simulation.constants_Cessna_Ce500 import *
-
-
 class AircraftModel:
     def __init__(self, aero_params: AerodynamicParameters):
         self.aero_params = aero_params
@@ -289,3 +286,130 @@ class AircraftModel:
         axs[1, 1].set_title("r [rad/sec]")
 
         plt.show()
+
+    def get_idealized_shortperiod_eigenvalues(self, m, rho, V0):
+        Cma = self.aero_params.C_m_alpha
+        muc = self.get_non_dim_masses(m, rho)[0]
+        A = 2 * muc * (KY2) * (2 * muc - CZa)
+        B = -2 * muc * KY2 * CZa - (2 * muc + CZq) * Cma - (2 * muc + CZa) * Cmq
+        C = CZa * Cmq - (2 * muc + CZq) * Cma
+        eigenvalue_shortperiod1 = (
+            complex(-B / (2 * A), +np.sqrt(4 * A * C - B**2) / (2 * A)) * V0 / c
+        )
+        eigenvalue_shortperiod2 = (
+            complex(-B / (2 * A), -np.sqrt(4 * A * C - B**2) / (2 * A)) * V0 / c
+        )
+        return eigenvalue_shortperiod1, eigenvalue_shortperiod2
+
+    def get_idealized_phugoid_eigenvalues(self, m, rho, V0, th0):
+        Cma = self.aero_params.C_m_alpha
+        muc = self.get_non_dim_masses(m, rho)[0]
+        _, CZ0 = self.get_gravity_term_coeff(m, V0, rho, th0)
+        A = 2 * muc * (CZa * Cmq - 2 * muc * Cma)
+        B = 2 * muc * (CXu * Cma - Cmu * CXa) + Cmq * (CZu * CXa - CXu * CZa)
+        C = CZ0 * (Cmu * CZa - CZu * Cma)
+        eigenvalue_phugoid1 = complex(-B / (2 * A), +np.sqrt(4 * A * C - B**2) / (2 * A)) * V0 / c
+        eigenvalue_phugoid2 = complex(-B / (2 * A), -np.sqrt(4 * A * C - B**2) / (2 * A)) * V0 / c
+        return eigenvalue_phugoid1, eigenvalue_phugoid2
+
+    def get_idealized_aperiodicroll_eigenvalues(self, m, rho, V0):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        eigenvalue_aperiodicroll = Clp / (4 * mub * KX2) * V0 / c
+        return eigenvalue_aperiodicroll
+
+    def get_idealized_dutchroll_eigenvalues(self, m, rho, V0):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        A = 2 * (Cnr + 2 * KZ2 * CYb)
+        B = np.sqrt(64 * KZ2 * (4 * mub * Cnb + CYb * Cnr) - 4 * (Cnr + 2 * KZ2 * CYb) ** 2)
+        C = 16 * mub * KZ2
+        eigenvalue_dutchroll1 = (A + B) / C * V0 / c
+        eigenvalue_dutchroll2 = (A - B) / C * V0 / c
+        return eigenvalue_dutchroll1, eigenvalue_dutchroll2
+
+    def get_idealized_spiral_eigenvalues(self, m, rho, V0, CL):
+        mub = self.get_non_dim_masses(m, rho)[1]
+        A = 2 * CL * (Clb * Cnr - Cnb * Clr)
+        B = Clp * (CYb * Cnr + 4 * mub * Cnb)
+        C = Cnp * (CYb * Clr + 4 * mub * Clb)
+        eigenvalue_spiral = A / (B - C) * V0 / c
+        return eigenvalue_spiral
+
+    def get_shortperiod_eigenvalues(self, m, rho, V0, A):
+        (
+            eigenvalue_shortperiod1,
+            eigenvalue_shortperiod2,
+        ) = self.get_idealized_shortperiod_eigenvalues(m, rho, V0)
+        eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
+
+        eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_shortperiod1))]
+        eig2 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_shortperiod2))]
+
+        return eig1, eig2
+
+    def get_phugoid_eigenvalues(self, m, rho, V0, th0, A):
+        eigenvalue_phugoid1, eigenvalue_phugoid2 = self.get_idealized_phugoid_eigenvalues(
+            m, rho, V0, th0
+        )
+        eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
+
+        eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_phugoid1))]
+        eig2 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_phugoid2))]
+
+        return eig1, eig2
+
+    def get_aperiodicroll_eigenvalues(self, m, rho, V0, A):
+        eigenvalue_aperiodicroll = self.get_idealized_aperiodicroll_eigenvalues(m, rho, V0)
+        eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
+
+        eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_aperiodicroll))]
+
+        return eig1
+
+    def get_dutchroll_eigenvalues(self, m, rho, V0, A):
+        eigenvalue_dutchroll1, eigenvalue_dutchroll2 = self.get_idealized_dutchroll_eigenvalues(
+            m, rho, V0
+        )
+        eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
+
+        eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_dutchroll1))]
+        eig2 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_dutchroll2))]
+
+        return eig1, eig2
+
+    def get_spiral_eigenvalues(self, m, rho, V0, CL, A):
+        eigenvalue_spiral = self.get_idealized_spiral_eigenvalues(m, rho, V0, CL)
+        eigenvalues, _ = self.get_eigenvalues_and_eigenvectors(A)
+
+        eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_spiral))]
+
+        return eig1
+
+    def match_eigenvalues_asymmetric(self, A, m, rho, CL):
+        eigenvalues = self.get_eigenvalues_and_eigenvectors(A)
+        motions = ["Aperiodic Roll", "Dutch Roll", "Spiral"]
+        matched_eigenvalues = []
+
+        for i, motion in enumerate(motions):
+            if motion == "Aperiodic Roll":
+                real_eigenvalues = np.real(eigenvalues)
+                abs_diff = np.abs(
+                    real_eigenvalues - self.get_idealized_aperiodicroll_eigenvalues(m, rho)
+                )
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((real_eigenvalues[index], motion))
+
+            elif motion == "Dutch Roll":
+                abs_diff = np.abs(eigenvalues - self.get_idealized_dutchroll_eigenvalues(m, rho))
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((eigenvalues[index], motion))
+                matched_eigenvalues.append((eigenvalues[index].conjugate(), motion))
+
+            elif motion == "Spiral":
+                real_eigenvalues = np.real(eigenvalues)
+                abs_diff = np.abs(
+                    real_eigenvalues - self.get_idealized_spiral_eigenvalues(m, rho, CL)
+                )
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((real_eigenvalues[index], motion))
+
+        return matched_eigenvalues
