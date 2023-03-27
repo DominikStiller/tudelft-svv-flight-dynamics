@@ -4,8 +4,8 @@ import numpy as np
 
 from fd.simulation.aircraft_model import AircraftModel
 from fd.structs import AerodynamicParameters
-
-from tests.test_simulation.constants_Cessna_Ce500 import c
+from tests.test_simulation.constants_Cessna_Ce500 import *
+from tests.test_simulation.constants_Cessna_Ce500 import c, b
 
 
 class MyTestCase(unittest.TestCase):
@@ -78,7 +78,75 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(eig1, eigenvalues2)
         self.assertAlmostEqual(eig2, eigenvalues1)
 
-    """
+
+'''
+    def test_aperiodicroll_eigenvalues(self):
+        aero_params = AerodynamicParameters
+        aero_params.C_m_alpha = -0.4300
+        aero_params.C_m_delta = -1.5530
+        m = 4547.8
+        V0 = 59.9
+        rho = 0.904627056
+        th0 = 0
+        CL = 1.1360
+        model = AircraftModel(aero_params)
+        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
+
+        A_prim = 4 * muc ** 2 * KY2 * (CZadot - 2 * muc)
+        B_prim = Cmadot * 2 * muc * (CZq + 2 * muc) - Cmq * 2 * muc * (CZadot - 2 * muc) - 2 * muc * KY2 * (
+                    CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
+        C_prim = Cma * 2 * muc * (CZq + 2 * muc) - Cmadot * (2 * muc * CX0 + CXu * (CZq + 2 * muc)) + Cmq * (
+                    CXu * (CZadot - 2 * muc) - 2 * muc * CZa) + 2 * muc * KY2 * (CXa * CZu - CZa * CXu)
+        D_prim = Cmu * (CXa * (CZq + 2 * muc) - CZ0 * (CZadot - 2 * muc)) - Cma * (
+                    2 * muc * CX0 + CXu * (CZq + 2 * muc)) + Cmadot * (CX0 * CXu - CZ0 * CZu) + Cmq * (
+                             CXu * CZa - CZu * CXa)
+        E_prim = -Cmu * (CX0 * CXa + CZ0 * CZa) + Cma * (CX0 * CXu + CZ0 * CZu)
+        p = (E_prim, D_prim, C_prim, B_prim, A_prim)
+
+        roots = np.polynomial.polynomial.polyroots(p)
+        eig1 = model.get_aperiodicroll_eigenvalues( m, rho, A)
+        eigenvalues1 = -0.3291 * V0/b
+
+        self.assertAlmostEqual(roots[2], eig1)
+
+
+    def test_dutchroll_eigenvalues(self):
+        aero_params = AerodynamicParameters
+        aero_params.C_m_alpha = -0.4300
+        aero_params.C_m_delta = -1.5530
+        m = 4547.8
+        V0 = 59.9
+        rho = 0.904627056
+        th0 = 0
+        CL = 1.1360
+        model = AircraftModel(aero_params)
+        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
+        #print(model.get_eigenvalues_and_eigenvectors(A)[0])
+        eig1, eig2 = model.get_dutchroll_eigenvalues(m, rho, A)
+        eigenvalues1 = complex( -0.0313, 0.3314) * V0/b
+        eigenvalues2 = complex(-0.0313, -0.3314) * V0/b
+        self.assertAlmostEqual(eig1, eigenvalues1)
+        self.assertAlmostEqual(eig2, eigenvalues2)
+
+    def test_spiral_eigenvalues(self):
+        aero_params = AerodynamicParameters
+        aero_params.C_m_alpha = -0.4300
+        aero_params.C_m_delta = -1.5530
+        m = 4547.8
+        V0 = 59.9
+        rho = 0.904627056
+        th0 = 0
+        CL = 1.1360
+        model = AircraftModel(aero_params)
+        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
+        #print(model.get_eigenvalues_and_eigenvectors(A)[0])
+        eig1 = model.get_spiral_eigenvalues(m, rho, CL, A)
+        eigenvalues1 = -0.0108 * V0/b
+        self.assertAlmostEqual(eig1, eigenvalues1)
+        
+    '''
+
+
     def test_analytic_eigenvalues_symmetric(self):
         #In order to perform this test you need to:
         #1. Change the imported constants file in aircraft model with the ones for cessna Ce500
@@ -155,7 +223,7 @@ class MyTestCase(unittest.TestCase):
         assert_allclose(roots*V0/b, np.sort(eigenvalues),rtol = 1e-8 )
 
 
-    """
+
 
 
 if __name__ == "__main__":

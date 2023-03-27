@@ -4,7 +4,7 @@ import numpy as np
 from math import sin, cos
 import control.matlab as ml
 from fd.structs import AerodynamicParameters
-from tests.test_simulation.constants_Cessna_Ce500 import c, V0
+from tests.test_simulation.constants_Cessna_Ce500 import *
 from fd.simulation.constants import *
 
 import matplotlib.pyplot as plt
@@ -119,7 +119,7 @@ class AircraftModel:
             D: Feedthrough matrix
         """
 
-        mub = self.get_non_dim_masses(m, rho)[-1]
+        #mub = self.get_non_dim_masses(m, rho)[-1]
         # x = [beta, phi, p, r]T
         # C_1*x_dot + C_2*x +C_3*u = 0
 
@@ -366,3 +366,30 @@ class AircraftModel:
         eig1 = eigenvalues[np.argmin(np.abs(eigenvalues - eigenvalue_spiral))]
 
         return eig1
+
+    def match_eigenvalues_asymmetric(self, A, m, rho, CL):
+        eigenvalues = self.get_eigenvalues_and_eigenvectors(A)
+        motions = ['Aperiodic Roll', 'Dutch Roll', 'Spiral']
+        matched_eigenvalues = []
+
+        for i, motion in enumerate(motions):
+            if motion == 'Aperiodic Roll':
+                real_eigenvalues = np.real(eigenvalues)
+                abs_diff = np.abs(real_eigenvalues - self.get_idealized_aperiodicroll_eigenvalues( m, rho))
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((real_eigenvalues[index], motion))
+
+            elif motion == 'Dutch Roll':
+                abs_diff = np.abs(eigenvalues - self.get_idealized_dutchroll_eigenvalues( m, rho))
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((eigenvalues[index], motion))
+                matched_eigenvalues.append((eigenvalues[index].conjugate(), motion))
+
+            elif motion == 'Spiral':
+                real_eigenvalues = np.real(eigenvalues)
+                abs_diff = np.abs(real_eigenvalues - self.get_idealized_spiral_eigenvalues( m, rho, CL))
+                index = np.argmin(abs_diff)
+                matched_eigenvalues.append((real_eigenvalues[index], motion))
+
+        return matched_eigenvalues
+
