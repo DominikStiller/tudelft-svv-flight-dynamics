@@ -1,5 +1,3 @@
-import numpy as np
-
 # Aircraft geometry:
 V = 59.9
 S = 24.2  # wing area [m^2]

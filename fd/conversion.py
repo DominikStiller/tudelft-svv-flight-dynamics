@@ -3,6 +3,8 @@ import math
 import re
 from typing import Union
 
+import numpy as np
+
 
 def deg_to_rad(deg):
     """Convert value from degree to radians"""
@@ -39,9 +41,24 @@ def ft_to_m(ft):
     return 0.3048 * ft
 
 
+def in_to_m(ft):
+    """Convert distance in inch to meters"""
+    return 0.0254 * ft
+
+
 def C_to_K(C):
     """Convert temperature in Celcius to Kelvin"""
     return 273.15 + C
+
+
+def deg_to_rad(deg):
+    """Convert angle in degrees to radians"""
+    return np.deg2rad(deg)
+
+
+def degs_to_rads(degs):
+    """Convert rotation in degrees/s to radians/s"""
+    return np.deg2rad(degs)
 
 
 def timestamp_to_s(timestamp: Union[str, datetime.time]):
