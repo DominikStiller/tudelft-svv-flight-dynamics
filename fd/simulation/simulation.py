@@ -44,6 +44,8 @@ class Simulation:
         yout += np.array([0, phi0, p0, r0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
+        df_result = df_result.set_index("t", drop=True)
+
         return df_result
 
     def simulate_dutch_roll_yd(self, df_dutch_roll_yd):
@@ -71,6 +73,7 @@ class Simulation:
         yout += np.array([0, phi0, p0, r0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
+        df_result = df_result.set_index("t", drop=True)
         return df_result
 
     def simulate_spiral(self, df_spiral):
@@ -98,6 +101,8 @@ class Simulation:
         yout += np.array([0, phi0, p0, r0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
+        df_result = df_result.set_index("t", drop=True)
+
         return df_result
 
     def simulate_aperiodic_roll(self, df_aperiodic_roll):
@@ -124,6 +129,7 @@ class Simulation:
         yout += np.array([0, phi0, p0, r0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
         df_result = pd.DataFrame(result, columns=["t", "beta", "phi", "p", "r"])
+        df_result = df_result.set_index("t", drop=True)
         return df_result
 
     def simulate_phugoid(self, df_phugoid):
@@ -194,8 +200,8 @@ if __name__ == "__main__":
             )
         )
     )
-    df = FlightTest("data/B24").df_spiral
-    df_out = sim.simulate_spiral(df)
+    df = FlightTest("data/B24").df_dutch_roll
+    df_out = sim.simulate_dutch_roll(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     """
     y1 = "tas"

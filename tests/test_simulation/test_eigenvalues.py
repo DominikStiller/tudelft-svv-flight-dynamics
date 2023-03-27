@@ -42,6 +42,8 @@ class MyTestCase(unittest.TestCase):
 
         self.assertTupleEqual((first, second, third), (True, True, True))
 
+        """
+
     def test_analytic_eigenvalues_symmetric(self):
         # In order to perform this test you need to:
         # 1. Change the imported constants file in aircraft model with the ones for cessna Ce500
@@ -81,7 +83,7 @@ class MyTestCase(unittest.TestCase):
 
         assert_allclose(roots * V0 / c, np.sort(eigenvalues), rtol=1e-8)
 
-    """"
+
     def test_analytic_eigenvalues_asymmetric(self):
         #In order to perform this test you need to:
         #1. Change the imported constants file in aircraft model with the ones for cessna Ce500
