@@ -237,5 +237,5 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
     ax_V.invert_yaxis()
 
     format_plot(zeroline=True)
-    save_plot("data/", "elevator_trim_curve")
+    save_plot("data/", "elevator_force_curve")
     plt.show()
