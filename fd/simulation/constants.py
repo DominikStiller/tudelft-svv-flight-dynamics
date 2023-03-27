@@ -103,3 +103,11 @@ duration_dutch_roll = 20  # [s]
 duration_dutch_roll_yd = 10  # [s]
 duration_aperiodic_roll = 12  # [s]
 duration_spiral = 120  # [s]
+
+# Lead times for eigenmotions w.r.t. timestamp
+lead_phugoid = 1  # [s]
+lead_short_period = 1  # [s]
+lead_dutch_roll = 2  # [s]
+lead_dutch_roll_yd = 3  # [s]
+lead_aperiodic_roll = 1  # [s]
+lead_spiral = 5  # [s]
