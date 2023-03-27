@@ -2,10 +2,20 @@
 
 from math import pi
 
+from fd.conversion import lbs_to_kg, in_to_m, kts_to_ms
+
 g = 9.81  # [m/s^2] (gravity constant)
 
 # Aircraft mass
-mass_basic_empty = 9172.9 / g  # basic empty weight [kg]
+mass_basic_empty = lbs_to_kg(9172.9)  # basic empty weight [kg]
+
+# CG positions of components
+xcgOEW = in_to_m(291.74)
+xcgP = in_to_m(131)
+xcgcoor = in_to_m(170)
+xcg1 = in_to_m(214)
+xcg2 = in_to_m(251)
+xcg3 = in_to_m(288)
 
 # Aircraft geometry
 S = 30.00  # wing area [m^2]
@@ -20,13 +30,6 @@ A = b**2 / S  # wing aspect ratio [-]
 Ah = bh**2 / Sh  # stabilizer aspect ratio [-]
 Vh_V = 1  # [-]
 ih = -2 * pi / 180  # stabilizer angle of incidence [rad]
-OEW = 9172.9 * 0.45359237
-xcgOEW = 291.74 * 0.0254
-xcgP = 131 * 0.0254
-xcgcoor = 170 * 0.0254
-xcg1 = 214 * 0.0254
-xcg2 = 251 * 0.0254
-xcg3 = 288 * 0.0254
 
 # Constant values concerning atmosphere and gravity
 rho0 = 1.2250  # air density at sea level [kg/m^3]
@@ -35,6 +38,7 @@ Tempgrad = -0.0065  # temperature gradient in ISA [K/m]
 Temp0 = 288.15  # temperature at sea level in ISA [K]
 R = 287.05  # specific gas constant [m^2/s^2K]
 gamma = 1.4  #
+cas_stall = kts_to_ms(106)  # equivalent stall speed [m/s]
 
 # Constant values concerning aircraft inertia
 KX2 = 0.019
@@ -99,3 +103,11 @@ duration_dutch_roll = 20  # [s]
 duration_dutch_roll_yd = 10  # [s]
 duration_aperiodic_roll = 12  # [s]
 duration_spiral = 120  # [s]
+
+# Lead times for eigenmotions w.r.t. timestamp
+lead_phugoid = 1  # [s]
+lead_short_period = 1  # [s]
+lead_dutch_roll = 2  # [s]
+lead_dutch_roll_yd = 3  # [s]
+lead_aperiodic_roll = 1  # [s]
+lead_spiral = 5  # [s]

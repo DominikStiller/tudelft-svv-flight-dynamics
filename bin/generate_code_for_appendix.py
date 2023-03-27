@@ -6,7 +6,7 @@ paths.extend(Path("tests").glob("**/*.*"))
 paths.append(Path("bin/generate_code_for_appendix.py"))  # so meta
 
 check_is_file = lambda f: f.is_file()
-check_has_proper_extension = lambda f: f.suffix in [".py", ".yml"]
+check_has_proper_extension = lambda f: f.suffix in [".py"]
 check_is_not_init = lambda f: f.name != "__init__.py"
 
 paths = filter(
