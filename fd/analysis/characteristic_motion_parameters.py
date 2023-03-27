@@ -6,27 +6,27 @@ from fd.structs import AerodynamicParameters
 
 
 def time_constant_aperiodic_roll(eig, Ve):
-    """"
+    """ "
     Calculating time constant for the aperiodic roll
     Args:
         eig: eigenvalue for aperiodic roll
         Ve: equivalent velocity during aperiodic roll
 
     """
-    tau = - (1/eig) * (c/Ve)
+    tau = -(1 / eig) * (c / Ve)
 
     return tau
 
 
 def time_constant_spiral(eig, Ve):
-    """"
+    """ "
     Calculating time constant for the spiral
     Args:
         eig: eigenvalue spiral
         Ve: equivalent velocity during spiral
 
     """
-    tau = - (1/eig) * (c/Ve)
+    tau = -(1 / eig) * (c / Ve)
     return tau
 
 
@@ -42,8 +42,8 @@ def characteristics_dutch_roll(imag_eig, real_eig, Ve):
     Returns:
 
     """
-    P = ((2*pi)/(imag_eig)) * (b/Ve)
-    T_half = (np.log(0.5)/(real_eig)) * (b/Ve)
+    P = ((2 * pi) / (imag_eig)) * (b / Ve)
+    T_half = (np.log(0.5) / (real_eig)) * (b / Ve)
     return P, T_half
 
 
@@ -59,8 +59,8 @@ def characteristics_phugoid(imag_eig, real_eig, Ve):
     Returns:
 
     """
-    P = ((2*pi)/(imag_eig)) * (b/Ve)
-    T_half = (np.log(0.5)/(real_eig)) * (b/Ve)
+    P = ((2 * pi) / (imag_eig)) * (b / Ve)
+    T_half = (np.log(0.5) / (real_eig)) * (b / Ve)
     return P, T_half
 
 
@@ -75,6 +75,6 @@ def characteristics_short_period(imag_eig, real_eig, Ve):
     Returns:
 
     """
-    P = ((2*pi)/(imag_eig)) * (b/Ve)
-    T_half = (np.log(0.5)/(real_eig)) * (b/Ve)
+    P = ((2 * pi) / (imag_eig)) * (b / Ve)
+    T_half = (np.log(0.5) / (real_eig)) * (b / Ve)
     return P, T_half
