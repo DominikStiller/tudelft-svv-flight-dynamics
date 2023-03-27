@@ -7,7 +7,8 @@ from fd.structs import AerodynamicParameters
 
 # from fd.simulation.constants import *
 
-from tests.test_simulation.constants_Cessna_Ce500 import *
+#from tests.test_simulation.constants_Cessna_Ce500 import *
+from fd.simulation.constants import *
 import matplotlib.pyplot as plt
 
 
@@ -268,7 +269,7 @@ class AircraftModel:
         yout, t, xout = ml.lsim(sys, u, t, x0)
         fig, axs = plt.subplots(2, 2, sharex=True)
 
-        axs[0, 0].plot(t, xout[:, 0] + V0 * np.ones(t.size))
+        axs[0, 0].plot(t, xout[:, 0] )
         axs[0, 0].set_title("$beta$ [rad]")
 
         axs[1, 0].plot(t, xout[:, 1])
