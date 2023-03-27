@@ -42,6 +42,7 @@ cas_stall = kts_to_ms(106)  # equivalent stall speed [m/s]
 
 # Constant values concerning aircraft inertia
 KX2 = 0.019
+#Kx2 = 0.010
 KZ2 = 0.042
 KXZ = 0.002
 KY2 = 1.25 * 1.114
@@ -83,20 +84,23 @@ CYda = -0.0400
 CYdr = +0.2300
 
 #Clb = -0.10260
-Clb = -0.10
-#Clp = -0.71085
+Clb = -0.1026
+#Clp = -0.10
 Clp = -0.45
 Clr = +0.23760
-Clda = -0.23088
+#Clda = -0.23088
+Clda = -1
 Cldr = +0.03440
 
 #Cnb = +0.1348 init
-Cnb = 0.10
+Cnb = 0.13
 Cnbdot = 0
 #Cnp = -0.0602
-Cnp = -0.2
-Cnr = -0.2061
-Cnda = -0.0120
+Cnp = -0.0602
+#Cnr = -0.2061
+Cnr = -0.26
+#Cnda = -0.0120
+Cnda = -0.012
 Cndr = -0.0939
 
 # Durations of the eigenmotions

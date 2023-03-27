@@ -200,8 +200,8 @@ if __name__ == "__main__":
             )
         )
     )
-    df = FlightTest("data/B24").df_dutch_roll
-    df_out = sim.simulate_dutch_roll(df)
+    df = FlightTest("data/B24").df_spiral
+    df_out = sim.simulate_spiral(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     """
     y1 = "tas"
@@ -220,12 +220,15 @@ if __name__ == "__main__":
     ax1.set_ylabel(y1)
     ax2.plot(df_out.index, df_out[y2])
     ax2.plot(df_out.index, df[y2], color="black")
+    #ax2.set_ylim(-0.6, 0.3)
     ax2.set_ylabel(y2)
     ax3.plot(df_out.index, df_out[y3])
     ax3.plot(df_out.index, df[y3], color="black")
+    ax3.set_ylim(-0.3, 0.25)
     ax3.set_ylabel(y3)
     ax4.plot(df_out.index, df_out[y4])
     ax4.plot(df_out.index, df[y4], color="black")
+    ax4.set_ylim(-0.25, 0.3)
     ax4.set_ylabel(y4)
     # ax5.plot(df_out.index, df['delta_'])
     ax4.set_xlabel("t")
