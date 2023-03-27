@@ -40,16 +40,13 @@ class SimulatedMeasuredComparison:
         ax_r.plot(
             self.simulated_dutch_roll.index,
             self.simulated_dutch_roll["r"],
-            label="Simulated",
         )
         ax_r.plot(
             self.flight_test.df_dutch_roll.index,
             self.flight_test.df_dutch_roll["p"],
-            label="Measured",
         )
         ax_r.set_xlabel("Time [s]")
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
-        ax_r.legend()
 
         format_plot()
         plt.show()
