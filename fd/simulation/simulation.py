@@ -90,7 +90,7 @@ class Simulation:
         state0 = np.array([0, 0, 0, 0])
 
         model = AircraftModel(AerodynamicParameters)
-        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
+        A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         print(np.linalg.eig(A)[0])
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
@@ -119,7 +119,7 @@ class Simulation:
         state0 = np.array([0, 0, 0, 0])
 
         model = AircraftModel(AerodynamicParameters)
-        A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
+        A, B, C, D = self.model.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
         sys = ml.ss(A, B, C, D)
         yout, t, xout = ml.lsim(sys, input, t, state0)
         yout += np.array([0, phi0, p0, r0])
@@ -191,8 +191,8 @@ if __name__ == "__main__":
             )
         )
     )
-    df = FlightTest("data/B24").df_aperiodic_roll
-    df_out = sim.simulate_aperiodic_roll(df)
+    df = FlightTest("data/B24").df_spiral
+    df_out = sim.simulate_spiral(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
     """
     y1 = "tas"

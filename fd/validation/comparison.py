@@ -44,6 +44,7 @@ class SimulatedMeasuredComparison:
         self.plot_dutch_roll_yd()
         self.plot_aperiodic_roll_full()
         self.plot_aperiodic_roll()
+        print("Done")
 
     def plot_dutch_roll(self):
         fig, (ax_p, ax_r) = plt.subplots(2, 1, figsize=(12, 6))
