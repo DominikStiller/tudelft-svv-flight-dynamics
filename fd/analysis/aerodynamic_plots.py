@@ -119,9 +119,10 @@ def plot_delta_e_V_inv_squared(
 def plot_elevator_trim_curve(
     delta_e,
     alpha,
+    cas,
     delta_e_front,
     alpha_front,
-    cas,
+    cas_front,
     C_m_0,
     C_m_delta_e,
     cas_stall,
@@ -171,6 +172,7 @@ def plot_elevator_trim_curve(
     xx_V = np.linspace(0.95 * cas_stall, 200, 100)
     ax_V.plot(xx_V, y_intercept_V_inv_sq + slope_V_inv_sq * 1 / xx_V**2, "r")
     ax_V.scatter(cas, delta_e, marker="x", color="black", s=50)
+    ax_V.scatter(cas_front, delta_e_front, color="r", marker="x", s=50)
     ax_V.axvline(x=cas_stall, color="b", linestyle="--", label="$V_{stall}$")
     ax_V.axhline(
         y=delta_e_asymptote,
