@@ -84,7 +84,7 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu, CXa, CZ0, 0],
+                [CXu, CXa, CZ0, CXq * c / V0],
                 [CZu, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
                 [Cmu, Cma, 0, Cmq * c / V0],

@@ -160,7 +160,7 @@ class TestEigenvalues(unittest.TestCase):
     def test_analytic_eigenvalues_symmetric(self):
         # In order to perform this test you need to:
         # 1. Change the imported constants file in aircraft model with the ones for cessna Ce500
-        # 2. Comment any mub calculation out from the aircraft model
+        # 2. Comment any muc, Cx0 and Cz0 calculation out from the aircraft model
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
         aero_params.C_m_delta = -1.5530
