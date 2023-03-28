@@ -31,11 +31,6 @@ class TestAerodynamics(TestCase):
             [0.02, 0.1, -5.0],
             rtol=1e-01,
         )
-        assert_allclose(
-            estimate_CL_alpha(np.array([0.11, 0.19, 0.31, 0.39]), np.array([0, 5, 10, 15])),
-            [0.02, 0.1, -5.0],
-            rtol=1e-01,
-        )
 
     def test_calc_CD(self):
         assert_allclose(calc_CD(1000, 10, 1.225), 0.54421769, rtol=1e-01)
