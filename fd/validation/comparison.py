@@ -16,34 +16,34 @@ class SimulatedMeasuredComparison:
         self.simulation = simulation
 
     def run_simulations(self):
-        self.simulated_dutch_roll = self.simulation.simulate_symmetric(
-            self.flight_test.df_dutch_roll
+        self.simulated_dutch_roll = self.simulation.simulate_asymmetric(
+            self.flight_test.df_dutch_roll, flip_input=True
         )
-        self.simulated_phugoid = self.simulation.simulate_phugoid(self.flight_test.df_phugoid)
-        self.simulated_aperiodic_roll = self.simulation.simulate_aperiodic_roll(
+        self.simulated_phugoid = self.simulation.simulate_symmetric(self.flight_test.df_phugoid)
+        self.simulated_aperiodic_roll = self.simulation.simulate_asymmetric(
             self.flight_test.df_aperiodic_roll
         )
-        self.simulated_dutch_roll_yd = self.simulation.simulate_dutch_roll_yd(
-            self.flight_test.df_dutch_roll_yd
+        self.simulated_dutch_roll_yd = self.simulation.simulate_asymmetric(
+            self.flight_test.df_dutch_roll_yd, flip_input=True
         )
-        self.simulated_spiral = self.simulation.simulate_spiral(self.flight_test.df_spiral)
-        self.simulated_short_period = self.simulation.simulate_short_period(
+        self.simulated_spiral = self.simulation.simulate_asymmetric(self.flight_test.df_spiral)
+        self.simulated_short_period = self.simulation.simulate_symmetric(
             self.flight_test.df_short_period
         )
 
     def plot_responses(self):
         self.plot_phugoid_full()
-        self.plot_phugoid()
-        self.plot_short_period_full()
-        self.plot_short_period()
-        self.plot_spiral_full()
-        self.plot_spiral()
-        self.plot_dutch_roll_full()
-        self.plot_dutch_roll()
-        self.plot_dutch_roll_yd_full()
-        self.plot_dutch_roll_yd()
-        self.plot_aperiodic_roll_full()
-        self.plot_aperiodic_roll()
+        # self.plot_phugoid()
+        # self.plot_short_period_full()
+        # self.plot_short_period()
+        # self.plot_spiral_full()
+        # self.plot_spiral()
+        # self.plot_dutch_roll_full()
+        # self.plot_dutch_roll()
+        # self.plot_dutch_roll_yd_full()
+        # self.plot_dutch_roll_yd()
+        # self.plot_aperiodic_roll_full()
+        # self.plot_aperiodic_roll()
         print("Done")
 
     def plot_dutch_roll(self):
