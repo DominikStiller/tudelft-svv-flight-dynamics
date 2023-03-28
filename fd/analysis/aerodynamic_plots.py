@@ -100,7 +100,8 @@ def plot_delta_e_V_inv_squared(
     """
     fig, ax = plt.subplots(figsize=(12, 6))
 
-    slope, y_intercept, _, _ = stats.theilslopes(delta_e, V_inv_squared, alpha=0.99)
+    # slope, y_intercept, _, _ = stats.theilslopes(delta_e, V_inv_squared, alpha=0.99)
+    slope, y_intercept, _, _, _ = stats.linregress(V_inv_squared, delta_e)
     xx = np.linspace(0, max(V_inv_squared) * 1.05, 2)
     plt.plot(xx, slope * xx + y_intercept, "r")
     plt.scatter(V_inv_squared, delta_e, marker="x", color="black", s=50)
@@ -133,22 +134,25 @@ def plot_elevator_trim_curve(
         cas (array_like): CAS [m/s]
         cas_stall (float): stall CAS [m/s]
     """
-    slope_V_inv_sq, y_intercept_V_inv_sq, _, _ = stats.theilslopes(
-        delta_e, 1 / cas**2, alpha=0.99
-    )
+    # slope_V_inv_sq, y_intercept_V_inv_sq, _, _ = stats.theilslopes(
+    #     delta_e, 1 / cas**2, alpha=0.99
+    # )
+    slope_V_inv_sq, y_intercept_V_inv_sq, _, _, _ = stats.linregress(1 / cas**2, delta_e)
     delta_e_asymptote = -C_m_0 / C_m_delta_e
 
     fig, (ax_alpha, ax_V) = plt.subplots(1, 2, figsize=(12, 6), sharey="all")
 
     # Delta_e vs alpha
-    slope_alpha, y_intercept_alpha, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    # slope_alpha, y_intercept_alpha, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    slope_alpha, y_intercept_alpha, _, _, _ = stats.linregress(alpha, delta_e)
     xx_alpha = np.linspace(0, max(alpha) * 1.05, 2)
     ax_alpha.plot(xx_alpha, slope_alpha * xx_alpha + y_intercept_alpha, "r", label=r"$\alpha$")
     ax_alpha.scatter(alpha, delta_e, marker="x", color="black", s=50)
 
     # Delta_e vs alpha - alpha0
     alpha0 = (y_intercept_V_inv_sq - y_intercept_alpha) / slope_alpha
-    slope_alpha0, y_intercept_alpha0, _, _ = stats.theilslopes(delta_e, alpha - alpha0, alpha=0.99)
+    # slope_alpha0, y_intercept_alpha0, _, _ = stats.theilslopes(delta_e, alpha - alpha0, alpha=0.99)
+    slope_alpha0, y_intercept_alpha0, _, _, _ = stats.linregress(alpha - alpha0, delta_e)
     xx_alpha0 = np.linspace(0, max(alpha - alpha0) * 1.05, 2)
     ax_alpha.plot(
         xx_alpha0, slope_alpha0 * xx_alpha0 + y_intercept_alpha0, "b", label=r"$\alpha-\alpha_0$"
@@ -194,7 +198,8 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
 
     dynamic_pressure_stall = calc_dynamic_pressure(cas_stall, rho0)
     dynamic_pressure = partial(calc_dynamic_pressure, rho=rho0)(cas)
-    slope, y_intercept, _, _ = stats.theilslopes(F_e, dynamic_pressure, alpha=0.99)
+    # slope, y_intercept, _, _ = stats.theilslopes(F_e, dynamic_pressure, alpha=0.99)
+    slope, y_intercept, _, _, _ = stats.linregress(dynamic_pressure, F_e)
 
     # F_e vs q
     xx_q = np.linspace(dynamic_pressure_stall, max(dynamic_pressure) * 1.05, 2)
@@ -237,5 +242,5 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
     ax_V.invert_yaxis()
 
     format_plot(zeroline=True)
-    save_plot("data/", "elevator_trim_curve")
+    save_plot("data/", "elevator_force_curve")
     plt.show()

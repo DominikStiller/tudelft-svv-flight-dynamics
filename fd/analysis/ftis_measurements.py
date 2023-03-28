@@ -9,6 +9,7 @@ from fd.conversion import (
     degs_to_rads,
 )
 from fd.io import load_ftis_measurements
+from fd.simulation.constants import g
 
 COLUMNS = {
     "vane_AOA": "alpha",
@@ -34,6 +35,8 @@ COLUMNS = {
     "Ahrs1_bPitchRate": "q",
     "Ahrs1_bYawRate": "r",
     "Fms1_trueHeading": "chi",
+    "Ahrs1_bLongAcc": "acc_x",
+    "Ahrs1_bLatAcc": "acc_y",
 }
 
 
@@ -67,6 +70,8 @@ class FTISMeasurements:
         self.df["tas"] = kts_to_ms(self.df["tas"])
         self.df["T_static"] = C_to_K(self.df["T_static"])
         self.df["T_total"] = C_to_K(self.df["T_total"])
+        self.df["acc_x"] = self.df["acc_x"] * g
+        self.df["acc_y"] = self.df["acc_y"] * g
 
         return self.df
 

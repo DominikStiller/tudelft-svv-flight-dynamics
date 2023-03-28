@@ -1,14 +1,8 @@
 import datetime
-import math
 import re
 from typing import Union
 
 import numpy as np
-
-
-def deg_to_rad(deg):
-    """Convert value from degree to radians"""
-    return math.pi / 180 * deg
 
 
 def lbshr_to_kgs(lbshr):

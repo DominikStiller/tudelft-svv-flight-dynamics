@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import numpy as np
+
 from fd.analysis.aerodynamic_plots import (
     plot_elevator_control_force,
     plot_elevator_trim_curve,
@@ -22,6 +24,12 @@ from fd.simulation.constants import (
     duration_dutch_roll_yd,
     duration_aperiodic_roll,
     duration_spiral,
+    lead_spiral,
+    lead_aperiodic_roll,
+    lead_dutch_roll_yd,
+    lead_dutch_roll,
+    lead_short_period,
+    lead_phugoid,
 )
 from fd.structs import AerodynamicParameters
 
@@ -115,36 +123,41 @@ class FlightTest:
 
     @property
     def df_phugoid(self):
-        return self._get_maneuver_df(self.data_sheet.timestamp_phugoid, duration_phugoid)
+        return self._get_maneuver_df(
+            self.data_sheet.timestamp_phugoid, duration_phugoid, lead_phugoid
+        )
 
     @property
     def df_short_period(self):
-        return self._get_maneuver_df(self.data_sheet.timestamp_short_period, duration_short_period)
+        return self._get_maneuver_df(
+            self.data_sheet.timestamp_short_period, duration_short_period, lead_short_period
+        )
 
     @property
     def df_dutch_roll(self):
-        return self._get_maneuver_df(self.data_sheet.timestamp_dutch_roll, duration_dutch_roll)
+        return self._get_maneuver_df(
+            self.data_sheet.timestamp_dutch_roll, duration_dutch_roll, lead_dutch_roll
+        )
 
     @property
     def df_dutch_roll_yd(self):
         return self._get_maneuver_df(
-            self.data_sheet.timestamp_dutch_roll_yd, duration_dutch_roll_yd
+            self.data_sheet.timestamp_dutch_roll_yd, duration_dutch_roll_yd, lead_dutch_roll_yd
         )
 
     @property
     def df_aperiodic_roll(self):
         return self._get_maneuver_df(
-            self.data_sheet.timestamp_aperiodic_roll, duration_aperiodic_roll
+            self.data_sheet.timestamp_aperiodic_roll, duration_aperiodic_roll, lead_aperiodic_roll
         )
 
     @property
     def df_spiral(self):
-        return self._get_maneuver_df(self.data_sheet.timestamp_spiral, duration_spiral)
+        return self._get_maneuver_df(self.data_sheet.timestamp_spiral, duration_spiral, lead_spiral)
 
-    def _get_maneuver_df(self, timestamp: float, duration: float):
+    def _get_maneuver_df(self, timestamp: float, duration: float, lead: float):
         """Get rows from FTIS data corresponding to a certain maneuver, identified by start timestamp and duration"""
-        # Give 1 second lead time and select by duration
-        df = self.df_ftis.loc[timestamp - 1 : timestamp + duration].copy()
-        df.index -= df.index[0]
+        df = self.df_ftis.loc[timestamp - lead : timestamp + duration].copy()
+        df.index = np.round(df.index - df.index[0], 2)
         df["time_min"] -= df["time_min"][0]
         return df

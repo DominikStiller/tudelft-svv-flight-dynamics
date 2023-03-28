@@ -74,7 +74,8 @@ def estimate_CL_alpha(CL: float, alpha: float) -> tuple[float, float, float]:
         CL_alpha_equals0 (float): CL at alpha = 0
         alpha_0 (float): alpha at CL = 0
     """
-    CLalpha, CL_alpha_equals0, _, _ = stats.theilslopes(CL, alpha, alpha=0.99)
+    # CLalpha, CL_alpha_equals0, _, _ = stats.theilslopes(CL, alpha, alpha=0.99)
+    CLalpha, CL_alpha_equals0, _, _, _ = stats.linregress(alpha, CL)
     alpha_0 = -CL_alpha_equals0 / CLalpha
 
     return CLalpha, CL_alpha_equals0, alpha_0
@@ -109,8 +110,8 @@ def estimate_CD0_e(CD: list, CL: list) -> tuple[float, float]:
 
     """
 
-    slope, CD0, _, _ = stats.theilslopes(CD, CL**2, alpha=0.99)
-    # slope, CD0, _, _, _ = stats.linregress(CL**2, CD)
+    # slope, CD0, _, _ = stats.theilslopes(CD, CL**2, alpha=0.99)
+    slope, CD0, _, _, _ = stats.linregress(CL**2, CD)
     e = 1 / (math.pi * constants.A * slope)
 
     return CD0, e
@@ -128,7 +129,8 @@ def estimate_Cmalpha(alpha, delta_e, Cmdelta):
 
     """
 
-    slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    # slope, _, _, _ = stats.theilslopes(delta_e, alpha, alpha=0.99)
+    slope, _, _, _, _ = stats.linregress(alpha, delta_e)
     return -slope * Cmdelta
 
 
