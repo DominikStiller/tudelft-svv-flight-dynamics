@@ -93,6 +93,8 @@ class FlightTest:
         plot_elevator_trim_curve(
             self.df_elevator_trim["delta_e_reduced"],
             self.df_elevator_trim["alpha"],
+            self.df_cg_shift["delta_e_reduced"].iloc[1],
+            self.df_cg_shift["alpha"].iloc[1],
             self.df_elevator_trim["cas_reduced"],
             constants.Cm0,
             self.aerodynamic_parameters.C_m_delta,

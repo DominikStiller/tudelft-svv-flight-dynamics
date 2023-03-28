@@ -119,6 +119,8 @@ def plot_delta_e_V_inv_squared(
 def plot_elevator_trim_curve(
     delta_e,
     alpha,
+    delta_e_front,
+    alpha_front,
     cas,
     C_m_0,
     C_m_delta_e,
@@ -147,7 +149,6 @@ def plot_elevator_trim_curve(
     slope_alpha, y_intercept_alpha, _, _, _ = stats.linregress(alpha, delta_e)
     xx_alpha = np.linspace(0, max(alpha) * 1.05, 2)
     ax_alpha.plot(xx_alpha, slope_alpha * xx_alpha + y_intercept_alpha, "r", label=r"$\alpha$")
-    ax_alpha.scatter(alpha, delta_e, marker="x", color="black", s=50)
 
     # Delta_e vs alpha - alpha0
     alpha0 = (y_intercept_V_inv_sq - y_intercept_alpha) / slope_alpha
@@ -160,6 +161,10 @@ def plot_elevator_trim_curve(
     ax_alpha.scatter(alpha - alpha0, delta_e, marker="x", color="black", s=50)
     ax_alpha.set_xlabel(r"$\alpha$ [rad]")
     ax_alpha.set_ylabel(r"$\delta_e^*$ [rad]")
+
+    ax_alpha.scatter(alpha, delta_e, marker="x", color="black", s=50, label="Regular CG")
+    ax_alpha.scatter(alpha_front, delta_e_front, color="r", marker="x", s=50, label="Forward CG")
+
     ax_alpha.legend()
 
     # Delta_e vs V
@@ -219,7 +224,7 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
     ax_q.legend()
 
     # F_e vs V
-    xx_V = np.linspace(cas_stall, 120, 100)
+    xx_V = np.linspace(cas_stall, 95, 100)
     ax_V.plot(
         xx_V,
         y_intercept + slope * partial(calc_dynamic_pressure, rho=rho0)(xx_V),
