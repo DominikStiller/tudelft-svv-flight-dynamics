@@ -5,6 +5,7 @@ from math import pi
 from fd.analysis.flight_test import FlightTest
 from fd.plotting import format_plot
 from fd.simulation.simulation import Simulation
+from fd.plotting import save_plot
 
 
 class SimulatedMeasuredComparison:
@@ -31,8 +32,18 @@ class SimulatedMeasuredComparison:
         )
 
     def plot_responses(self):
+        self.plot_phugoid_full()
+        self.plot_phugoid()
         self.plot_short_period_full()
-        # self.plot_phugoid()
+        self.plot_short_period()
+        self.plot_spiral_full()
+        self.plot_spiral()
+        self.plot_dutch_roll_full()
+        self.plot_dutch_roll()
+        self.plot_dutch_roll_yd_full()
+        self.plot_dutch_roll_yd()
+        self.plot_aperiodic_roll_full()
+        self.plot_aperiodic_roll()
 
     def plot_dutch_roll(self):
         fig, (ax_p, ax_r) = plt.subplots(2, 1, figsize=(12, 6))
@@ -62,6 +73,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "dutch_roll")
         plt.show()
 
     def plot_dutch_roll_full(self):
@@ -111,6 +123,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "dutch_roll_full")
         plt.show()
 
     def plot_dutch_roll_yd(self):
@@ -141,6 +154,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "dutch_roll_yd")
         plt.show()
 
     def plot_dutch_roll_yd_full(self):
@@ -167,29 +181,30 @@ class SimulatedMeasuredComparison:
         ax_phi.legend()
 
         ax_p.plot(
-            self.simulated_dutch_roll.index,
+            self.simulated_dutch_roll_yd.index,
             self.simulated_dutch_roll_yd["p"] * 180 / pi,
             label="Simulated",
         )
         ax_p.plot(
-            self.flight_test.df_dutch_roll.index,
+            self.flight_test.df_dutch_roll_yd.index,
             self.flight_test.df_dutch_roll_yd["p"] * 180 / pi,
             label="Measured",
         )
         ax_p.set_ylabel("Roll rate $p$ [°/s]")
 
         ax_r.plot(
-            self.simulated_dutch_roll.index,
+            self.simulated_dutch_roll_yd.index,
             self.simulated_dutch_roll_yd["r"] * 180 / pi,
         )
         ax_r.plot(
-            self.flight_test.df_dutch_roll.index,
+            self.flight_test.df_dutch_roll_yd.index,
             self.flight_test.df_dutch_roll_yd["r"] * 180 / pi,
         )
         ax_r.set_xlabel("Time [s]")
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "dutch_roll_yd_full")
         plt.show()
 
     def plot_aperiodic_roll(self):
@@ -220,6 +235,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "aperiodic_roll")
         plt.show()
 
     def plot_aperiodic_roll_full(self):
@@ -269,6 +285,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "aperiodic_roll_full")
         plt.show()
 
     def plot_spiral(self):
@@ -299,6 +316,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "spiral")
         plt.show()
 
     def plot_spiral_full(self):
@@ -344,6 +362,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Yaw rate $r$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "spiral_full")
         plt.show()
 
     def plot_phugoid(self):
@@ -374,6 +393,7 @@ class SimulatedMeasuredComparison:
         ax_r.set_ylabel("Pitch rate $q$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "phugoid")
         plt.show()
 
     def plot_phugoid_full(self):
@@ -424,6 +444,7 @@ class SimulatedMeasuredComparison:
         ax_q.set_ylabel("Pitch rate $q$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "phugoid_full")
         plt.show()
 
     def plot_short_period(self):
@@ -454,6 +475,7 @@ class SimulatedMeasuredComparison:
         ax_q.set_ylabel("Pitch rate $q$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "short_period")
         plt.show()
 
     def plot_short_period_full(self):
@@ -504,4 +526,5 @@ class SimulatedMeasuredComparison:
         ax_q.set_ylabel("Pitch rate $q$ [°/s]")
 
         format_plot()
+        save_plot("C:\SVV\Results_final", "short_period_full")
         plt.show()

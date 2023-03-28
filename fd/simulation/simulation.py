@@ -144,10 +144,7 @@ class Simulation:
         state0 = np.array([0, 0, 0, 0])  # np.array([u_hat0, alpha0, theta0, q0])
 
         A, B, C, D = self.model.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
-        print(np.linalg.eig(A)[0])
-        print(np.linalg.eig(A)[1])
         sys = ml.ss(A, B, C, D)
-        print(self.model.get_eigenvalues_and_eigenvectors(A)[0])
         yout, t, xout = ml.lsim(sys, input, t, state0)
         yout += np.array([u_hat0, alpha0, theta0, q0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
@@ -171,10 +168,7 @@ class Simulation:
         state0 = np.array([0, 0, 0, 0])  # np.array([u_hat0, alpha0, theta0, q0])
 
         A, B, C, D = self.model.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
-        print(np.linalg.eig(A)[0])
-        print(np.linalg.eig(A)[1])
         sys = ml.ss(A, B, C, D)
-        print(self.model.get_eigenvalues_and_eigenvectors(A)[0])
         yout, t, xout = ml.lsim(sys, input, t, state0)
         yout += np.array([u_hat0, alpha0, theta0, q0])
         result = np.hstack((np.transpose(t).reshape((len(t), 1)), yout))
@@ -187,20 +181,20 @@ if __name__ == "__main__":
     sim = Simulation(
         AircraftModel(
             AerodynamicParameters(
-                C_L_alpha=4.758556374647304,
-                alpha_0=-0.023124783070063493,
-                C_D_0=0.023439123324849084,
-                # C_m_alpha=-0.5554065208385275,
-                C_m_alpha=-0.5,
-                C_m_delta=-1.3380975545274032,
-                e=1.0713238368125688,
+                C_L_alpha=4.554563959995982,
+                alpha_0=-0.01761409899012749,
+                C_D_0=0.021751219725363168,
+                C_m_alpha=-0.542023763280942,
+                # C_m_alpha=-0.5,
+                C_m_delta=-1.2081152660084742,
+                e=0.8551746350325393,
             )
         )
     )
-    df = FlightTest("data/B24").df_phugoid
-    df_out = sim.simulate_phugoid(df)
+    df = FlightTest("data/B24").df_aperiodic_roll
+    df_out = sim.simulate_aperiodic_roll(df)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-
+    """
     y1 = "tas"
     y2 = "alpha"
     y3 = "theta"
@@ -210,11 +204,10 @@ if __name__ == "__main__":
     y2 = "phi"
     y3 = "p"
     y4 = "r"
-    """
 
-    ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
-    # ax1.plot(df_out.index, df_out[y1])
-    ax1.plot(df_out.index, df[y1], color="black")
+    # ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
+    ax1.plot(df_out.index, df_out[y1])
+    # ax1.plot(df_out.index, df[y1], color="black")
     ax1.set_ylabel(y1)
     ax2.plot(df_out.index, df_out[y2])
     ax2.plot(df_out.index, df[y2], color="black")

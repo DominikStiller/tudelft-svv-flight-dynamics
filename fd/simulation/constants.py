@@ -57,20 +57,26 @@ fuel_flow_standard = 0.048  # [kg/s]
 
 # Stability derivatives
 # CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
-CXu = -0.09500
+# CXu = -0.09500
+CXu = -0.15
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-CZu = -0.37616
-CZa = -5.74340
-CZadot = -0.00350
+# CZu = -0.37616
+CZu = -0.45
+# CZa = -5.74340
+# CZa = -5.5
+CZa = -6
+# CZadot = -0.00350
+CZadot = -0.005
 CZq = -5.66290
 CZde = -0.69612
 
 Cm0 = +0.0297
-Cmu = +0.06990
+# Cmu = +0.06990
+Cmu = 0.1
 Cmadot = +0.17800
 Cmq = -8.79415
 CmTc = -0.0064
@@ -82,18 +88,26 @@ CYr = +0.8495
 CYda = -0.0400
 CYdr = +0.2300
 
-Clb = -0.10260
-Clb = -0.13
-Clp = -0.71085
-Clr = +0.23760
-Clda = -0.23088
-Cldr = +0.03440
+# Clb = -0.10260
+Clb = -0.07
+# Clp = -0.71085
+Clp = -0.55
+# Clr = +0.23760
+Clr = 0.2
+# Clda = -0.23088
+Clda = -0.3
+# Cldr = +0.03440
+Cldr = 0.039
 
-Cnb = +0.1348
+# Cnb = +0.1348
+Cnb = 0.12
 Cnbdot = 0
-Cnp = -0.0602
-Cnr = -0.2061
-Cnda = -0.0120
+# Cnp = -0.0602
+Cnp = -0.1
+# Cnr = -0.2061
+Cnr = -0.3
+# Cnda = -0.0120
+Cnda = -0.03
 Cndr = -0.0939
 
 # Durations of the eigenmotions
@@ -112,3 +126,5 @@ lead_dutch_roll = 2  # [s]
 lead_dutch_roll_yd = 3  # [s]
 lead_aperiodic_roll = 1  # [s]
 lead_spiral = 5  # [s]
+
+print(Clb * Cnr - Cnb * Clr)
