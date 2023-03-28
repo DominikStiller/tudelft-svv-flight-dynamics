@@ -16,7 +16,7 @@ class Simulation:
     def __init__(self, model: AircraftModel):
         self.model = model
 
-    def simulate_asymmetric(self, data, flip_input) -> DataFrame:
+    def simulate_asymmetric(self, data, flip_input=False) -> DataFrame:
         t = data.index
 
         delta_a = data["delta_a"] - data["delta_a"].iloc[0]
