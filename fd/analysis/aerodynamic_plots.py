@@ -217,7 +217,6 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
     ax_q.set_xlabel(r"$\frac{1}{2}\rho_0 \tilde V_e^2$ [Pa]")
     ax_q.set_ylabel(r"$F_e^*$ [N]")
     ax_q.legend()
-    ax_q.invert_yaxis()
 
     # F_e vs V
     xx_V = np.linspace(cas_stall, 120, 100)
