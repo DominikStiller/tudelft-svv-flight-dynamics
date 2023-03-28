@@ -4,8 +4,10 @@ import control.matlab as ml
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.linalg as alg
+import pandas as pd
 from numpy.typing import ArrayLike
 
+from fd.analysis.aerodynamics import calc_CL
 from fd.simulation.constants import *
 from fd.structs import AerodynamicParameters
 
@@ -48,6 +50,16 @@ class AircraftModel:
         CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
         CZ0 = -W * cos(th0) / (0.5 * rho * V0**2 * S)
         return CX0, CZ0
+
+    def get_state_space_matrices_symmetric_from_df(self, data: pd.DataFrame):
+        m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
+        V0 = data["tas"].iloc[0]
+        rho0 = data["rho"].iloc[0]
+        theta0 = data["theta"].iloc[0]
+
+        ABCD = self.get_state_space_matrices_symmetric(m, V0, rho0, theta0)
+
+        return ABCD
 
     def get_state_space_matrices_symmetric(
         self, m: float, V0: float, rho: float, th0: float
@@ -98,6 +110,17 @@ class AircraftModel:
         C = np.eye(4)
         D = np.zeros((4, 1))
         return A, B, C, D
+
+    def get_state_space_matrices_asymmetric_from_df(self, data: pd.DataFrame):
+        m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
+        V0 = data["tas"].iloc[0]
+        rho0 = data["rho"].iloc[0]
+        theta0 = data["theta"].iloc[0]
+        CL = calc_CL(data["W"].iloc[0] * np.cos(theta0), V0, rho0)
+
+        ABCD = self.get_state_space_matrices_asymmetric(m, V0, rho0, theta0, CL)
+
+        return ABCD
 
     def get_state_space_matrices_asymmetric(
         self, m: float, V0: float, rho: float, th0: float, CL: float
