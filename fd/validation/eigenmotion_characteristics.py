@@ -13,6 +13,8 @@ def time_constant_aperiodic_roll(eig: complex, Ve):
     Returns:
         time constant
     """
+    if abs(eig.imag) > 0:
+        print(f"WARNING: aperiodic roll eigenvalue should be real, is {eig}")
     tau = -(1 / eig.real) * (c / Ve)
     return tau
 
@@ -27,6 +29,8 @@ def time_constant_spiral(eig: complex, Ve):
     Returns:
         Time constant
     """
+    if abs(eig.imag) > 0:
+        print(f"WARNING: spiral eigenvalue should be real, is {eig}")
     tau = -(1 / eig.real) * (c / Ve)
     return tau
 

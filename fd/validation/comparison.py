@@ -14,7 +14,7 @@ class SimulatedMeasuredComparison:
         self.simulation = simulation
 
     def run_simulations(self):
-        self.simulated_dutch_roll = self.simulation.simulate_dutch_roll(
+        self.simulated_dutch_roll = self.simulation.simulate_symmetric(
             self.flight_test.df_dutch_roll
         )
 
