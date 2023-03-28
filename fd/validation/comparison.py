@@ -33,17 +33,17 @@ class SimulatedMeasuredComparison:
 
     def plot_responses(self):
         self.plot_phugoid_full()
-        # self.plot_phugoid()
-        # self.plot_short_period_full()
-        # self.plot_short_period()
-        # self.plot_spiral_full()
-        # self.plot_spiral()
-        # self.plot_dutch_roll_full()
-        # self.plot_dutch_roll()
-        # self.plot_dutch_roll_yd_full()
-        # self.plot_dutch_roll_yd()
-        # self.plot_aperiodic_roll_full()
-        # self.plot_aperiodic_roll()
+        self.plot_phugoid()
+        self.plot_short_period_full()
+        self.plot_short_period()
+        self.plot_spiral_full()
+        self.plot_spiral()
+        self.plot_dutch_roll_full()
+        self.plot_dutch_roll()
+        self.plot_dutch_roll_yd_full()
+        self.plot_dutch_roll_yd()
+        self.plot_aperiodic_roll_full()
+        self.plot_aperiodic_roll()
         print("Done")
 
     def plot_dutch_roll(self):

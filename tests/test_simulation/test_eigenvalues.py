@@ -155,12 +155,66 @@ class TestEigenvalues(unittest.TestCase):
         eig1 = model.get_spiral_eigenvalues(m, rho, V0, CL, A)
         eigenvalues1 = -0.0108 * V0 / b
         self.assertAlmostEqual(eig1, eigenvalues1)
+    def test_Routh_symm(self):
+        A_prim = 4 * muc ** 2 * KY2 * (CZadot - 2 * muc)
+        B_prim = (
+                Cmadot * 2 * muc * (CZq + 2 * muc)
+                - Cmq * 2 * muc * (CZadot - 2 * muc)
+                - 2 * muc * KY2 * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
+        )
+        C_prim = (
+                Cma * 2 * muc * (CZq + 2 * muc)
+                - Cmadot * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
+                + Cmq * (CXu * (CZadot - 2 * muc) - 2 * muc * CZa)
+                + 2 * muc * KY2 * (CXa * CZu - CZa * CXu)
+        )
+        D_prim = (
+                Cmu * (CXa * (CZq + 2 * muc) - CZ0 * (CZadot - 2 * muc))
+                - Cma * (2 * muc * CX0 + CXu * (CZq + 2 * muc))
+                + Cmadot * (CX0 * CXu - CZ0 * CZu)
+                + Cmq * (CXu * CZa - CZu * CXa)
+        )
+        E_prim = -Cmu * (CX0 * CXa + CZ0 * CZa) + Cma * (CX0 * CXu + CZ0 * CZu)
+        R = B_prim*C_prim*D_prim - A_prim*D_prim**2 - B_prim**2*E_prim
+        np.testing.assert_equal(R>0, True)
+
+    def test_Routh_asymm(self):
+        A_prim = 16 * mub ** 3 * (KX2 * KZ2 - KXZ ** 2)
+        B_prim = (
+                -4
+                * mub ** 2
+                * (2 * CYb * (KX2 * KZ2 - KXZ ** 2) + Cnr * KX2 + Clp * KZ2 + (Clr + Cnp) * KXZ)
+        )
+        C_prim = (
+                2
+                * mub
+                * (
+                        (CYb * Cnr - CYr * Cnb) * KX2
+                        + (CYb * Clp - Clb * CYp) * KZ2
+                        + ((CYb * Cnp - Cnb * CYp) + (CYb * Clr - Clb * CYr)) * KXZ
+                        + 4 * mub * Cnb * KX2
+                        + 4 * mub * Clb * KXZ
+                        + 0.5 * (Clp * Cnr - Cnp * Clr)
+                )
+        )
+        D_prim = (
+                -4 * mub * CL * (Clb * KZ2 + Cnb * KXZ)
+                + 2 * mub * (Clb * Cnp - Cnb * Clp)
+                + 0.5 * CYb * (Clr * Cnp - Cnr * Clp)
+                + 0.5 * CYp * (Clb * Cnr - Cnb * Clr)
+                + 0.5 * CYr * (Clp * Cnb - Cnp * Clb)
+        )
+        E_prim = CL * (Clb * Cnr - Cnb * Clr)
+        R = B_prim * C_prim * D_prim - A_prim * D_prim ** 2 - B_prim ** 2 * E_prim
+        np.testing.assert_equal(R > 0, True)
+
+
 
     @skip
     def test_analytic_eigenvalues_symmetric(self):
         # In order to perform this test you need to:
         # 1. Change the imported constants file in aircraft model with the ones for cessna Ce500
-        # 2. Comment any muc, Cx0 and Cz0 calculation out from the aircraft model
+        # 2. Comment any mub calculation out from the aircraft model
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
         aero_params.C_m_delta = -1.5530

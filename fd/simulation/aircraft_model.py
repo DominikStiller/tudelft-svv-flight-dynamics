@@ -96,7 +96,7 @@ class AircraftModel:
         )
         C_2 = np.array(
             [
-                [CXu, CXa, CZ0, CXq * c / V0],
+                [CXu, CXa, CZ0, 0],
                 [CZu, CZa, -CX0, (CZq + 2 * muc) * c / V0],
                 [0, 0, 0, c / V0],
                 [Cmu, Cma, 0, Cmq * c / V0],
@@ -241,6 +241,8 @@ class AircraftModel:
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
+        E_prim = CL * (Clb * Cnr - Cnb * Clr)
+        print("E = ", E_prim)
         return A, B, C, D
 
     def get_eigenvalues_and_eigenvectors(self, A: ArrayLike):
