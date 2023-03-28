@@ -16,12 +16,14 @@ class Simulation:
     def __init__(self, model: AircraftModel):
         self.model = model
 
-    def simulate_asymmetric(self, data) -> DataFrame:
+    def simulate_asymmetric(self, data, flip_input) -> DataFrame:
         t = data.index
 
-        delta_a = -(data["delta_a"] - data["delta_a"].iloc[0])
-        delta_r = -(data["delta_r"] - data["delta_a"].iloc[0])
+        delta_a = data["delta_a"] - data["delta_a"].iloc[0]
+        delta_r = data["delta_r"] - data["delta_a"].iloc[0]
         input = np.column_stack((delta_a, delta_r))
+        if flip_input:
+            input *= -1
 
         phi0 = data["phi"].iloc[0]
         p0 = data["p"].iloc[0]
