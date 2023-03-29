@@ -207,6 +207,7 @@ class AircraftModel:
                 ],
             ]
         )
+        print(np.linalg.eig(A)[0])
         B = np.array(
             [
                 [V0 / b * CYda / 2 / mub, V0 / b * CYdr / 2 / mub],
@@ -241,6 +242,8 @@ class AircraftModel:
         # In order to get the state variables as output:
         C = np.eye(4)
         D = np.zeros((4, 2))
+        E_prim = CL * (Clb * Cnr - Cnb * Clr)
+        print("E = ", E_prim)
         return A, B, C, D
 
     def get_eigenvalues_and_eigenvectors(self, A: ArrayLike):

@@ -57,26 +57,20 @@ fuel_flow_standard = 0.048  # [kg/s]
 
 # Stability derivatives
 # CX0 = W * sin(th0) / (0.5 * rho * V0**2 * S)
-# CXu = -0.09500
-CXu = -0.15
+CXu = -0.09500
 CXa = +0.47966  # Positive, see FD lecture notes
 CXadot = +0.08330
 CXq = -0.28170
 CXde = -0.03728
 
-# CZu = -0.37616
-CZu = -0.45
-# CZa = -5.74340
-# CZa = -5.5
-CZa = -6
-# CZadot = -0.00350
-CZadot = -0.005
+CZu = -0.37616
+CZa = -5.74340
+CZadot = -0.00350
 CZq = -5.66290
 CZde = -0.69612
 
 Cm0 = +0.0297
-# Cmu = +0.06990
-Cmu = 0.1
+Cmu = +0.06990
 Cmadot = +0.17800
 Cmq = -8.79415
 CmTc = -0.0064
@@ -88,25 +82,18 @@ CYr = +0.8495
 CYda = -0.0400
 CYdr = +0.2300
 
-# Clb = -0.10260
+Clb = -0.10260
 Clb = -0.13
-# Clp = -0.71085
-Clp = -0.85
-# Clr = +0.23760
-Clr = 0.17
-# Clda = -0.23088
-Clda = -0.3
+Clp = -0.71085
+Clr = +0.23760
+Clda = -0.23088
 Cldr = +0.03440
 
-# Cnb = +0.1348
-Cnb = 0.114
+Cnb = +0.1348
 Cnbdot = 0
-# Cnp = -0.0602
-Cnp = -0.0902
-# Cnr = -0.2061
-Cnr = -0.3
-# Cnda = -0.0120
-Cnda = -0.07
+Cnp = -0.0602
+Cnr = -0.2061
+Cnda = -0.0120
 Cndr = -0.0939
 
 # Durations of the eigenmotions
