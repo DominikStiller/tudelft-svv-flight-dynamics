@@ -40,7 +40,7 @@ class TestEigenvalues(unittest.TestCase):
         eigenvalues, eigenvectors = model.get_eigenvalues_and_eigenvectors(A)
         first = eigenvalues[0] < 0
         second = eigenvalues[1] == np.conj(eigenvalues[2])
-        third = eigenvalues[3] > 0
+        third = eigenvalues[3] < 0
 
         self.assertTupleEqual((first, second, third), (True, True, True))
 
