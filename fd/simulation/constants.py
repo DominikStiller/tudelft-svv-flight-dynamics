@@ -3,6 +3,5 @@
 # from fd.simulation.constants_init import *
 
 from fd.simulation.constants_improved import *
-#from tests.test_simulation.constants_Cessna_Ce500 import *
 
-
+# from tests.test_simulation.constants_Cessna_Ce500 import *

@@ -207,6 +207,7 @@ class AircraftModel:
                 ],
             ]
         )
+        print(np.linalg.eig(A)[0])
         B = np.array(
             [
                 [V0 / b * CYda / 2 / mub, V0 / b * CYdr / 2 / mub],
