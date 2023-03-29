@@ -6,6 +6,7 @@ This is the repository for the TU Delft [AE3212-II](https://studiegids.tudelft.n
 Links:
 * See the [developer's guidelines](docs/CONTRIBUTING.md) if you want to contribute
 * See the [assignment](docs/assignment.pdf) for a description of the tasks
+* See the [report](docs/report.pdf) for the results
 
 
 ## Setup
