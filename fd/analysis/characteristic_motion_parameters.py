@@ -31,7 +31,6 @@ def time_constant_spiral(eig, Ve):
 
 
 def characteristics_dutch_roll(imag_eig, real_eig, Ve):
-
     """
     Calculating the period and time to damp to half amplitude for the Dutch roll
     Args:
@@ -48,7 +47,6 @@ def characteristics_dutch_roll(imag_eig, real_eig, Ve):
 
 
 def characteristics_phugoid(imag_eig, real_eig, Ve):
-
     """
     Calculating the period and time to damp to half amplitude for the Dutch roll
     Args:
