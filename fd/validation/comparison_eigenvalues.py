@@ -30,7 +30,7 @@ class EigenvalueComparison:
         eigs, _ = self.model.get_eigenvalues_and_eigenvectors(A)
         eig_phugoid = eigs[2]
         P, T_half = characteristics_phugoid(eig_phugoid)
-        print(f"Phugoid (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s")
+        print(f"Phugoid (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s, {eig_phugoid}")
 
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         V0 = data["tas"].iloc[0]
@@ -46,7 +46,9 @@ class EigenvalueComparison:
         eigs, _ = self.model.get_eigenvalues_and_eigenvectors(A)
         eig_short_period = eigs[0]
         P, T_half = characteristics_short_period(eig_short_period)
-        print(f"Short period (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s")
+        print(
+            f"Short period (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s, {eig_short_period}"
+        )
 
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         V0 = data["tas"].iloc[0]
@@ -61,7 +63,7 @@ class EigenvalueComparison:
         eigs, _ = self.model.get_eigenvalues_and_eigenvectors(A)
         eig_dutch_roll = eigs[1]
         P, T_half = characteristics_dutch_roll(eig_dutch_roll)
-        print(f"Dutch roll (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s")
+        print(f"Dutch roll (simulated): P = {P:.3f} s, T_half = {T_half:.3f} s, {eig_dutch_roll}")
 
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         V0 = data["tas"].iloc[0]
@@ -75,14 +77,14 @@ class EigenvalueComparison:
         A, _, _, _ = self.model.get_state_space_matrices_asymmetric_from_df(data)
         eigs, _ = self.model.get_eigenvalues_and_eigenvectors(A)
         eig_aperiodic_roll = eigs[0]
-        tau = time_constant_aperiodic_roll(eig_aperiodic_roll)
-        print(f"Aperiodic roll (simulated): tau = {tau:.3f}")
+        V0 = data["tas"].iloc[0]
+        tau = time_constant_aperiodic_roll(eig_aperiodic_roll, V0)
+        print(f"Aperiodic roll (simulated): tau = {tau:.3f}, {eig_aperiodic_roll}")
 
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
-        V0 = data["tas"].iloc[0]
         rho0 = data["rho"].iloc[0]
         eig_aperiodic_roll = self.model.get_idealized_aperiodicroll_eigenvalues(m, rho0, V0)
-        tau = time_constant_aperiodic_roll(eig_aperiodic_roll)
+        tau = time_constant_aperiodic_roll(eig_aperiodic_roll, V0)
         print(f"Aperiodic roll (idealized): tau = {tau:.3f}")
 
     def _compare_spiral(self):
@@ -91,7 +93,7 @@ class EigenvalueComparison:
         eigs, _ = self.model.get_eigenvalues_and_eigenvectors(A)
         eig_spiral = eigs[3]
         tau = time_constant_spiral(eig_spiral)
-        print(f"Spiral (simulated): tau = {tau:.3f}")
+        print(f"Spiral (simulated): tau = {tau:.3f}, {eig_spiral}")
 
         m = (data["m"].iloc[0] + data["m"].iloc[-1]) / 2
         V0 = data["tas"].iloc[0]

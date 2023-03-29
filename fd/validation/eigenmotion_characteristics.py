@@ -3,7 +3,7 @@ import numpy as np
 from fd.simulation.constants import *
 
 
-def time_constant_aperiodic_roll(eig: complex):
+def time_constant_aperiodic_roll(eig: complex, V0):
     """
     Calculating time constant for the aperiodic roll
     Args:
