@@ -66,23 +66,26 @@ class Simulation:
 
 
 if __name__ == "__main__":
-    sim = Simulation(
-        AircraftModel(
-            AerodynamicParameters(
-                C_L_alpha=4.758556374647304,
-                alpha_0=-0.023124783070063493,
-                C_D_0=0.023439123324849084,
-                # C_m_alpha=-0.5554065208385275,
-                C_m_alpha=-0.5,
-                C_m_delta=-1.3380975545274032,
-                e=1.0713238368125688,
-            )
-        )
-    )
-    df = FlightTest("data/B24").df_short_period
-    df_out = sim.simulate_asymmetric(df)
+    # sim = Simulation(
+    #     AircraftModel(
+    #         AerodynamicParameters(
+    #             C_L_alpha=4.758556374647304,
+    #             alpha_0=-0.023124783070063493,
+    #             C_D_0=0.023439123324849084,
+    #             # C_m_alpha=-0.5554065208385275,
+    #             C_m_alpha=-0.5,
+    #             C_m_delta=-1.3380975545274032,
+    #             e=1.0713238368125688,
+    #         )
+    #     )
+    # )
+    ft = FlightTest("data/B24")
+    df = ft.df_spiral
+    aircraft_model = AircraftModel(ft.aerodynamic_parameters)
+    sim = Simulation(aircraft_model)
+    df_out = sim.simulate_asymmetric(df, flip_input=False)
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1)
-
+    """
     y1 = "tas"
     y2 = "alpha"
     y3 = "theta"
@@ -92,18 +95,17 @@ if __name__ == "__main__":
     y2 = "phi"
     y3 = "p"
     y4 = "r"
-    """
 
-    ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
-    # ax1.plot(df_out.index, df_out[y1])
-    ax1.plot(df_out.index, df[y1], color="black")
+    # ax1.plot(df_out.index, df_out["u_hat"] * df["tas"].iloc[0] + df["tas"].iloc[0])
+    ax1.plot(df_out.index, df_out[y1])
+    # ax1.plot(df_out.index, df[y1], color="black")
     ax1.set_ylabel(y1)
     ax2.plot(df_out.index, df_out[y2])
     ax2.plot(df_out.index, df[y2], color="black")
     # ax2.set_ylim(-0.2, 2.7)
     ax2.set_ylabel(y2)
-    ax3.plot(df_out.index, df["delta_e"])
-    # ax3.plot(df_out.index, df[y3], color="black")
+    ax3.plot(df_out.index, df_out[y3])
+    ax3.plot(df_out.index, df[y3], color="black")
     # ax3.set_ylim(-0.3, 0.25)
     ax3.set_ylabel(y3)
     ax4.plot(df_out.index, df_out[y4])
