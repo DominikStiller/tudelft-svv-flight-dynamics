@@ -120,6 +120,9 @@ def plot_elevator_trim_curve(
     delta_e,
     alpha,
     cas,
+    delta_e_front,
+    alpha_front,
+    cas_front,
     C_m_0,
     C_m_delta_e,
     cas_stall,
@@ -147,7 +150,6 @@ def plot_elevator_trim_curve(
     slope_alpha, y_intercept_alpha, _, _, _ = stats.linregress(alpha, delta_e)
     xx_alpha = np.linspace(0, max(alpha) * 1.05, 2)
     ax_alpha.plot(xx_alpha, slope_alpha * xx_alpha + y_intercept_alpha, "r", label=r"$\alpha$")
-    ax_alpha.scatter(alpha, delta_e, marker="x", color="black", s=50)
 
     # Delta_e vs alpha - alpha0
     alpha0 = (y_intercept_V_inv_sq - y_intercept_alpha) / slope_alpha
@@ -160,12 +162,17 @@ def plot_elevator_trim_curve(
     ax_alpha.scatter(alpha - alpha0, delta_e, marker="x", color="black", s=50)
     ax_alpha.set_xlabel(r"$\alpha$ [rad]")
     ax_alpha.set_ylabel(r"$\delta_e^*$ [rad]")
+
+    ax_alpha.scatter(alpha, delta_e, marker="x", color="black", s=50, label="Regular CG")
+    ax_alpha.scatter(alpha_front, delta_e_front, color="r", marker="x", s=50, label="Forward CG")
+
     ax_alpha.legend()
 
     # Delta_e vs V
     xx_V = np.linspace(0.95 * cas_stall, 200, 100)
     ax_V.plot(xx_V, y_intercept_V_inv_sq + slope_V_inv_sq * 1 / xx_V**2, "r")
     ax_V.scatter(cas, delta_e, marker="x", color="black", s=50)
+    ax_V.scatter(cas_front, delta_e_front, color="r", marker="x", s=50)
     ax_V.axvline(x=cas_stall, color="b", linestyle="--", label="$V_{stall}$")
     ax_V.axhline(
         y=delta_e_asymptote,
@@ -217,10 +224,9 @@ def plot_elevator_control_force(F_e, cas, cas_stall):
     ax_q.set_xlabel(r"$\frac{1}{2}\rho_0 \tilde V_e^2$ [Pa]")
     ax_q.set_ylabel(r"$F_e^*$ [N]")
     ax_q.legend()
-    ax_q.invert_yaxis()
 
     # F_e vs V
-    xx_V = np.linspace(cas_stall, 120, 100)
+    xx_V = np.linspace(cas_stall, 95, 100)
     ax_V.plot(
         xx_V,
         y_intercept + slope * partial(calc_dynamic_pressure, rho=rho0)(xx_V),

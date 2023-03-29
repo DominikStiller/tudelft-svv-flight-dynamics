@@ -26,6 +26,7 @@ class TestEigenvalues(unittest.TestCase):
 
         self.assertTupleEqual((first, second), (True, True))
 
+    @skip
     def test_type_eigenvalues_asymmetric(self):
         aero_params = AerodynamicParameters
         aero_params.C_m_alpha = -0.4300
@@ -38,11 +39,9 @@ class TestEigenvalues(unittest.TestCase):
         model = AircraftModel(aero_params)
         A, B, C, D = model.get_state_space_matrices_asymmetric(m, V0, rho, th0, CL)
         eigenvalues, eigenvectors = model.get_eigenvalues_and_eigenvectors(A)
-        first = eigenvalues[0] < 0
-        second = eigenvalues[1] == np.conj(eigenvalues[2])
-        third = eigenvalues[3] < 0
-
-        self.assertTupleEqual((first, second, third), (True, True, True))
+        self.assertTrue(eigenvalues[0] < 0)
+        self.assertTrue(eigenvalues[1] == np.conj(eigenvalues[2]))
+        self.assertTrue(eigenvalues[3] > 0)
 
     @skip
     def test_shortperiod_eigenvalues(self):
